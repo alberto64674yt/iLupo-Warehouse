@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iLupo Warehouse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>iLupo Warehouse</h1>
+        <p class="subtitle">Portfolio de Herramientas y Creaciones</p>
+    </header>
+    <main id="portfolio-grid"></main>
+
+    <script>
+        function renderContent(proyectos) {
+            const grid = document.getElementById('portfolio-grid');
+            grid.innerHTML = '';
+
+            if (!proyectos || proyectos.length === 0) {
+                grid.innerHTML = '<p class="empty-message">No hay proyectos para mostrar.</p>';
+                return;
+            }
+
+            proyectos.slice().reverse().forEach(proyecto => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                let descripcionHtml = marked.parse(proyecto.descripcion || '');
+                
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
+                descripcionHtml = descripcionHtml.replace(youtubeRegex, (match, videoId) => {
+                    return `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+                });
+
+                const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
+                descripcionHtml = descripcionHtml.replace(downloadImgRegex, (match, imgUrl, downloadUrl) => {
+                    return `<a href="${downloadUrl}" class="download-image-link" target="_blank" title="Descargar"><img src="${imgUrl}" alt="Imagen de descarga"/></a>`;
+                });
+                
+                card.innerHTML = `
+                    <a href="${proyecto.enlace || '#'}" class="card-image-link" target="_blank">
+                        <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
+                    </a>
+                    <div class="card-content">
+                        <h2>${proyecto.titulo}</h2>
+                        <div class="description">${descripcionHtml}</div>
+                        ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button" target="_blank">Visitar Enlace</a>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- ESTA ES LA PARTE CORREGIDA ---
+        // Usamos fetch para cargar el JSON, que es la forma correcta.
+        fetch('proyectos.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No se pudo cargar proyectos.json");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Guardamos los datos en una variable global para que el panel pueda usarlos si es necesario
+                window.proyectos = data; 
+                renderContent(window.proyectos);
+            })
+            .catch(error => {
+                console.error("Error al cargar los proyectos:", error);
+                document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>';
+            });
+        
+        // Escuchar mensajes del panel para la previsualización en vivo
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'previewUpdate') {
+                renderContent(event.data.payload);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control - iLupo Warehouse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="panel-layout">
+    <div class="editor-pane">
+        <div id="admin-panel">
+            <h1>Panel de Control</h1>
+            <div class="form-container">
+                <h3>Añadir Nuevo Proyecto</h3>
+                <input type="text" id="titulo" placeholder="Título del proyecto" oninput="updatePreview()">
+                <textarea id="descripcion" placeholder="Descripción (soporta Markdown)" oninput="updatePreview()"></textarea>
+                <div class="markdown-ayuda">
+                    <p><b>Ayuda:</b> **negrita**, *cursiva*, [enlace](url), `https://link.youtube.com`, `[IMAGEN-DESCARGA](url_imagen, url_descarga)`</p>
+                </div>
+                <input type="text" id="imagen" placeholder="URL de la imagen principal" oninput="updatePreview()">
+                <input type="text" id="enlace" placeholder="URL del botón (opcional)" oninput="updatePreview()">
+                <button onclick="addProject()">Añadir Proyecto a la Lista</button>
+            </div>
+            <hr>
+            <div class="save-container">
+                <h2>Paso Final: Guardar Todo</h2>
+                <p>Pulsa para descargar el fichero <strong>proyectos.json</strong> actualizado. Reemplaza el antiguo con este.</p>
+                <button class="save-button" onclick="saveAndDownload()">Generar y Descargar Fichero</button>
+            </div>
+        </div>
+    </div>
+    <div class="preview-pane">
+        <iframe id="preview-frame" src="index.html"></iframe>
+    </div>
+    <script>
+        let currentProjects = [];
+        const previewFrame = document.getElementById('preview-frame');
+
+        // Función para cargar los datos iniciales
+        function loadInitialData() {
+            fetch('proyectos.json')
+            .then(response => response.json())
+            .then(data => {
+                currentProjects = data;
+                previewFrame.onload = function() {
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
+                };
+                // Si el iframe ya está cargado, enviar los datos inmediatamente
+                if (document.readyState === "complete") {
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
+                }
+            });
+        }
+
+        function updatePreview() {
+            const tempProject = {
+                titulo: document.getElementById('titulo').value,
+                descripcion: document.getElementById('descripcion').value,
+                imagen: document.getElementById('imagen').value,
+                enlace: document.getElementById('enlace').value
+            };
+            const liveProjects = [...currentProjects, tempProject];
+            previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: liveProjects }, '*');
+        }
+
+        function addProject() {
+            const proyecto = {
+                titulo: document.getElementById('titulo').value,
+                descripcion: document.getElementById('descripcion').value,
+                imagen: document.getElementById('imagen').value,
+                enlace: document.getElementById('enlace').value
+            };
+            if (!proyecto.titulo || !proyecto.descripcion || !proyecto.imagen) {
+                alert('Título, descripción e imagen son obligatorios.'); return;
+            }
+            currentProjects.push(proyecto);
+            document.getElementById('titulo').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('imagen').value = '';
+            document.getElementById('enlace').value = '';
+            previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
+            alert('Proyecto añadido a la lista. Pulsa "Generar y Descargar" para guardar.');
+        }
+
+        function saveAndDownload() {
+            const fileContent = JSON.stringify(currentProjects, null, 2);
+            const blob = new Blob([fileContent], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'proyectos.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+        
+        loadInitialData();
+    </script>
+</body>
+</html>

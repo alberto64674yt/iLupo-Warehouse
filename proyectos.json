@@ -1,0 +1,8 @@
+[
+  {
+    "titulo": "Mi Primer Proyecto de Ejemplo",
+    "descripcion": "Esta es la descripción de un proyecto de ejemplo para que veas cómo funciona. Puedes borrarlo simplemente borrando este texto y guardando el fichero vacío `[]`.",
+    "imagen": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
+    "enlace": "https://google.com"
+  }
+]
