@@ -15,12 +15,16 @@
             <div class="form-container">
                 <h3>Añadir Nuevo Proyecto</h3>
                 <input type="text" id="titulo" placeholder="Título del proyecto" oninput="updatePreview()">
-                <textarea id="descripcion" placeholder="Descripción (soporta Markdown)" oninput="updatePreview()"></textarea>
+                <input type="text" id="id" placeholder="ID para la URL (ej: mi-proyecto-1)" oninput="updatePreview()">
+                
+                <textarea id="resumen" placeholder="Resumen para la tarjeta (texto corto)" oninput="updatePreview()"></textarea>
+                <textarea id="contenido_completo" placeholder="Contenido completo de la página (soporta Markdown)" oninput="updatePreview()"></textarea>
+
                 <div class="markdown-ayuda">
                     <p><b>Ayuda:</b> **negrita**, *cursiva*, [enlace](url), `https://link.youtube.com`, `[IMAGEN-DESCARGA](url_imagen, url_descarga)`</p>
                 </div>
-                <input type="text" id="imagen" placeholder="URL de la imagen principal" oninput="updatePreview()">
-                <input type="text" id="enlace" placeholder="URL del botón (opcional)" oninput="updatePreview()">
+                <input type="text" id="imagen" placeholder="URL de la imagen principal (para la tarjeta)" oninput="updatePreview()">
+                <input type="text" id="enlace" placeholder="URL del botón principal (opcional)" oninput="updatePreview()">
                 <button onclick="addProject()">Añadir Proyecto a la Lista</button>
             </div>
             <hr>
@@ -38,16 +42,12 @@
         let currentProjects = [];
         const previewFrame = document.getElementById('preview-frame');
 
-        // Función para cargar los datos iniciales
         function loadInitialData() {
             fetch('proyectos.json')
             .then(response => response.json())
             .then(data => {
-                currentProjects = data;
-                previewFrame.onload = function() {
-                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
-                };
-                // Si el iframe ya está cargado, enviar los datos inmediatamente
+                currentProjects = data.items || [];
+                previewFrame.onload = () => previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
                 if (document.readyState === "complete") {
                     previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
                 }
@@ -57,7 +57,9 @@
         function updatePreview() {
             const tempProject = {
                 titulo: document.getElementById('titulo').value,
-                descripcion: document.getElementById('descripcion').value,
+                id: document.getElementById('id').value,
+                resumen: document.getElementById('resumen').value,
+                contenido_completo: document.getElementById('contenido_completo').value,
                 imagen: document.getElementById('imagen').value,
                 enlace: document.getElementById('enlace').value
             };
@@ -68,16 +70,20 @@
         function addProject() {
             const proyecto = {
                 titulo: document.getElementById('titulo').value,
-                descripcion: document.getElementById('descripcion').value,
+                id: document.getElementById('id').value,
+                resumen: document.getElementById('resumen').value,
+                contenido_completo: document.getElementById('contenido_completo').value,
                 imagen: document.getElementById('imagen').value,
                 enlace: document.getElementById('enlace').value
             };
-            if (!proyecto.titulo || !proyecto.descripcion || !proyecto.imagen) {
-                alert('Título, descripción e imagen son obligatorios.'); return;
+            if (!proyecto.titulo || !proyecto.id || !proyecto.resumen || !proyecto.contenido_completo || !proyecto.imagen) {
+                alert('Todos los campos son obligatorios (excepto el enlace del botón).'); return;
             }
             currentProjects.push(proyecto);
             document.getElementById('titulo').value = '';
-            document.getElementById('descripcion').value = '';
+            document.getElementById('id').value = '';
+            document.getElementById('resumen').value = '';
+            document.getElementById('contenido_completo').value = '';
             document.getElementById('imagen').value = '';
             document.getElementById('enlace').value = '';
             previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
@@ -85,7 +91,7 @@
         }
 
         function saveAndDownload() {
-            const fileContent = JSON.stringify(currentProjects, null, 2);
+            const fileContent = JSON.stringify({ items: currentProjects }, null, 2);
             const blob = new Blob([fileContent], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
