@@ -12,9 +12,9 @@
 body {
     font-family: 'Space Grotesk', sans-serif; margin: 0; background-color: var(--dark-bg); color: var(--text-color); line-height: 1.7;
 }
-.panel-body { overflow: hidden; } /* Evita el scroll en el body del panel */
+.panel-body { overflow: hidden; }
 
-/* ... (Aquí irían todos los estilos de header, main, card, etc. que no cambian) ... */
+/* --- Estilos Generales --- */
 header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
 header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
@@ -57,14 +57,17 @@ footer p { margin: 0; }
 .preview-pane { width: 60%; }
 #admin-panel { max-width: 100%; }
 #preview-frame { width: 100%; height: 100%; border: none; }
-input, textarea { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; width: 100%; padding: 12px; margin-bottom: 1rem; box-sizing: border-box; font-size: 1rem; }
-textarea#resumen { height: 100px; }
-textarea#contenido_completo { height: 250px; }
+input, textarea, fieldset { background-color: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; width: 100%; padding: 12px; margin-bottom: 1rem; box-sizing: border-box; font-size: 1rem; }
+fieldset { padding: 1.5rem; }
+legend { padding: 0 0.5rem; color: var(--primary-color); font-weight: 700; }
+label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--light-text); }
+textarea#resumen { height: 80px; }
+textarea#contenido_completo { height: 200px; }
 input:focus, textarea:focus { border-color: var(--primary-color); outline: none; }
-.markdown-ayuda { font-size: 0.8rem; color: var(--light-text); margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; background-color: rgba(0,0,0,0.2); border-radius: 4px; }
-button { width: 100%; padding: 15px; color: var(--dark-bg); background-color: var(--primary-color); border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700; transition: filter 0.2s; }
-button:hover { filter: brightness(1.1); }
-#cancel-button { background-color: var(--light-text); margin-top: 0.5rem; }
+.markdown-ayuda { font-size: 0.8rem; color: var(--light-text); margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; background-color: rgba(0,0,0,0.2); border-radius: 4px; border: none; }
+.form-actions button { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700; transition: filter 0.2s; }
+#main-button { background-color: var(--primary-color); color: var(--dark-bg); }
+#cancel-button { background-color: var(--light-text); margin-top: 0.5rem; color: var(--dark-bg); }
 .save-button { background-color: var(--success-color); color: white; }
 hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; }
 .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; }
