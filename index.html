@@ -26,14 +26,15 @@
             </div>
             <div class="view-switcher">
                 <button id="grid-view-btn" class="view-btn active" title="Vista de Rejilla">
-                    <svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24"><path d="M3,3V11H11V3M9,9H5V5H9M3,13V21H11V13M9,19H5V15H9M13,3V11H21V3M19,9H15V5H19M13,13V21H21V13M19,19H15V15H19Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,3V11H11V3M9,9H5V5H9M3,13V21H11V13M9,19H5V15H9M13,3V11H21V3M19,9H15V5H19M13,13V21H21V13M19,19H15V15H19Z"/></svg>
                 </button>
                 <button id="list-view-btn" class="view-btn" title="Vista de Lista">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"/></svg>
                 </button>
             </div>
         </div>
-        <div id="tag-filter-container" class="tag-filter-container"></div>
+        <div id="tag-filter-container" class="tag-filter-container">
+            </div>
     </div>
 
     <main id="portfolio-grid"></main>
@@ -69,15 +70,14 @@
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
                 
-                // --- LÓGICA MEJORADA PARA LA ANIMACIÓN 3D ---
                 card.addEventListener('mousemove', (e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
-                    const rotateX = (y - centerY) / 15; // Más sensibilidad
-                    const rotateY = (centerX - x) / 15; // Más sensibilidad
+                    const rotateX = (y - centerY) / 15;
+                    const rotateY = (centerX - x) / 15;
                     const innerCard = e.currentTarget.querySelector('.card-inner');
                     innerCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
                 });
@@ -173,7 +173,10 @@
                 const target = e.target;
                 if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) progress++;
                 else if (!target.classList.contains('secret-letter')) progress = 0;
-                if (progress === requiredLength) window.location.href = 'panel.html';
+                if (progress === requiredLength) {
+                    alert('Acceso correcto. Redirigiendo...');
+                    window.location.href = 'panel.html';
+                }
             });
         })();
     </script>
