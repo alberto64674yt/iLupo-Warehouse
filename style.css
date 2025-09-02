@@ -54,7 +54,7 @@ main {
 .top-controls {
     display: flex;
     gap: 1rem;
-    align-items: flex-end;
+    align-items: flex-end; /* Corregido para un espaciado consistente */
 }
 .search-container { 
     flex-grow: 1; 
@@ -126,11 +126,13 @@ main {
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
     gap: 2.5rem; 
-    perspective: 1000px; 
+    perspective: 1000px; /* Asegura que la perspectiva esté activa por defecto */
 }
 #portfolio-grid.view-list {
     display: block;
-    perspective: none;
+    /* Eliminamos la línea "perspective: none;" de aquí */ 
+    /* Y añadimos: */
+    transform-style: flat; /* Asegura que no haya efectos 3D en vista de lista */
 }
 .card { 
     background-color: var(--surface-color); 
@@ -150,6 +152,15 @@ main {
     gap: 1.5rem;
     padding: 1rem;
     margin-bottom: 1.5rem;
+    transform-style: flat; /* También a la tarjeta individual en vista de lista */
+    transform: none; /* Desactiva el translateY en vista de lista */
+    box-shadow: none; /* Desactiva la sombra en vista de lista */
+    border-color: var(--border-color); /* Restaura el color de borde */
+}
+#portfolio-grid.view-list .card:hover { /* Evita el efecto hover en vista de lista */
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border-color);
 }
 .card:hover {
     transform: translateY(-8px);
@@ -168,6 +179,7 @@ main {
     flex-direction: row;
     align-items: center;
     gap: 1.5rem;
+    transform: none !important; /* Asegura que no haya rotación en vista de lista */
 }
 .card-hero-image { 
     width: 100%; 
@@ -329,7 +341,7 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
 .edit-button { background-color: var(--edit-color); color: white; }
 .delete-button { background-color: var(--danger-color); color: white; }
-.duplicate-button { background-color: var(--duplicate-color); color: white; } /* ESTILO NUEVO */
+.duplicate-button { background-color: var(--duplicate-color); color: white; }
 .back-to-site-button { display: inline-block; padding: 8px 15px; margin-bottom: 2rem; background-color: var(--surface-color); color: var(--light-text); text-decoration: none; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; transition: all 0.2s; }
 .back-to-site-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
 .secret-letter { cursor: pointer; -webkit-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
