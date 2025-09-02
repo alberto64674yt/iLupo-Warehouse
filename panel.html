@@ -35,7 +35,6 @@
                     <legend>Parte 2: Contenido de la Página de Detalle</legend>
                     <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (Markdown)</label>
-                        
                         <div class="markdown-toolbar">
                             <button onclick="applyMarkdown('bold')"><b>B</b></button>
                             <button onclick="applyMarkdown('italic')"><i>I</i></button>
@@ -48,13 +47,11 @@
                             <button onclick="applyMarkdown('quote')">Cita</button>
                             <button onclick="applyMarkdown('hr')">Línea</button>
                         </div>
-                        
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
                         <div class="markdown-ayuda">
                             <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
                             <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
                         </div>
-                        
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
@@ -80,52 +77,24 @@
         const previewFrame = document.getElementById('preview-frame');
         const contentTextarea = document.getElementById('contenido_completo');
 
-        // --- NUEVA FUNCIÓN PARA LA BARRA DE HERRAMIENTAS ---
         function applyMarkdown(type) {
-            const start = contentTextarea.selectionStart;
-            const end = contentTextarea.selectionEnd;
+            const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
             const selectedText = contentTextarea.value.substring(start, end);
             let markdownText = '';
-
             switch(type) {
-                case 'bold':
-                    markdownText = `**${selectedText || 'texto en negrita'}**`;
-                    break;
-                case 'italic':
-                    markdownText = `*${selectedText || 'texto en cursiva'}*`;
-                    break;
-                case 'h2':
-                    markdownText = `\n## ${selectedText || 'Título Mediano'}\n`;
-                    break;
-                case 'h3':
-                    markdownText = `\n### ${selectedText || 'Título Pequeño'}\n`;
-                    break;
-                case 'link':
-                    const url = prompt('Introduce la URL del enlace:', 'https://');
-                    if (url) markdownText = `[${selectedText || 'texto del enlace'}](${url})`;
-                    break;
-                case 'image':
-                    const imgUrl = prompt('Introduce la URL de la imagen:', 'https://');
-                    if (imgUrl) markdownText = `![${selectedText || 'descripción'}](${imgUrl})`;
-                    break;
-                case 'ul':
-                    markdownText = `\n- Punto 1\n- Punto 2`;
-                    break;
-                case 'ol':
-                    markdownText = `\n1. Punto 1\n2. Punto 2`;
-                    break;
-                case 'quote':
-                    markdownText = `\n> ${selectedText || 'Texto citado'}\n`;
-                    break;
-                case 'hr':
-                    markdownText = `\n\n---\n\n`;
-                    break;
+                case 'bold': markdownText = `**${selectedText||'negrita'}**`; break;
+                case 'italic': markdownText = `*${selectedText||'cursiva'}*`; break;
+                case 'h2': markdownText = `\n## ${selectedText||'Título 2'}\n`; break;
+                case 'h3': markdownText = `\n### ${selectedText||'Título 3'}\n`; break;
+                case 'link': const url = prompt('URL del enlace:', 'https://'); if(url) markdownText = `[${selectedText||'texto'}](${url})`; break;
+                case 'image': const imgUrl = prompt('URL de la imagen:', 'https://'); if(imgUrl) markdownText = `![${selectedText||'alt text'}](${imgUrl})`; break;
+                case 'ul': markdownText = `\n- Punto 1\n- Punto 2`; break;
+                case 'ol': markdownText = `\n1. Punto 1\n2. Punto 2`; break;
+                case 'quote': markdownText = `\n> ${selectedText||'Cita'}\n`; break;
+                case 'hr': markdownText = `\n\n---\n\n`; break;
             }
-            
             if(markdownText) {
-                const before = contentTextarea.value.substring(0, start);
-                const after = contentTextarea.value.substring(end, contentTextarea.value.length);
-                contentTextarea.value = before + markdownText + after;
+                contentTextarea.value = contentTextarea.value.substring(0, start) + markdownText + contentTextarea.value.substring(end);
                 contentTextarea.focus();
                 contentTextarea.selectionEnd = start + markdownText.length;
                 updatePreview();
@@ -133,8 +102,37 @@
         }
 
         function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();previewFrame.onload=()=>{updatePreview()}})}
-        function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
-        [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.innerHTML=`<span>${p.titulo}</span><div class="manage-buttons"><button class="edit-button" onclick="editProject(${o})">Editar</button><button class="delete-button" onclick="deleteProject(${o})">Borrar</button></div>`;c.appendChild(t)})}
+        
+        function renderManageList(){
+            const c = document.getElementById('manage-list');
+            c.innerHTML = '';
+            if (currentProjects.length === 0) { c.innerHTML = '<p>No hay proyectos.</p>'; return; }
+            [...currentProjects].reverse().forEach((p, i) => {
+                const originalIndex = currentProjects.length - 1 - i;
+                const item = document.createElement('div');
+                item.className = 'manage-item';
+                item.innerHTML = `
+                    <span>${p.titulo}</span>
+                    <div class="manage-buttons">
+                        <button class="duplicate-button" onclick="duplicateProject(${originalIndex})">Duplicar</button>
+                        <button class="edit-button" onclick="editProject(${originalIndex})">Editar</button>
+                        <button class="delete-button" onclick="deleteProject(${originalIndex})">Borrar</button>
+                    </div>`;
+                c.appendChild(item);
+            });
+        }
+
+        // --- NUEVA FUNCIÓN PARA DUPLICAR ---
+        function duplicateProject(index) {
+            const projectToDuplicate = JSON.parse(JSON.stringify(currentProjects[index])); // Clonación profunda
+            projectToDuplicate.titulo = projectToDuplicate.titulo + " (Copia)";
+            projectToDuplicate.id = projectToDuplicate.id + "-copia";
+            currentProjects.push(projectToDuplicate);
+            renderManageList();
+            previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
+            alert(`Se ha duplicado "${projectToDuplicate.titulo}". Pulsa "Generar y Descargar" para guardar.`);
+        }
+
         function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
         function updatePreview(){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1){l[editingIndex]=p}else if(p.titulo){l.push(p)}
         if(previewMode==='list'){previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}else{previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:p},'*')}}
