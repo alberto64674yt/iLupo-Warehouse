@@ -1,72 +1,47 @@
 # 📖 Manual de Usuario: iLupo Warehouse
 
-Esta es una guía completa sobre cómo gestionar y actualizar el contenido de este portfolio.
-
-## Lógica del Sistema
-
-Este proyecto utiliza un **"Generador Offline"**. La lógica es simple:
-
-1.  **Editas en tu PC:** Usas el fichero `panel.html` en tu ordenador para añadir o modificar proyectos de forma visual.
-2.  **Guardas en tu PC:** El panel genera un fichero `proyectos.json` actualizado, que tú guardas en tu carpeta local.
-3.  **Publicas en Internet:** Subes la carpeta completa y actualizada a un hosting como Netlify.
-
-La **única fuente de la verdad** son siempre los ficheros que tienes en tu ordenador.
+Esta es la guía completa para gestionar este portfolio. El sistema está diseñado para ser 100% online, sin depender de archivos locales.
 
 ---
 
-## ✍️ Cómo Añadir o Editar un Proyecto
+## ✅ Flujo de Trabajo (100% Online)
 
-Este es el flujo de trabajo que seguirás cada vez que quieras actualizar la web.
+El proceso se divide en **Generar** el fichero de datos actualizado y **Subirlo** a GitHub.
 
-### Paso 1: Abrir el Panel de Control
+### Fase 1: Generar el `proyectos.json`
 
-En tu ordenador, abre el fichero **`panel.html`** en tu navegador (preferiblemente con "Open with Live Server" desde VS Code para que todo funcione bien). Verás el editor a la izquierda y la previsualización en vivo a la derecha.
+1.  **Abrir el Panel de Control:**
+    * Ve a la dirección de tu panel: **`https://[TU_DIRECCIÓN_WEB].netlify.app/panel.html`**
+    * El panel cargará automáticamente la última lista de proyectos.
 
-### Paso 2: Rellenar los Campos
+2.  **Añadir, Editar o Borrar:**
+    * Usa el formulario para crear un nuevo proyecto o pulsa "Editar" en un proyecto existente para modificarlo.
+    * Utiliza la previsualización en vivo para ver los cambios.
 
-Introduce la información de tu nuevo proyecto en el formulario:
+3.  **Descargar el Fichero Actualizado:**
+    * Cuando hayas terminado tu sesión de edición, pulsa el botón verde **"Generar y Descargar Fichero"**.
+    * Se descargará un `proyectos.json` a tu ordenador con todos los cambios.
 
-* **Título del proyecto:** El nombre principal de tu herramienta o creación.
-* **ID para la URL:** Un nombre corto, **único**, en minúsculas y sin espacios (usa guiones). Ej: `mi-calculadora-genial`, `proyecto-alpha-2`. Esto creará la URL de la página de detalle.
-* **Resumen para la tarjeta:** El texto corto que aparecerá en la página de inicio.
-* **Contenido completo de la página:** Aquí es donde te explayas. Este campo soporta formato **Markdown** (ver chuleta abajo).
-* **URL de la imagen principal:** El enlace directo a la imagen que se usará en la tarjeta y en la cabecera de la página de detalle.
-* **URL del botón (opcional):** El enlace principal para un botón de "Visitar Enlace" en la página de detalle.
+### Fase 2: Publicar los Cambios en GitHub
 
-### Paso 3: Usar el Editor de "Contenido Completo" (La Chuleta)
+1.  **Ir a tu Repositorio de GitHub.**
+2.  **Borrar el `proyectos.json` antiguo:**
+    * Haz clic en el fichero `proyectos.json` de la lista.
+    * Usa el menú de los tres puntos (`...`) y selecciona **"Delete file"**. Confirma el borrado.
+3.  **Subir el `proyectos.json` nuevo:**
+    * Vuelve a la página principal del repositorio.
+    * Pulsa **"Add file" -> "Upload files"**.
+    * Arrastra el `proyectos.json` que acabas de descargar a la ventana.
+    * Confirma con **"Commit changes"**.
 
-Aquí puedes añadir texto con formato, imágenes, vídeos y más.
+Netlify detectará el cambio y actualizará la web automáticamente en 1-2 minutos.
 
-#### Texto con Formato
-* **Negrita:** `**texto en negrita**`
-* **Cursiva:** `*texto en cursiva*`
-* **Listas:** Empieza cada línea con un guion (`- `).
-* **Enlaces:** `[El texto que se ve](https://la-web-a-la-que-apunta.com)`
+---
 
-#### Imágenes Normales
-Sube tu imagen a un servicio como [Imgur](https://imgur.com/upload) o [Postimages](https://postimages.org/), copia el "Enlace Directo" y pégalo con este formato:
+## ✨ Funciones Avanzadas de la Web
 
-#### Vídeos de YouTube
-Copia la URL normal del vídeo desde tu navegador y pégala en su propia línea. El código la convertirá en un vídeo incrustado automáticamente.
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
-
-
-#### Imagen con Link de Descarga
-Este es el formato especial para crear una imagen en la que se puede hacer clic para descargar un archivo. Necesita dos enlaces separados por una coma.
-
-1.  **URL de la Imagen:** El enlace a la imagen que quieres que se vea (ej: un botón de descarga que has diseñado y subido a Imgur).
-2.  **URL de la Descarga:** El enlace directo al fichero que se va a descargar (ej: un `.zip` en Google Drive o Mega).
-
-**Formato a pegar:**
-[IMAGEN-DESCARGA](URL_DE_LA_IMAGEN, URL_DE_LA_DESCARGA)
-
-**Ejemplo práctico:**
-[IMAGEN-DESCARGA](https://www.google.com/search?q=https://i.imgur.com/mi-boton.png, https://www.google.com/search?q=https://ejemplo.com/programa.zip)
-
-
-### Paso 4: Guardar y Publicar
-
-1.  Una vez rellenados los campos, pulsa **"Añadir Proyecto a la Lista"**. Verás que aparece en la previsualización. Puedes añadir varios seguidos.
-2.  Cuando hayas añadido todos los proyectos de la sesión, pulsa el botón verde **"Generar y Descargar Fichero"**.
-3.  Guarda el fichero **`proyectos.json`** que se descarga, **reemplazando al antiguo** en tu carpeta local.
-4.  Sube la **carpeta entera y actualizada** (`iLupo Warehouse`) a Netlify para publicar los cambios.
+* **Buscador:** Filtra los proyectos en tiempo real por su título.
+* **Filtro por Etiquetas:** Haz clic en una o varias etiquetas para ver solo los proyectos que las contengan. La barra de etiquetas tiene scroll lateral si hay muchas.
+* **Paginación:** Si hay más de 9 proyectos, aparecerán controles para navegar entre las páginas.
+* **Selector de Vista:** Puedes cambiar entre la vista de rejilla (tarjetas) y la vista de lista (más compacta).
+* **Páginas de Etiquetas:** En la página de detalle de un proyecto, puedes hacer clic en sus etiquetas para ver todos los demás proyectos con esa misma etiqueta.
