@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>iLupo Warehouse</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,8 +33,7 @@
                 </button>
             </div>
         </div>
-        <div id="tag-filter-container" class="tag-filter-container">
-            </div>
+        <div id="tag-filter-container" class="tag-filter-container"></div>
     </div>
 
     <main id="portfolio-grid"></main>
@@ -67,7 +66,9 @@
 
             paginatedProjects.forEach((proyecto, index) => {
                 const card = document.createElement('a');
+                // --- ARREGLO AQUÍ: Añadimos la clase para la animación inicial ---
                 card.className = 'card';
+                card.style.opacity = 0; // Ocultar inicialmente para la animación
                 card.href = `proyecto.html?id=${proyecto.id}`;
                 
                 card.addEventListener('mousemove', (e) => {
@@ -95,6 +96,12 @@
                         </div>
                     </div>`;
                 grid.appendChild(card);
+                
+                // --- ARREGLO AQUÍ: Se restaura el temporizador para la animación escalonada ---
+                setTimeout(() => {
+                    card.style.opacity = 1;
+                    card.classList.add('initial-appear');
+                }, index * 100);
             });
         }
 
