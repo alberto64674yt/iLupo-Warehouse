@@ -19,7 +19,14 @@
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+        // --- CAMBIO AQUÍ: Configuramos Markdown para que respete los saltos de línea ---
+        marked.setOptions({
+            gfm: true,
+            breaks: true
+        });
+
         function renderContent(proyectos) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
@@ -31,11 +38,12 @@
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
+                
                 card.innerHTML = `
                     <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
                     <div class="card-content">
                         <h2>${proyecto.titulo}</h2>
-                        <p class="card-excerpt">${proyecto.resumen || ''}</p>
+                        <div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div>
                         <span class="button-imitation">Ver detalles</span>
                     </div>
                 `;
