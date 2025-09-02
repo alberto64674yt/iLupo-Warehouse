@@ -15,17 +15,14 @@
         <p class="subtitle">Portfolio de Herramientas y Creaciones</p>
     </header>
     <main id="portfolio-grid"></main>
-    
     <footer>
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         function renderContent(proyectos) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
-            // El mensaje ya estaba aquí, se muestra cuando la lista de proyectos está vacía
             if (!proyectos || proyectos.length === 0) {
                 grid.innerHTML = '<p class="empty-message">No hay nada disponible actualmente.</p>';
                 return;
@@ -34,7 +31,6 @@
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                
                 card.innerHTML = `
                     <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
                     <div class="card-content">
