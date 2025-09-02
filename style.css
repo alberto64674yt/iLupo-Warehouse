@@ -50,6 +50,8 @@ footer p { margin: 0; }
 .download-image-link img { width: 100%; border: 1px solid var(--border-color); transition: opacity 0.2s; }
 .download-image-link:hover img { opacity: 0.8; }
 .empty-message { text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--light-text); }
+
+/* --- Panel de Control --- */
 .panel-container { display: flex; height: 100vh; }
 .editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); background-color: var(--dark-bg); }
 .preview-pane { width: 60%; display: flex; flex-direction: column; }
@@ -80,12 +82,12 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .back-to-site-button { display: inline-block; padding: 8px 15px; margin-bottom: 2rem; background-color: var(--surface-color); color: var(--light-text); text-decoration: none; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; transition: all 0.2s; }
 .back-to-site-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
 
-/* --- ARREGLO PARA QUE NO SE PUEDA SELECCIONAR EL TEXTO SECRETO --- */
+/* --- Estilo para las letras del código secreto (CON ARREGLO !IMPORTANT) --- */
 .secret-letter {
     cursor: pointer;
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10+ */
-    user-select: none; /* Standard syntax */
+    -webkit-user-select: none !important; /* Safari */
+    -ms-user-select: none !important; /* IE 10+ */
+    user-select: none !important; /* Standard syntax */
 }
 .secret-letter:hover {
     text-decoration: underline dotted var(--primary-color);
