@@ -20,13 +20,24 @@
     </header>
 
     <div class="filter-controls">
-        <div class="search-container">
-            <input type="text" id="search-box" placeholder="Buscar por nombre...">
+        <div class="top-controls">
+            <div class="search-container">
+                <input type="text" id="search-box" placeholder="Buscar por nombre...">
+            </div>
+            <div class="view-switcher">
+                <button id="grid-view-btn" class="view-btn active" title="Vista de Rejilla">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,3V11H11V3M9,9H5V5H9M3,13V21H11V13M9,19H5V15H9M13,3V11H21V3M19,9H15V5H19M13,13V21H21V13M19,19H15V15H19Z"/></svg>
+                </button>
+                <button id="list-view-btn" class="view-btn" title="Vista de Lista">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"/></svg>
+                </button>
+            </div>
         </div>
         <div id="tag-filter-container" class="tag-filter-container"></div>
     </div>
 
     <main id="portfolio-grid"></main>
+    <div id="pagination-container" class="pagination-container"></div>
     
     <footer>
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
@@ -34,37 +45,29 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        let allProjects = []; let activeTags = new Set(); const searchBox = document.getElementById('search-box');
+        let allProjects = [];
+        let activeTags = new Set();
+        let currentPage = 1;
+        const projectsPerPage = 9;
+        const searchBox = document.getElementById('search-box');
+        const grid = document.getElementById('portfolio-grid');
+        const paginationContainer = document.getElementById('pagination-container');
+
         marked.setOptions({ gfm: true, breaks: true });
 
-        // Función para renderizar las tarjetas de proyectos
         function renderCards(proyectos) {
-            const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
                 grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos.</p>';
                 return;
             }
-            proyectos.slice().reverse().forEach((proyecto, index) => {
-                const card = document.createElement('a');
-                card.className = 'card initial-hidden'; // Añadir clase para ocultar inicialmente
-                card.href = `proyecto.html?id=${proyecto.id}`;
-                
-                // Efecto 3D al mover el ratón sobre la tarjeta
-                card.addEventListener('mousemove', (e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = (y - centerY) / 20; // Ajusta la sensibilidad
-                    const rotateY = (centerX - x) / 20; // Ajusta la sensibilidad
-                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                });
-                card.addEventListener('mouseleave', (e) => {
-                    e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0)';
-                });
 
+            const paginatedProjects = proyectos.slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
+
+            paginatedProjects.slice().reverse().forEach((proyecto, index) => {
+                const card = document.createElement('a');
+                card.className = 'card';
+                card.href = `proyecto.html?id=${proyecto.id}`;
                 card.innerHTML = `
                     <div class="card-inner">
                         <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
@@ -73,108 +76,87 @@
                             <div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div>
                             <span class="button-imitation">Ver detalles</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 grid.appendChild(card);
-
-                // Animación de aparición con retraso
-                setTimeout(() => {
-                    card.classList.remove('initial-hidden');
-                    card.classList.add('initial-appear');
-                }, index * 100); // Retraso de 100ms por cada tarjeta
             });
         }
 
-        // Función para generar los botones de las etiquetas dinámicamente
+        function setupPagination(totalProjects) {
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.ceil(totalProjects / projectsPerPage);
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.innerText = i;
+                pageButton.className = 'page-btn';
+                if (i === currentPage) pageButton.classList.add('active');
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    filterAndRender();
+                    window.scrollTo(0, 0);
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+        }
+
         function generateTags(proyectos) {
             const tagContainer = document.getElementById('tag-filter-container');
             const allTags = new Set();
-            proyectos.forEach(p => {
-                if (p.tags && p.tags.length > 0) {
-                    p.tags.forEach(tag => allTags.add(tag.trim()));
-                }
-            });
-
+            proyectos.forEach(p => (p.tags || []).forEach(tag => allTags.add(tag.trim())));
+            
             tagContainer.innerHTML = '<button class="tag-button active" data-tag="all">Todos</button>';
-            [...allTags].sort().forEach(tag => {
-                tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag}</button>`;
-            });
+            [...allTags].sort().forEach(tag => tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag}</button>`);
 
             document.querySelectorAll('.tag-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
+                button.addEventListener('click', e => {
                     const clickedTag = e.target.dataset.tag;
-                    if (clickedTag === 'all') { activeTags.clear(); } else { if (activeTags.has(clickedTag)) { activeTags.delete(clickedTag); } else { activeTags.add(clickedTag); } }
-                    document.querySelectorAll('.tag-button').forEach(btn => { if (activeTags.size === 0) { btn.classList.toggle('active', btn.dataset.tag === 'all'); } else { btn.classList.remove('active'); if (activeTags.has(btn.dataset.tag)) { btn.classList.add('active'); } document.querySelector('.tag-button[data-tag="all"]').classList.remove('active'); } });
+                    if (clickedTag === 'all') activeTags.clear();
+                    else activeTags.has(clickedTag) ? activeTags.delete(clickedTag) : activeTags.add(clickedTag);
+                    
+                    document.querySelectorAll('.tag-button').forEach(btn => {
+                        btn.classList.toggle('active', (activeTags.size === 0 && btn.dataset.tag === 'all') || activeTags.has(btn.dataset.tag));
+                    });
+                    currentPage = 1;
                     filterAndRender();
                 });
             });
         }
 
-        // Función principal que filtra y renderiza los proyectos
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
-            let filteredProjects = allProjects;
+            let filtered = allProjects;
 
-            if (searchTerm) {
-                filteredProjects = filteredProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
-            }
-
+            if (searchTerm) filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             if (activeTags.size > 0) {
-                filteredProjects = filteredProjects.filter(p => {
+                filtered = filtered.filter(p => {
                     const projectTags = new Set((p.tags || []).map(t => t.trim()));
-                    return [...activeTags].every(activeTag => projectTags.has(activeTag));
+                    return [...activeTags].every(tag => projectTags.has(tag));
                 });
             }
-
-            renderCards(filteredProjects);
+            renderCards(filtered);
+            setupPagination(filtered.length);
         }
 
-        // Carga inicial de datos
-        fetch('proyectos.json')
-            .then(response => {
-                if (!response.ok) { throw new Error("Fichero proyectos.json no encontrado"); }
-                return response.json();
-            })
-            .then(data => {
-                allProjects = data.items || [];
-                window.proyectos = allProjects; // Para la preview
-                generateTags(allProjects);
-                filterAndRender();
-            })
-            .catch(error => {
-                console.error("Error al cargar los proyectos:", error);
-                document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>';
-            });
-
-        // Event listener para la búsqueda en tiempo real
-        searchBox.addEventListener('input', filterAndRender);
+        fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
+        searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
         
-        // Event listener para la previsualización en vivo desde el panel.html
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'previewUpdate') {
-                allProjects = event.data.payload;
-                generateTags(allProjects);
-                filterAndRender();
-            }
-        });
-    </script>
+        // Selector de Vista
+        const gridBtn = document.getElementById('grid-view-btn');
+        const listBtn = document.getElementById('list-view-btn');
+        gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
+        listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
 
+        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; generateTags(allProjects); filterAndRender(); } });
+    </script>
     <script>
         (function() {
-            const requiredLength = 5;
-            let progress = 0;
-            document.addEventListener('click', function(e) {
+            const requiredLength = 5; let progress = 0;
+            document.addEventListener('click', e => {
                 const target = e.target;
-                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
-                    progress++;
-                } else if (!target.classList.contains('secret-letter')) {
-                    progress = 0;
-                }
-                if (progress === requiredLength) {
-                    alert('Acceso correcto. Redirigiendo...');
-                    window.location.href = 'panel.html';
-                }
+                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) progress++;
+                else if (!target.classList.contains('secret-letter')) progress = 0;
+                if (progress === requiredLength) window.location.href = 'panel.html';
             });
         })();
     </script>
