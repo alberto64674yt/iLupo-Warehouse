@@ -8,43 +8,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="panel-layout">
-    <div class="editor-pane">
-        <div id="admin-panel">
-            <h1>Panel de Control</h1>
-            <div class="form-container">
-                <h3>Añadir Nuevo Proyecto</h3>
-                <input type="text" id="titulo" placeholder="Título del proyecto" oninput="updatePreview()">
-                <input type="text" id="id" placeholder="ID para la URL (ej: mi-proyecto-1)" oninput="updatePreview()">
-                <textarea id="resumen" placeholder="Resumen para la tarjeta (texto corto)" oninput="updatePreview()"></textarea>
-                <textarea id="contenido_completo" placeholder="Contenido completo de la página (soporta Markdown)" oninput="updatePreview()"></textarea>
-                <div class="markdown-ayuda">
-                    <p><b>Ayuda:</b> **negrita**, *cursiva*, [enlace](url), `https://link.youtube.com`, `[IMAGEN-DESCARGA](url_imagen, url_descarga)`</p>
+<body class="panel-body">
+    <div class="panel-container">
+        <div class="editor-pane">
+            <div id="admin-panel">
+                <h1>Panel de Control</h1>
+                <div class="form-container">
+                    <h3 id="form-title">Añadir Nuevo Proyecto</h3>
+                    <input type="text" id="titulo" placeholder="Título del proyecto" oninput="updatePreview()">
+                    <input type="text" id="id" placeholder="ID para la URL (ej: mi-proyecto-1)" oninput="updatePreview()">
+                    <textarea id="resumen" placeholder="Resumen para la tarjeta (texto corto)" oninput="updatePreview()"></textarea>
+                    <textarea id="contenido_completo" placeholder="Contenido completo de la página (soporta Markdown)" oninput="updatePreview()"></textarea>
+                    <div class="markdown-ayuda">
+                        <p><b>Ayuda:</b> **negrita**, *cursiva*, [enlace](url), `https://link.youtube.com`, `[IMAGEN-DESCARGA](url_imagen, url_descarga)`</p>
+                    </div>
+                    <input type="text" id="imagen" placeholder="URL de la imagen principal" oninput="updatePreview()">
+                    <input type="text" id="enlace" placeholder="URL del botón principal (opcional)" oninput="updatePreview()">
+                    <button id="main-button" onclick="submitProject()">Añadir Proyecto a la Lista</button>
+                    <button id="cancel-button" onclick="cancelEdit()" style="display: none;">Cancelar Edición</button>
                 </div>
-                <input type="text" id="imagen" placeholder="URL de la imagen principal" oninput="updatePreview()">
-                <input type="text" id="enlace" placeholder="URL del botón principal (opcional)" oninput="updatePreview()">
-                <button onclick="addProject()">Añadir Proyecto a la Lista</button>
-            </div>
-            <hr>
-            <div class="manage-container">
-                <h2>Gestionar Proyectos Existentes</h2>
-                <div id="manage-list"></div>
-            </div>
-            <hr>
-            <div class="save-container">
-                <h2>Paso Final: Guardar Todo</h2>
-                <p>Pulsa para descargar el fichero <strong>proyectos.json</strong> actualizado. Reemplaza el antiguo con este.</p>
-                <button class="save-button" onclick="saveAndDownload()">Generar y Descargar Fichero</button>
+                <hr>
+                <div class="manage-container">
+                    <h2>Gestionar Proyectos Existentes</h2>
+                    <div id="manage-list"></div>
+                </div>
+                <hr>
+                <div class="save-container">
+                    <h2>Paso Final: Guardar Todo</h2>
+                    <p>Pulsa para descargar el fichero <strong>proyectos.json</strong> actualizado. Reemplaza el antiguo con este.</p>
+                    <button class="save-button" onclick="saveAndDownload()">Generar y Descargar Fichero</button>
+                </div>
             </div>
         </div>
+
+        <div class="preview-pane">
+            <iframe id="preview-frame" src="index.html"></iframe>
+        </div>
     </div>
-    <div class="preview-pane">
-        <iframe id="preview-frame" src="index.html"></iframe>
-    </div>
+
     <script>
         let currentProjects = [];
+        let editingIndex = -1; // -1 significa que estamos añadiendo, cualquier otro número es el índice del proyecto que se edita
         const previewFrame = document.getElementById('preview-frame');
 
+        // --- Carga y Renderizado ---
         function loadInitialData() {
             fetch('proyectos.json')
             .then(response => response.json())
@@ -58,38 +65,27 @@
             });
         }
 
-        // --- NUEVA FUNCIÓN PARA MOSTRAR LA LISTA DE GESTIÓN ---
         function renderManageList() {
             const listContainer = document.getElementById('manage-list');
             listContainer.innerHTML = '';
-            if (currentProjects.length === 0) {
-                listContainer.innerHTML = '<p>No hay proyectos en la lista.</p>';
-                return;
-            }
-            const reversedProjects = [...currentProjects].reverse();
-            reversedProjects.forEach((proyecto, index) => {
+            if (currentProjects.length === 0) { listContainer.innerHTML = '<p>No hay proyectos en la lista.</p>'; return; }
+            
+            [...currentProjects].reverse().forEach((proyecto, index) => {
                 const originalIndex = currentProjects.length - 1 - index;
-                const projectElement = document.createElement('div');
-                projectElement.className = 'manage-item';
-                projectElement.innerHTML = `
+                const item = document.createElement('div');
+                item.className = 'manage-item';
+                item.innerHTML = `
                     <span>${proyecto.titulo}</span>
-                    <button class="delete-button" onclick="deleteProject(${originalIndex})">Borrar</button>
+                    <div class="manage-buttons">
+                        <button class="edit-button" onclick="editProject(${originalIndex})">Editar</button>
+                        <button class="delete-button" onclick="deleteProject(${originalIndex})">Borrar</button>
+                    </div>
                 `;
-                listContainer.appendChild(projectElement);
+                listContainer.appendChild(item);
             });
         }
-        
-        // --- NUEVA FUNCIÓN PARA BORRAR ---
-        function deleteProject(index) {
-            if (confirm(`¿Seguro que quieres borrar el proyecto "${currentProjects[index].titulo}"?`)) {
-                currentProjects.splice(index, 1);
-                renderManageList();
-                updatePreview(true); // Actualiza la preview con la lista ya modificada
-                alert('Proyecto borrado de la lista. Pulsa "Generar y Descargar" para guardar los cambios.');
-            }
-        }
 
-        function updatePreview(forceUpdate = false) {
+        function updatePreview() {
             const tempProject = {
                 titulo: document.getElementById('titulo').value,
                 id: document.getElementById('id').value,
@@ -98,12 +94,51 @@
                 imagen: document.getElementById('imagen').value,
                 enlace: document.getElementById('enlace').value
             };
-            // Si no estamos borrando, añadimos el proyecto temporal para la preview en vivo
-            const liveProjects = forceUpdate ? [...currentProjects] : [...currentProjects, tempProject];
+
+            let liveProjects = [...currentProjects];
+            if (editingIndex > -1) {
+                liveProjects[editingIndex] = tempProject; // Si estamos editando, reemplazamos el item en la preview
+            } else if (tempProject.titulo) {
+                liveProjects.push(tempProject); // Si estamos creando, lo añadimos al final para la preview en vivo
+            }
             previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: liveProjects }, '*');
         }
+        
+        // --- Lógica de Edición y Borrado ---
+        function editProject(index) {
+            editingIndex = index;
+            const proyecto = currentProjects[index];
+            document.getElementById('form-title').innerText = 'Editando Proyecto';
+            document.getElementById('titulo').value = proyecto.titulo;
+            document.getElementById('id').value = proyecto.id;
+            document.getElementById('resumen').value = proyecto.resumen;
+            document.getElementById('contenido_completo').value = proyecto.contenido_completo;
+            document.getElementById('imagen').value = proyecto.imagen;
+            document.getElementById('enlace').value = proyecto.enlace;
+            document.getElementById('main-button').innerText = 'Guardar Cambios';
+            document.getElementById('cancel-button').style.display = 'block';
+            window.scrollTo(0, 0); // Sube al principio de la página
+        }
 
-        function addProject() {
+        function cancelEdit() {
+            editingIndex = -1;
+            document.getElementById('form-title').innerText = 'Añadir Nuevo Proyecto';
+            document.getElementById('main-button').innerText = 'Añadir Proyecto a la Lista';
+            document.getElementById('cancel-button').style.display = 'none';
+            clearForm();
+            updatePreview();
+        }
+
+        function deleteProject(index) {
+            if (confirm(`¿Seguro que quieres borrar "${currentProjects[index].titulo}"?`)) {
+                currentProjects.splice(index, 1);
+                renderManageList();
+                previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
+                alert('Proyecto borrado. Pulsa "Generar y Descargar" para guardar los cambios.');
+            }
+        }
+
+        function submitProject() {
             const proyecto = {
                 titulo: document.getElementById('titulo').value,
                 id: document.getElementById('id').value,
@@ -115,16 +150,19 @@
             if (!proyecto.titulo || !proyecto.id || !proyecto.resumen || !proyecto.contenido_completo || !proyecto.imagen) {
                 alert('Todos los campos son obligatorios (excepto el enlace del botón).'); return;
             }
-            currentProjects.push(proyecto);
-            renderManageList(); // Actualizar la lista de gestión
-            document.getElementById('titulo').value = '';
-            document.getElementById('id').value = '';
-            document.getElementById('resumen').value = '';
-            document.getElementById('contenido_completo').value = '';
-            document.getElementById('imagen').value = '';
-            document.getElementById('enlace').value = '';
-            updatePreview(true); // Actualizar la preview con el proyecto ya añadido
-            alert('Proyecto añadido a la lista. Pulsa "Generar y Descargar" para guardar.');
+
+            if (editingIndex > -1) { // Guardar un cambio existente
+                currentProjects[editingIndex] = proyecto;
+                alert('Proyecto actualizado. Pulsa "Generar y Descargar" para guardar permanentemente.');
+                cancelEdit();
+            } else { // Añadir un proyecto nuevo
+                currentProjects.push(proyecto);
+                alert('Proyecto añadido. Pulsa "Generar y Descargar" para guardar.');
+                clearForm();
+            }
+            
+            renderManageList();
+            previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
         }
 
         function saveAndDownload() {
@@ -137,6 +175,15 @@
             URL.revokeObjectURL(a.href);
         }
         
+        function clearForm() {
+            document.getElementById('titulo').value = '';
+            document.getElementById('id').value = '';
+            document.getElementById('resumen').value = '';
+            document.getElementById('contenido_completo').value = '';
+            document.getElementById('imagen').value = '';
+            document.getElementById('enlace').value = '';
+        }
+
         loadInitialData();
     </script>
 </body>
