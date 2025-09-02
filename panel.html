@@ -36,8 +36,16 @@
                     <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (soporta Markdown)</label>
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
+                        
                         <div class="markdown-ayuda">
-                            <p><b>Ayuda:</b> **negrita**, *cursiva*, [enlace](url), `https://link.youtube.com`, `[IMAGEN-DESCARGA](url_imagen, url_descarga)`</p>
+                            <p><b>**Negrita**</b> &nbsp;&nbsp; <i>*Cursiva*</i> &nbsp;&nbsp; `---` (Línea)</p>
+                            <p><b>Listas:</b> Empieza la línea con `- ` o `1. `</p>
+                            <p><b>Títulos:</b> `## Título Mediano`, `### Título Pequeño`</p>
+                            <p><b>Cita:</b> `> Texto citado`</p>
+                            <p><b>Enlace:</b> `[texto visible](https://url.com)`</p>
+                            <p><b>Imagen:</b> `![alt text](https://url/imagen.jpg)`</p>
+                            <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
+                            <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
                         </div>
                         
                         <label for="enlace">URL del Botón Principal (opcional)</label>
@@ -75,7 +83,7 @@
         function updatePreview(){const p={titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value};let l=[...currentProjects];if(editingIndex>-1){l[editingIndex]=p}else if(p.titulo){l.push(p)}
         previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}
         function editProject(i){editingIndex=i;const p=currentProjects[i];document.getElementById('form-title').innerText='Editando Proyecto';document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace;document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0)}
-        function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('form-title').innerText='Añadir Nuevo Proyecto';document.getElementById('main-button').innerText='Añadir Proyecto a la Lista';document.getElementById('cancel-button').style.display='none';updatePreview()}
+        function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto a la Lista';document.getElementById('cancel-button').style.display='none';updatePreview()}
         function deleteProject(i){if(confirm(`¿Borrar "${currentProjects[i].titulo}"?`)){currentProjects.splice(i,1);renderManageList();previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:currentProjects},'*');alert('Proyecto borrado. Pulsa "Generar y Descargar".')}}
         function submitProject(){const p={titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value};if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Todos los campos son obligatorios (excepto el enlace).');return}
         if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado. Pulsa "Generar y Descargar".');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido. Pulsa "Generar y Descargar".');clearForm()}
