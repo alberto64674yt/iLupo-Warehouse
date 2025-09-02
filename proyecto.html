@@ -12,8 +12,7 @@
 </head>
 <body class="detail-page-body">
     <a href="index.html" class="back-link">&larr; Volver a todos los proyectos</a>
-    <main id="project-detail-content" class="project-detail-container">
-        </main>
+    <main id="project-detail-content" class="project-detail-container"></main>
     <footer>
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
@@ -24,42 +23,41 @@
             const proyectoId = params.get('id');
             const container = document.getElementById('project-detail-content');
 
-            if (!proyectoId) {
-                container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return;
-            }
+            if (!proyectoId) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
 
             fetch('proyectos.json')
                 .then(response => response.json())
                 .then(data => {
                     const proyecto = (data.items || []).find(p => p.id === proyectoId);
-                    if (!proyecto) {
-                        container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return;
-                    }
+                    if (!proyecto) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
 
                     document.title = proyecto.titulo + " | iLupo Warehouse";
 
-                    let descripcionHtml = marked.parse(proyecto.contenido_completo || '');
+                    // --- ESTA ES LA PARTE CORREGIDA ---
+                    let rawContent = proyecto.contenido_completo || '';
                     
                     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
-                    descripcionHtml = descripcionHtml.replace(youtubeRegex, (match, videoId) => {
+                    rawContent = rawContent.replace(youtubeRegex, (match, videoId) => {
                         return `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
                     });
 
                     const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
-                    descripcionHtml = descripcionHtml.replace(downloadImgRegex, (match, imgUrl, downloadUrl) => {
+                    rawContent = rawContent.replace(downloadImgRegex, (match, imgUrl, downloadUrl) => {
                         return `<a href="${downloadUrl}" class="download-image-link" target="_blank" title="Descargar"><img src="${imgUrl}" alt="Imagen de descarga"/></a>`;
                     });
+                    
+                    // Procesamos el Markdown DESPUÉS de nuestras reglas especiales
+                    const finalHtml = marked.parse(rawContent);
 
                     container.innerHTML = `
                         <h1 class="project-title">${proyecto.titulo}</h1>
                         <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
-                        <div class="project-description">${descripcionHtml}</div>
+                        <div class="project-description">${finalHtml}</div>
                         ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal del Proyecto</a>` : ''}
                     `;
                 });
         }
         
-        // Ejecutar al cargar el DOM para asegurar que todo está listo
         document.addEventListener('DOMContentLoaded', renderProject);
     </script>
 </body>
