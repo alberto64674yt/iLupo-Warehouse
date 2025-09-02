@@ -7,14 +7,6 @@
       "contenido_completo": "Este es el **contenido completo** que se ve cuando haces clic en la tarjeta. \n\nAquí puedes explayarte, añadir múltiples párrafos, listas, y por supuesto, vídeos de YouTube como este:\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n\nTambién puedes añadir imágenes que al hacer clic lleven a una descarga, usando un formato especial:\n\n[IMAGEN-DESCARGA](https://via.placeholder.com/600x300.png?text=Clic+aquí+para+descargar, https://github.com/git-guides/install-git/archive/refs/heads/main.zip)",
       "imagen": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
       "enlace": "https://google.com"
-    },
-    {
-      "titulo": "test",
-      "id": "test",
-      "resumen": "fdfdfdfdfdffd dfdfdfdfdfd dfdfdfd",
-      "contenido_completo": "fdfdd\ndfdfdd\ndfdfdfd\nfddf",
-      "imagen": "https://i.imgur.com/OjQQvdz_d.webp",
-      "enlace": ""
     }
   ]
 }
