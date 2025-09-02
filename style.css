@@ -72,3 +72,20 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
 .edit-button { background-color: var(--edit-color); color: white; }
 .delete-button { background-color: var(--danger-color); color: white; }
+/* ... (todo el CSS anterior sigue igual, solo añade esto al final) ... */
+
+/* --- Estilo para las letras del código secreto --- */
+.secret-letter {
+    cursor: pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.secret-letter:hover {
+    /* Opcional: un sutil subrayado para darte una pista a ti mismo */
+    text-decoration: underline dotted var(--primary-color);
+}
