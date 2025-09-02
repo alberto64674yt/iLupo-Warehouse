@@ -13,7 +13,6 @@
         <div class="editor-pane">
             <div id="admin-panel">
                 <a href="index.html" class="back-to-site-button">← Volver a la Web Principal</a>
-
                 <h1>Panel de Control</h1>
                 
                 <fieldset>
@@ -36,17 +35,26 @@
                     <legend>Parte 2: Contenido de la Página de Detalle</legend>
                     <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (Markdown)</label>
+                        
+                        <div class="markdown-toolbar">
+                            <button onclick="applyMarkdown('bold')"><b>B</b></button>
+                            <button onclick="applyMarkdown('italic')"><i>I</i></button>
+                            <button onclick="applyMarkdown('h2')">Tít 2</button>
+                            <button onclick="applyMarkdown('h3')">Tít 3</button>
+                            <button onclick="applyMarkdown('link')">Enlace</button>
+                            <button onclick="applyMarkdown('image')">Imagen</button>
+                            <button onclick="applyMarkdown('ul')">Lista</button>
+                            <button onclick="applyMarkdown('ol')">Lista Num.</button>
+                            <button onclick="applyMarkdown('quote')">Cita</button>
+                            <button onclick="applyMarkdown('hr')">Línea</button>
+                        </div>
+                        
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
                         <div class="markdown-ayuda">
-                            <p><b>**Negrita**</b> &nbsp;&nbsp; <i>*Cursiva*</i> &nbsp;&nbsp; `---` (Línea)</p>
-                            <p><b>Listas:</b> Empieza la línea con `- ` o `1. `</p>
-                            <p><b>Títulos:</b> `## Título Mediano`, `### Título Pequeño`</p>
-                            <p><b>Cita:</b> `> Texto citado`</p>
-                            <p><b>Enlace:</b> `[texto visible](https://url.com)`</p>
-                            <p><b>Imagen:</b> `![alt text](https://url/imagen.jpg)`</p>
                             <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
                             <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
                         </div>
+                        
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
@@ -70,6 +78,60 @@
     <script>
         let currentProjects = []; let editingIndex = -1; let previewMode = 'list';
         const previewFrame = document.getElementById('preview-frame');
+        const contentTextarea = document.getElementById('contenido_completo');
+
+        // --- NUEVA FUNCIÓN PARA LA BARRA DE HERRAMIENTAS ---
+        function applyMarkdown(type) {
+            const start = contentTextarea.selectionStart;
+            const end = contentTextarea.selectionEnd;
+            const selectedText = contentTextarea.value.substring(start, end);
+            let markdownText = '';
+
+            switch(type) {
+                case 'bold':
+                    markdownText = `**${selectedText || 'texto en negrita'}**`;
+                    break;
+                case 'italic':
+                    markdownText = `*${selectedText || 'texto en cursiva'}*`;
+                    break;
+                case 'h2':
+                    markdownText = `\n## ${selectedText || 'Título Mediano'}\n`;
+                    break;
+                case 'h3':
+                    markdownText = `\n### ${selectedText || 'Título Pequeño'}\n`;
+                    break;
+                case 'link':
+                    const url = prompt('Introduce la URL del enlace:', 'https://');
+                    if (url) markdownText = `[${selectedText || 'texto del enlace'}](${url})`;
+                    break;
+                case 'image':
+                    const imgUrl = prompt('Introduce la URL de la imagen:', 'https://');
+                    if (imgUrl) markdownText = `![${selectedText || 'descripción'}](${imgUrl})`;
+                    break;
+                case 'ul':
+                    markdownText = `\n- Punto 1\n- Punto 2`;
+                    break;
+                case 'ol':
+                    markdownText = `\n1. Punto 1\n2. Punto 2`;
+                    break;
+                case 'quote':
+                    markdownText = `\n> ${selectedText || 'Texto citado'}\n`;
+                    break;
+                case 'hr':
+                    markdownText = `\n\n---\n\n`;
+                    break;
+            }
+            
+            if(markdownText) {
+                const before = contentTextarea.value.substring(0, start);
+                const after = contentTextarea.value.substring(end, contentTextarea.value.length);
+                contentTextarea.value = before + markdownText + after;
+                contentTextarea.focus();
+                contentTextarea.selectionEnd = start + markdownText.length;
+                updatePreview();
+            }
+        }
+
         function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();previewFrame.onload=()=>{updatePreview()}})}
         function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
         [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.innerHTML=`<span>${p.titulo}</span><div class="manage-buttons"><button class="edit-button" onclick="editProject(${o})">Editar</button><button class="delete-button" onclick="deleteProject(${o})">Borrar</button></div>`;c.appendChild(t)})}
