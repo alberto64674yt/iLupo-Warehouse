@@ -8,6 +8,7 @@
     --danger-color: #ef4444;
     --success-color: #65a30d;
     --edit-color: #3b82f6;
+    --duplicate-color: #9333ea; /* Púrpura para el botón Duplicar */
 }
 body {
     font-family: 'Space Grotesk', sans-serif; 
@@ -19,8 +20,6 @@ body {
 .panel-body { 
     overflow: hidden; 
 }
-
-/* --- Estilos Generales y Cabecera --- */
 header { 
     background-color: var(--dark-bg); 
     text-align: center; 
@@ -47,8 +46,6 @@ main {
     width: 100%; 
     box-sizing: border-box; 
 }
-
-/* --- Controles de Filtro, Búsqueda y Vista --- */
 .filter-controls {
     max-width: 1200px; 
     margin: 0 auto 3rem auto; 
@@ -57,7 +54,7 @@ main {
 .top-controls {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    align-items: flex-end;
 }
 .search-container { 
     flex-grow: 1; 
@@ -101,7 +98,6 @@ main {
     overflow-x: auto;
     padding-bottom: 15px;
     scrollbar-width: none;
-    /* --- ARREGLO FORZADO AQUÍ --- */
     margin-top: 1.5rem !important; 
 }
 .tag-filter-container::-webkit-scrollbar { 
@@ -126,8 +122,6 @@ main {
     font-weight: 700;
     border-color: var(--primary-color);
 }
-
-/* --- Grid y Tarjetas (Vista Rejilla y Lista) --- */
 #portfolio-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
@@ -222,8 +216,6 @@ main {
 #portfolio-grid.view-list .button-imitation {
     display: none;
 }
-
-/* --- Paginación --- */
 .pagination-container {
     text-align: center;
     margin: 3rem 0 1rem 0;
@@ -245,8 +237,6 @@ main {
     font-weight: 700;
     border-color: var(--primary-color);
 }
-
-/* --- Página de Detalle, Etiquetas y Footer --- */
 footer { 
     text-align: center; 
     padding: 2rem 1rem; 
@@ -312,8 +302,6 @@ footer {
     color: var(--dark-bg);
     border-color: var(--primary-color);
 }
-
-/* --- Panel de Control --- */
 .panel-container { display: flex; height: 100vh; }
 .editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); background-color: var(--dark-bg); }
 .preview-pane { width: 60%; display: flex; flex-direction: column; }
@@ -341,16 +329,8 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
 .edit-button { background-color: var(--edit-color); color: white; }
 .delete-button { background-color: var(--danger-color); color: white; }
+.duplicate-button { background-color: var(--duplicate-color); color: white; } /* ESTILO NUEVO */
 .back-to-site-button { display: inline-block; padding: 8px 15px; margin-bottom: 2rem; background-color: var(--surface-color); color: var(--light-text); text-decoration: none; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; transition: all 0.2s; }
 .back-to-site-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
-
-/* --- Acceso Secreto --- */
-.secret-letter {
-    cursor: pointer;
-    -webkit-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-}
-.secret-letter:hover {
-    text-decoration: underline dotted var(--primary-color);
-}
+.secret-letter { cursor: pointer; -webkit-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
+.secret-letter:hover { text-decoration: underline dotted var(--primary-color); }
