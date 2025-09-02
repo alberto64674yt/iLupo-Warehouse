@@ -12,7 +12,10 @@
     <div class="panel-container">
         <div class="editor-pane">
             <div id="admin-panel">
+                <a href="index.html" class="back-to-site-button">← Volver a la Web Principal</a>
+
                 <h1>Panel de Control</h1>
+                
                 <fieldset>
                     <legend>Parte 1: Datos para la Tarjeta (Resumen)</legend>
                     <div class="form-section">
@@ -28,6 +31,7 @@
                         <input type="text" id="tags" placeholder="Ej: Herramienta, Python, Android" oninput="updatePreview()">
                     </div>
                 </fieldset>
+
                 <fieldset>
                     <legend>Parte 2: Contenido de la Página de Detalle</legend>
                     <div class="form-section">
@@ -47,7 +51,11 @@
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
                 </fieldset>
-                <div class="form-actions"><button id="main-button" onclick="submitProject()">Añadir</button><button id="cancel-button" onclick="cancelEdit()" style="display:none;">Cancelar</button></div>
+
+                <div class="form-actions">
+                    <button id="main-button" onclick="submitProject()">Añadir</button>
+                    <button id="cancel-button" onclick="cancelEdit()" style="display:none;">Cancelar</button>
+                </div>
                 <hr>
                 <div class="manage-container"><h2>Gestionar Proyectos</h2><div id="manage-list"></div></div>
                 <hr>
