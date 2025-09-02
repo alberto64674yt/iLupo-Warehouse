@@ -6,64 +6,29 @@
     --light-text: #9ca3af; /* Texto secundario (gris claro) */
     --border-color: #374151;
     --danger-color: #ef4444;
+    --success-color: #65a30d;
+    --edit-color: #3b82f6;
 }
 body {
-    font-family: 'Space Grotesk', sans-serif;
-    margin: 0;
-    background-color: var(--dark-bg);
-    color: var(--text-color);
-    line-height: 1.7;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    font-family: 'Space Grotesk', sans-serif; margin: 0; background-color: var(--dark-bg); color: var(--text-color); line-height: 1.7;
 }
-header {
-    background-color: var(--dark-bg);
-    text-align: center;
-    padding: 4rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
+.panel-body { overflow: hidden; } /* Evita el scroll en el body del panel */
+
+/* ... (Aquí irían todos los estilos de header, main, card, etc. que no cambian) ... */
+header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
 header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
-main {
-    padding: 3rem 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    flex-grow: 1; /* Hace que el contenido principal ocupe el espacio disponible */
-    width: 100%;
-    box-sizing: border-box;
-}
+main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
-.card {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-}
+.card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
 .card:hover { transform: translateY(-8px); border-color: var(--primary-color); }
 .card-hero-image { width: 100%; height: 220px; object-fit: cover; border-bottom: 1px solid var(--border-color); }
 .card-content { padding: 1.5rem; flex-grow: 1; }
 .card h2 { margin-top: 0; margin-bottom: 1rem; font-size: 1.75rem; font-weight: 700; color: white; }
 .card-excerpt { color: var(--light-text); }
 .button-imitation { display: inline-block; background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: 700; margin-top: 1.5rem; }
-
-/* --- FOOTER --- */
-footer {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: #1f2937;
-    border-top: 1px solid var(--border-color);
-    color: var(--light-text);
-    font-size: 0.9rem;
-}
+footer { text-align: center; padding: 2rem 1rem; background-color: #1f2937; border-top: 1px solid var(--border-color); color: var(--light-text); font-size: 0.9rem; }
 footer p { margin: 0; }
-
-/* --- Página de Detalle --- */
 .detail-page-body { background-color: var(--surface-color); }
 .project-detail-container { max-width: 800px; background-color: var(--dark-bg); padding: 2rem 3rem; border-radius: 16px; border: 1px solid var(--border-color); margin: 3rem auto; }
 .back-link { display: inline-block; margin: 2rem 0 0 2rem; color: var(--light-text); text-decoration: none; }
@@ -79,26 +44,31 @@ footer p { margin: 0; }
 .project-description blockquote { border-left: 3px solid var(--primary-color); padding-left: 1rem; margin-left: 0; color: var(--light-text); font-style: italic; }
 .project-description code { background-color: var(--surface-color); padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; }
 .project-button { margin-top: 2rem; }
-
-/* --- Panel de Control y Estilos de Borrado --- */
 .video-container, .download-image-link img { margin: 1.5rem 0; border-radius: 8px; }
 .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
 .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 .download-image-link img { width: 100%; border: 1px solid var(--border-color); transition: opacity 0.2s; }
 .download-image-link:hover img { opacity: 0.8; }
 .empty-message { text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--light-text); }
-.panel-layout { display: flex; height: 100vh; overflow: hidden; background-color: var(--dark-bg); }
-.editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); }
-.preview-pane { width: 60%; background-color: #000; }
-#admin-panel { background-color: var(--dark-bg); }
+
+/* --- Layout del Panel (CORREGIDO) --- */
+.panel-container { display: flex; height: 100vh; }
+.editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); background-color: var(--dark-bg); }
+.preview-pane { width: 60%; }
+#admin-panel { max-width: 100%; }
 #preview-frame { width: 100%; height: 100%; border: none; }
 input, textarea { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; width: 100%; padding: 12px; margin-bottom: 1rem; box-sizing: border-box; font-size: 1rem; }
 textarea#resumen { height: 100px; }
 textarea#contenido_completo { height: 250px; }
 input:focus, textarea:focus { border-color: var(--primary-color); outline: none; }
 .markdown-ayuda { font-size: 0.8rem; color: var(--light-text); margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; background-color: rgba(0,0,0,0.2); border-radius: 4px; }
-button { width: 100%; padding: 15px; color: var(--dark-bg); background-color: var(--primary-color); border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700; }
-.save-button { background-color: #65a30d; color: white; }
+button { width: 100%; padding: 15px; color: var(--dark-bg); background-color: var(--primary-color); border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700; transition: filter 0.2s; }
+button:hover { filter: brightness(1.1); }
+#cancel-button { background-color: var(--light-text); margin-top: 0.5rem; }
+.save-button { background-color: var(--success-color); color: white; }
 hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; }
 .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; }
-.delete-button { background-color: var(--danger-color); color: white; width: auto; padding: 8px 12px; font-size: 0.8rem; }
+.manage-buttons { display: flex; gap: 0.5rem; }
+.manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
+.edit-button { background-color: var(--edit-color); color: white; }
+.delete-button { background-color: var(--danger-color); color: white; }
