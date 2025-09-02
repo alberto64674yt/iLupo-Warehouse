@@ -8,7 +8,7 @@
     --danger-color: #ef4444;
     --success-color: #65a30d;
     --edit-color: #3b82f6;
-    --duplicate-color: #9333ea; /* Púrpura para el botón Duplicar */
+    --duplicate-color: #9333ea;
 }
 body {
     font-family: 'Space Grotesk', sans-serif; 
@@ -20,6 +20,8 @@ body {
 .panel-body { 
     overflow: hidden; 
 }
+
+/* --- Estilos Generales y Cabecera --- */
 header { 
     background-color: var(--dark-bg); 
     text-align: center; 
@@ -46,6 +48,8 @@ main {
     width: 100%; 
     box-sizing: border-box; 
 }
+
+/* --- Controles de Filtro, Búsqueda y Vista --- */
 .filter-controls {
     max-width: 1200px; 
     margin: 0 auto 3rem auto; 
@@ -54,7 +58,7 @@ main {
 .top-controls {
     display: flex;
     gap: 1rem;
-    align-items: flex-end; /* Corregido para un espaciado consistente */
+    align-items: flex-end;
 }
 .search-container { 
     flex-grow: 1; 
@@ -122,17 +126,16 @@ main {
     font-weight: 700;
     border-color: var(--primary-color);
 }
+
+/* --- Grid y Tarjetas con Animación --- */
 #portfolio-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
     gap: 2.5rem; 
-    perspective: 1000px; /* Asegura que la perspectiva esté activa por defecto */
+    perspective: 1000px; 
 }
 #portfolio-grid.view-list {
     display: block;
-    /* Eliminamos la línea "perspective: none;" de aquí */ 
-    /* Y añadimos: */
-    transform-style: flat; /* Asegura que no haya efectos 3D en vista de lista */
 }
 .card { 
     background-color: var(--surface-color); 
@@ -143,8 +146,10 @@ main {
     flex-direction: column; 
     text-decoration: none; 
     color: inherit;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
     transform-style: preserve-3d;
+    /* --- PARTE 1 DE LA ANIMACIÓN: ESTADO INICIAL --- */
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
 }
 #portfolio-grid.view-list .card {
     flex-direction: row;
@@ -152,21 +157,32 @@ main {
     gap: 1.5rem;
     padding: 1rem;
     margin-bottom: 1.5rem;
-    transform-style: flat; /* También a la tarjeta individual en vista de lista */
-    transform: none; /* Desactiva el translateY en vista de lista */
-    box-shadow: none; /* Desactiva la sombra en vista de lista */
-    border-color: var(--border-color); /* Restaura el color de borde */
-}
-#portfolio-grid.view-list .card:hover { /* Evita el efecto hover en vista de lista */
+    opacity: 1; /* Las vistas de lista no tienen animación de entrada */
     transform: none;
-    box-shadow: none;
-    border-color: var(--border-color);
 }
+/* --- PARTE 2 DE LA ANIMACIÓN: LA CLASE QUE LA ACTIVA --- */
+.card.initial-appear {
+    animation: card-drop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+/* --- PARTE 3 DE LA ANIMACIÓN: LA DEFINICIÓN --- */
+@keyframes card-drop-in {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 .card:hover {
     transform: translateY(-8px);
     border-color: var(--primary-color);
     box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3);
 }
+#portfolio-grid.view-list .card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--primary-color);
+}
+
 .card-inner {
     transform-style: preserve-3d;
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -179,7 +195,7 @@ main {
     flex-direction: row;
     align-items: center;
     gap: 1.5rem;
-    transform: none !important; /* Asegura que no haya rotación en vista de lista */
+    transform: none !important;
 }
 .card-hero-image { 
     width: 100%; 
