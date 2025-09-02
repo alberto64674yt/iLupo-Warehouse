@@ -1,12 +1,20 @@
 :root {
-    --primary-color: #facc15; --dark-bg: #111827; --surface-color: #1f2937; --text-color: #e5e7eb; --light-text: #9ca3af; --border-color: #374151; --danger-color: #ef4444; --success-color: #65a30d; --edit-color: #3b82f6;
+    --primary-color: #facc15; /* Amarillo */
+    --dark-bg: #111827; /* Gris oscuro casi negro */
+    --surface-color: #1f2937; /* Gris un poco más claro */
+    --text-color: #e5e7eb; /* Texto principal (blanco roto) */
+    --light-text: #9ca3af; /* Texto secundario (gris claro) */
+    --border-color: #374151;
+    --danger-color: #ef4444;
+    --success-color: #65a30d;
+    --edit-color: #3b82f6;
 }
 body {
     font-family: 'Space Grotesk', sans-serif; margin: 0; background-color: var(--dark-bg); color: var(--text-color); line-height: 1.7;
 }
 .panel-body { overflow: hidden; }
 
-/* ... (Todos los estilos anteriores) ... */
+/* --- Estilos Generales --- */
 header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
 header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
@@ -44,7 +52,6 @@ footer p { margin: 0; }
 .empty-message { text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--light-text); }
 
 /* --- Panel de Control --- */
-.panel-body { overflow: hidden; }
 .panel-container { display: flex; height: 100vh; }
 .editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); background-color: var(--dark-bg); }
 .preview-pane { width: 60%; display: flex; flex-direction: column; }
@@ -72,20 +79,32 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
 .edit-button { background-color: var(--edit-color); color: white; }
 .delete-button { background-color: var(--danger-color); color: white; }
-/* ... (todo el CSS anterior sigue igual, solo añade esto al final) ... */
 
 /* --- Estilo para las letras del código secreto --- */
 .secret-letter {
     cursor: pointer;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    -webkit-user-select: none;
+    user-select: none;
+}
+.secret-letter:hover {
+    text-decoration: underline dotted var(--primary-color);
 }
 
-.secret-letter:hover {
-    /* Opcional: un sutil subrayado para darte una pista a ti mismo */
-    text-decoration: underline dotted var(--primary-color);
+/* --- Estilo para el botón de Volver --- */
+.back-to-site-button {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-bottom: 2rem;
+    background-color: var(--surface-color);
+    color: var(--light-text);
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+.back-to-site-button:hover {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+    border-color: var(--primary-color);
 }
