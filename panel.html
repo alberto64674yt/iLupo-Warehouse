@@ -20,7 +20,7 @@
                         <input type="text" id="titulo" oninput="updatePreview()">
                         <label for="id">ID para la URL (ej: mi-proyecto-1)</label>
                         <input type="text" id="id" oninput="updatePreview()">
-                        <label for="resumen">Resumen Corto</label>
+                        <label for="resumen">Resumen Corto (para la tarjeta)</label>
                         <textarea id="resumen" oninput="updatePreview()"></textarea>
                         <label for="imagen">URL de la Imagen Principal</label>
                         <input type="text" id="imagen" oninput="updatePreview()">
@@ -33,7 +33,16 @@
                     <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (Markdown)</label>
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
-                        <div class="markdown-ayuda"><p>Ayuda completa...</p></div>
+                        <div class="markdown-ayuda">
+                            <p><b>**Negrita**</b> &nbsp;&nbsp; <i>*Cursiva*</i> &nbsp;&nbsp; `---` (Línea)</p>
+                            <p><b>Listas:</b> Empieza la línea con `- ` o `1. `</p>
+                            <p><b>Títulos:</b> `## Título Mediano`, `### Título Pequeño`</p>
+                            <p><b>Cita:</b> `> Texto citado`</p>
+                            <p><b>Enlace:</b> `[texto visible](https://url.com)`</p>
+                            <p><b>Imagen:</b> `![alt text](https://url/imagen.jpg)`</p>
+                            <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
+                            <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
+                        </div>
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
@@ -56,21 +65,9 @@
         function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();previewFrame.onload=()=>{updatePreview()}})}
         function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
         [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.innerHTML=`<span>${p.titulo}</span><div class="manage-buttons"><button class="edit-button" onclick="editProject(${o})">Editar</button><button class="delete-button" onclick="deleteProject(${o})">Borrar</button></div>`;c.appendChild(t)})}
-        function getProjectFromForm() {
-            const tagsValue = document.getElementById('tags').value;
-            return {
-                titulo: document.getElementById('titulo').value, id: document.getElementById('id').value, resumen: document.getElementById('resumen').value, contenido_completo: document.getElementById('contenido_completo').value, imagen: document.getElementById('imagen').value, enlace: document.getElementById('enlace').value,
-                tags: tagsValue ? tagsValue.split(',').map(tag => tag.trim()) : []
-            };
-        }
-        function updatePreview() {
-            const tempProject = getProjectFromForm();
-            let liveProjects = [...currentProjects];
-            if (editingIndex > -1) { liveProjects[editingIndex] = tempProject; } 
-            else if (tempProject.titulo) { liveProjects.push(tempProject); }
-            if (previewMode === 'list') { previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: liveProjects }, '*'); }
-            else { previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: tempProject }, '*'); }
-        }
+        function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
+        function updatePreview(){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1){l[editingIndex]=p}else if(p.titulo){l.push(p)}
+        if(previewMode==='list'){previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}else{previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:p},'*')}}
         function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
         function switchToDetailView(){previewMode='detail';document.getElementById('btn-list-view').classList.remove('active');document.getElementById('btn-detail-view').classList.add('active');if(previewFrame.src.includes('index.html')){previewFrame.src='proyecto.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
         function editProject(i){editingIndex=i;const p=currentProjects[i];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
