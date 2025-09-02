@@ -13,9 +13,9 @@
     <header>
         <h1>iLupo Warehouse</h1>
         <p class="subtitle">
-            Un port<span class="secret-letter" data-key="0">a</span>folio 
-            <span class="secret-letter" data-key="1">d</span>e herra<span class="secret-letter" data-key="2">m</span>ientas 
-            e <span class="secret-letter" data-key="3">i</span>nve<span class="secret-letter" data-key="4">n</span>ciones.
+            Un port<span class="secret-letter" data-key="0" onselectstart="return false;">a</span>folio 
+            <span class="secret-letter" data-key="1" onselectstart="return false;">d</span>e herra<span class="secret-letter" data-key="2" onselectstart="return false;">m</span>ientas 
+            e <span class="secret-letter" data-key="3" onselectstart="return false;">i</span>nve<span class="secret-letter" data-key="4" onselectstart="return false;">n</span>ciones.
         </p>
     </header>
     <main id="portfolio-grid"></main>
@@ -25,7 +25,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        // ... (el script para cargar los proyectos no cambia) ...
         marked.setOptions({ gfm: true, breaks: true });
         function renderContent(proyectos) {
             const grid = document.getElementById('portfolio-grid');
@@ -55,20 +54,15 @@
 
     <script>
         (function() {
-            const requiredLength = 5; // La palabra "admin" tiene 5 letras
+            const requiredLength = 5;
             let progress = 0;
-
             document.addEventListener('click', function(e) {
                 const target = e.target;
-                
-                // Comprobamos si hemos hecho clic en una letra secreta y si es la correcta en la secuencia
                 if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
-                    progress++; // Avanzamos en la secuencia
+                    progress++;
                 } else {
-                    progress = 0; // Si el clic es incorrecto, reiniciamos
+                    progress = 0;
                 }
-
-                // Si hemos completado la secuencia...
                 if (progress === requiredLength) {
                     alert('Acceso correcto.');
                     window.location.href = 'panel.html';
