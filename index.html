@@ -26,7 +26,7 @@
             </div>
             <div class="view-switcher">
                 <button id="grid-view-btn" class="view-btn active" title="Vista de Rejilla">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,3V11H11V3M9,9H5V5H9M3,13V21H11V13M9,19H5V15H9M13,3V11H21V3M19,9H15V5H19M13,13V21H21V13M19,19H15V15H19Z"/></svg>
+                    <svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24"><path d="M3,3V11H11V3M9,9H5V5H9M3,13V21H11V13M9,19H5V15H9M13,3V11H21V3M19,9H15V5H19M13,13V21H21V13M19,19H15V15H19Z"/></svg>
                 </button>
                 <button id="list-view-btn" class="view-btn" title="Vista de Lista">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"/></svg>
@@ -62,12 +62,29 @@
                 return;
             }
 
-            const paginatedProjects = proyectos.slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
+            const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
 
-            paginatedProjects.slice().reverse().forEach((proyecto, index) => {
+            paginatedProjects.forEach((proyecto, index) => {
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
+                
+                // --- LÓGICA MEJORADA PARA LA ANIMACIÓN 3D ---
+                card.addEventListener('mousemove', (e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 15; // Más sensibilidad
+                    const rotateY = (centerX - x) / 15; // Más sensibilidad
+                    const innerCard = e.currentTarget.querySelector('.card-inner');
+                    innerCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', (e) => {
+                    e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)';
+                });
+
                 card.innerHTML = `
                     <div class="card-inner">
                         <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
@@ -94,7 +111,8 @@
                 pageButton.addEventListener('click', () => {
                     currentPage = i;
                     filterAndRender();
-                    window.scrollTo(0, 0);
+                    const headerOffset = document.querySelector('header').offsetHeight;
+                    window.scrollTo({ top: headerOffset, behavior: 'smooth' });
                 });
                 paginationContainer.appendChild(pageButton);
             }
@@ -141,7 +159,6 @@
         fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
         
-        // Selector de Vista
         const gridBtn = document.getElementById('grid-view-btn');
         const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
