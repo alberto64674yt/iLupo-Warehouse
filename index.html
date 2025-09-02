@@ -12,25 +12,36 @@
 <body>
     <header>
         <h1>iLupo Warehouse</h1>
-        <p class="subtitle">
-            Un port<span class="secret-letter" data-key="0" onselectstart="return false;">a</span>folio 
-            <span class="secret-letter" data-key="1" onselectstart="return false;">d</span>e herra<span class="secret-letter" data-key="2" onselectstart="return false;">m</span>ientas 
-            e <span class="secret-letter" data-key="3" onselectstart="return false;">i</span>nve<span class="secret-letter" data-key="4" onselectstart="return false;">n</span>ciones.
-        </p>
+        <p class="subtitle">Portfolio de Herramientas y Creaciones</p>
     </header>
+
+    <div class="filter-controls">
+        <div class="search-container">
+            <input type="text" id="search-box" placeholder="Buscar por nombre...">
+        </div>
+        <div id="tag-filter-container" class="tag-filter-container">
+            </div>
+    </div>
+
     <main id="portfolio-grid"></main>
+    
     <footer>
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+        let allProjects = [];
+        let activeTags = new Set();
+        const searchBox = document.getElementById('search-box');
+
         marked.setOptions({ gfm: true, breaks: true });
-        function renderContent(proyectos) {
+
+        function renderCards(proyectos) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
-                grid.innerHTML = '<p class="empty-message">No hay nada disponible actualmente.</p>';
+                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos con los filtros actuales.</p>';
                 return;
             }
             proyectos.slice().reverse().forEach(proyecto => {
@@ -38,37 +49,105 @@
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
                 card.innerHTML = `
-                    <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
-                    <div class="card-content">
-                        <h2>${proyecto.titulo}</h2>
-                        <div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div>
-                        <span class="button-imitation">Ver detalles</span>
+                    <div class="card-inner">
+                        <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
+                        <div class="card-content">
+                            <h2>${proyecto.titulo}</h2>
+                            <div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div>
+                            <span class="button-imitation">Ver detalles</span>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
-        fetch('proyectos.json').then(r => r.ok ? r.json() : Promise.reject("File not found")).then(d => { window.proyectos = d.items || []; renderContent(window.proyectos); }).catch(e => { console.error(e); document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>'; });
-        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { renderContent(e.data.payload); } });
-    </script>
 
-    <script>
-        (function() {
-            const requiredLength = 5;
-            let progress = 0;
-            document.addEventListener('click', function(e) {
-                const target = e.target;
-                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
-                    progress++;
-                } else {
-                    progress = 0;
-                }
-                if (progress === requiredLength) {
-                    alert('Acceso correcto.');
-                    window.location.href = 'panel.html';
+        function generateTags(proyectos) {
+            const tagContainer = document.getElementById('tag-filter-container');
+            const allTags = new Set();
+            proyectos.forEach(p => {
+                if (p.tags && p.tags.length > 0) {
+                    p.tags.forEach(tag => allTags.add(tag.trim()));
                 }
             });
-        })();
+
+            tagContainer.innerHTML = '<button class="tag-button active" data-tag="all">Todos</button>';
+            allTags.forEach(tag => {
+                tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag}</button>`;
+            });
+
+            document.querySelectorAll('.tag-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const clickedTag = e.target.dataset.tag;
+                    if (clickedTag === 'all') {
+                        activeTags.clear();
+                    } else {
+                        if (activeTags.has(clickedTag)) {
+                            activeTags.delete(clickedTag);
+                        } else {
+                            activeTags.add(clickedTag);
+                        }
+                    }
+                    
+                    // Actualizar estado visual de los botones
+                    document.querySelectorAll('.tag-button').forEach(btn => {
+                        if (activeTags.size === 0) {
+                            btn.classList.toggle('active', btn.dataset.tag === 'all');
+                        } else {
+                            btn.classList.remove('active');
+                            if (activeTags.has(btn.dataset.tag)) {
+                                btn.classList.add('active');
+                            }
+                            document.querySelector('.tag-button[data-tag="all"]').classList.remove('active');
+                        }
+                    });
+
+                    filterAndRender();
+                });
+            });
+        }
+
+        function filterAndRender() {
+            const searchTerm = searchBox.value.toLowerCase();
+            let filteredProjects = allProjects;
+
+            // Filtrar por búsqueda
+            if (searchTerm) {
+                filteredProjects = filteredProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+            }
+
+            // Filtrar por etiquetas
+            if (activeTags.size > 0) {
+                filteredProjects = filteredProjects.filter(p => {
+                    const projectTags = new Set(p.tags.map(t => t.trim()));
+                    return [...activeTags].every(activeTag => projectTags.has(activeTag));
+                });
+            }
+
+            renderCards(filteredProjects);
+        }
+
+        fetch('proyectos.json')
+            .then(response => response.json())
+            .then(data => {
+                allProjects = data.items || [];
+                window.proyectos = allProjects; // Para la preview
+                generateTags(allProjects);
+                filterAndRender();
+            })
+            .catch(error => {
+                document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>';
+            });
+
+        searchBox.addEventListener('input', filterAndRender);
+        
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'previewUpdate') {
+                allProjects = event.data.payload;
+                generateTags(allProjects);
+                filterAndRender();
+            }
+        });
     </script>
 </body>
 </html>
