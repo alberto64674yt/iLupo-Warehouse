@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyectos por Etiqueta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 id="tag-page-title">Proyectos</h1>
+        <p class="subtitle"><a href="index.html" class="back-link-header">← Volver a todos los proyectos</a></p>
+    </header>
+    <main id="portfolio-grid"></main>
+    <footer>
+        <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            marked.setOptions({ gfm: true, breaks: true });
+            const params = new URLSearchParams(window.location.search);
+            const tagName = params.get('tag');
+            const titleElement = document.getElementById('tag-page-title');
+            const grid = document.getElementById('portfolio-grid');
+
+            if (!tagName) {
+                titleElement.innerText = "Etiqueta no especificada";
+                return;
+            }
+
+            titleElement.innerText = `Proyectos con la etiqueta: "${tagName}"`;
+            document.title = `Proyectos de ${tagName} | iLupo Warehouse`;
+
+            fetch('proyectos.json')
+                .then(response => response.json())
+                .then(data => {
+                    const allProjects = data.items || [];
+                    const filteredProjects = allProjects.filter(p => 
+                        p.tags && p.tags.map(t => t.trim()).includes(tagName)
+                    );
+
+                    if (filteredProjects.length === 0) {
+                        grid.innerHTML = '<p class="empty-message">No se encontraron proyectos con esta etiqueta.</p>';
+                        return;
+                    }
+
+                    filteredProjects.slice().reverse().forEach(proyecto => {
+                        const card = document.createElement('a');
+                        card.className = 'card';
+                        card.href = `proyecto.html?id=${proyecto.id}`;
+                        card.innerHTML = `
+                            <div class="card-inner">
+                                <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
+                                <div class="card-content">
+                                    <h2>${proyecto.titulo}</h2>
+                                    <div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div>
+                                    <span class="button-imitation">Ver detalles</span>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
