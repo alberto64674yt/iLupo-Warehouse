@@ -8,56 +8,59 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
 </head>
 <body class="detail-page-body">
     <a href="index.html" class="back-link">&larr; Volver a todos los proyectos</a>
-    <main id="project-detail-content" class="project-detail-container"></main>
+    <main id="project-detail-content" class="project-detail-container">
+        </main>
+    <footer>
+        <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
+    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        function renderProject() {
             const params = new URLSearchParams(window.location.search);
             const proyectoId = params.get('id');
+            const container = document.getElementById('project-detail-content');
 
             if (!proyectoId) {
-                document.getElementById('project-detail-content').innerHTML = '<h1>Proyecto no encontrado</h1>';
-                return;
+                container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return;
             }
 
             fetch('proyectos.json')
                 .then(response => response.json())
                 .then(data => {
-                    const proyectos = data.items || [];
-                    const proyecto = proyectos.find(p => p.id === proyectoId);
-
+                    const proyecto = (data.items || []).find(p => p.id === proyectoId);
                     if (!proyecto) {
-                        document.getElementById('project-detail-content').innerHTML = '<h1>Proyecto no encontrado</h1>';
-                        return;
+                        container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return;
                     }
 
                     document.title = proyecto.titulo + " | iLupo Warehouse";
 
-                    // AHORA USA EL CAMPO "contenido_completo"
                     let descripcionHtml = marked.parse(proyecto.contenido_completo || '');
                     
                     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
                     descripcionHtml = descripcionHtml.replace(youtubeRegex, (match, videoId) => {
                         return `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`;
                     });
+
                     const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
                     descripcionHtml = descripcionHtml.replace(downloadImgRegex, (match, imgUrl, downloadUrl) => {
                         return `<a href="${downloadUrl}" class="download-image-link" target="_blank" title="Descargar"><img src="${imgUrl}" alt="Imagen de descarga"/></a>`;
                     });
 
-                    const projectHTML = `
+                    container.innerHTML = `
                         <h1 class="project-title">${proyecto.titulo}</h1>
                         <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
                         <div class="project-description">${descripcionHtml}</div>
                         ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal del Proyecto</a>` : ''}
                     `;
-                    document.getElementById('project-detail-content').innerHTML = projectHTML;
                 });
-        });
+        }
+        
+        // Ejecutar al cargar el DOM para asegurar que todo está listo
+        document.addEventListener('DOMContentLoaded', renderProject);
     </script>
 </body>
 </html>
