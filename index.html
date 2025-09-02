@@ -12,7 +12,11 @@
 <body>
     <header>
         <h1>iLupo Warehouse</h1>
-        <p class="subtitle">Portfolio de Herramientas y Creaciones</p>
+        <p class="subtitle">
+            Un port<span class="secret-letter" data-key="0">a</span>folio 
+            <span class="secret-letter" data-key="1">d</span>e herra<span class="secret-letter" data-key="2">m</span>ientas 
+            e <span class="secret-letter" data-key="3">i</span>nve<span class="secret-letter" data-key="4">n</span>ciones.
+        </p>
     </header>
     <main id="portfolio-grid"></main>
     <footer>
@@ -21,12 +25,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        // --- CAMBIO AQUÍ: Configuramos Markdown para que respete los saltos de línea ---
-        marked.setOptions({
-            gfm: true,
-            breaks: true
-        });
-
+        // ... (el script para cargar los proyectos no cambia) ...
+        marked.setOptions({ gfm: true, breaks: true });
         function renderContent(proyectos) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
@@ -38,7 +38,6 @@
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                
                 card.innerHTML = `
                     <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
                     <div class="card-content">
@@ -50,22 +49,32 @@
                 grid.appendChild(card);
             });
         }
-        
-        fetch('proyectos.json')
-            .then(response => response.json())
-            .then(data => {
-                window.proyectos = data.items || [];
-                renderContent(window.proyectos);
-            })
-            .catch(error => {
-                document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>';
+        fetch('proyectos.json').then(r => r.ok ? r.json() : Promise.reject("File not found")).then(d => { window.proyectos = d.items || []; renderContent(window.proyectos); }).catch(e => { console.error(e); document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>'; });
+        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { renderContent(e.data.payload); } });
+    </script>
+
+    <script>
+        (function() {
+            const requiredLength = 5; // La palabra "admin" tiene 5 letras
+            let progress = 0;
+
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                
+                // Comprobamos si hemos hecho clic en una letra secreta y si es la correcta en la secuencia
+                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
+                    progress++; // Avanzamos en la secuencia
+                } else {
+                    progress = 0; // Si el clic es incorrecto, reiniciamos
+                }
+
+                // Si hemos completado la secuencia...
+                if (progress === requiredLength) {
+                    alert('Acceso correcto.');
+                    window.location.href = 'panel.html';
+                }
             });
-        
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'previewUpdate') {
-                renderContent(event.data.payload);
-            }
-        });
+        })();
     </script>
 </body>
 </html>
