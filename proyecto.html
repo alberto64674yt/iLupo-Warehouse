@@ -12,58 +12,53 @@
 </head>
 <body class="detail-page-body">
     <a href="index.html" class="back-link">&larr; Volver a todos los proyectos</a>
-    <main id="project-detail-content" class="project-detail-container">
-        </main>
+    <main id="project-detail-content" class="project-detail-container"></main>
     <footer>
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
     <script>
-        const container = document.getElementById('project-detail-content');
-
-        // Función que "viste" la página con los datos de un proyecto
-        function renderProjectDetails(proyecto) {
-            if (!proyecto || !proyecto.titulo) {
-                container.innerHTML = '<h1>Proyecto no encontrado o datos incompletos</h1>';
-                return;
-            }
-            document.title = proyecto.titulo + " | iLupo Warehouse";
-            let rawContent = proyecto.contenido_completo || '';
-            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
-            rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
-            const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
-            rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
-            const finalHtml = marked.parse(rawContent);
-            container.innerHTML = `
-                <h1 class="project-title">${proyecto.titulo}</h1>
-                <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
-                <div class="project-description">${finalHtml}</div>
-                ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal del Proyecto</a>` : ''}
-            `;
-        }
-
-        // Escuchar mensajes del panel de control
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'detailPreviewUpdate') {
-                renderProjectDetails(event.data.payload);
-            }
+        // --- CAMBIO AQUÍ: Configuramos Markdown para que respete los saltos de línea ---
+        marked.setOptions({
+            gfm: true,
+            breaks: true
         });
 
-        // Lógica para cargar un proyecto publicado (cuando no estamos en la preview)
-        function loadPublishedProject() {
+        function renderProject() {
             const params = new URLSearchParams(window.location.search);
             const proyectoId = params.get('id');
-            if (!proyectoId) return; // No hacer nada si no hay ID, para que la preview funcione
+            const container = document.getElementById('project-detail-content');
+
+            if (!proyectoId) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
 
             fetch('proyectos.json')
                 .then(response => response.json())
                 .then(data => {
                     const proyecto = (data.items || []).find(p => p.id === proyectoId);
-                    renderProjectDetails(proyecto);
+                    if (!proyecto) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
+
+                    document.title = proyecto.titulo + " | iLupo Warehouse";
+
+                    let rawContent = proyecto.contenido_completo || '';
+                    
+                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\v=|youtu\.be\/)([\w-]{11})/g;
+                    rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
+                    
+                    const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
+                    rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
+                    
+                    const finalHtml = marked.parse(rawContent);
+
+                    container.innerHTML = `
+                        <h1 class="project-title">${proyecto.titulo}</h1>
+                        <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
+                        <div class="project-description">${finalHtml}</div>
+                        ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal del Proyecto</a>` : ''}
+                    `;
                 });
         }
         
-        document.addEventListener('DOMContentLoaded', loadPublishedProject);
+        document.addEventListener('DOMContentLoaded', renderProject);
     </script>
 </body>
 </html>
