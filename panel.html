@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Panel de Control - iLupo Warehouse</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic" class=" crossorigin">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,20 +12,27 @@
     <div class="panel-container">
         <div class="editor-pane">
             <div id="admin-panel">
+                <a href="index.html" class="back-to-site-button">← Volver a la Web Principal</a>
+                
                 <h1>Panel de Control</h1>
+                
                 <fieldset>
                     <legend>Parte 1: Datos para la Tarjeta (Resumen)</legend>
                     <div class="form-section">
                         <label for="titulo">Título del Proyecto</label>
                         <input type="text" id="titulo" oninput="updatePreview()">
+                        
                         <label for="id">ID para la URL (ej: mi-proyecto-1)</label>
                         <input type="text" id="id" oninput="updatePreview()">
+                        
                         <label for="resumen">Resumen Corto (para la tarjeta)</label>
                         <textarea id="resumen" oninput="updatePreview()"></textarea>
+                        
                         <label for="imagen">URL de la Imagen Principal</label>
                         <input type="text" id="imagen" oninput="updatePreview()">
                     </div>
                 </fieldset>
+
                 <fieldset>
                     <legend>Parte 2: Contenido de la Página de Detalle</legend>
                     <div class="form-section">
@@ -41,14 +48,17 @@
                             <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
                             <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
                         </div>
+                        
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
                 </fieldset>
+
                 <div class="form-actions">
                     <button id="main-button" onclick="submitProject()">Añadir Proyecto a la Lista</button>
                     <button id="cancel-button" onclick="cancelEdit()" style="display: none;">Cancelar Edición</button>
                 </div>
+
                 <hr>
                 <div class="manage-container">
                     <h2>Gestionar Proyectos Existentes</h2>
