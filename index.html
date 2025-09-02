@@ -12,7 +12,11 @@
 <body>
     <header>
         <h1>iLupo Warehouse</h1>
-        <p class="subtitle">Portfolio de Herramientas y Creaciones</p>
+        <p class="subtitle">
+            Un port<span class="secret-letter" data-key="0" onselectstart="return false;">a</span>folio 
+            <span class="secret-letter" data-key="1" onselectstart="return false;">d</span>e herra<span class="secret-letter" data-key="2" onselectstart="return false;">m</span>ientas 
+            e <span class="secret-letter" data-key="3" onselectstart="return false;">i</span>nve<span class="secret-letter" data-key="4" onselectstart="return false;">n</span>ciones.
+        </p>
     </header>
 
     <div class="filter-controls">
@@ -30,13 +34,19 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <script>
         let allProjects = [];
         let activeTags = new Set();
         const searchBox = document.getElementById('search-box');
 
-        marked.setOptions({ gfm: true, breaks: true });
+        // Configuración de Markdown para que respete los saltos de línea
+        marked.setOptions({
+            gfm: true,
+            breaks: true
+        });
 
+        // Función para renderizar las tarjetas de proyectos
         function renderCards(proyectos) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
@@ -48,6 +58,22 @@
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
+                
+                // Efecto 3D al mover el ratón sobre la tarjeta
+                card.addEventListener('mousemove', (e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 20; // Ajusta la sensibilidad
+                    const rotateY = (centerX - x) / 20; // Ajusta la sensibilidad
+                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                card.addEventListener('mouseleave', (e) => {
+                    e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0)';
+                });
+
                 card.innerHTML = `
                     <div class="card-inner">
                         <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
@@ -62,6 +88,7 @@
             });
         }
 
+        // Función para generar los botones de las etiquetas dinámicamente
         function generateTags(proyectos) {
             const tagContainer = document.getElementById('tag-filter-container');
             const allTags = new Set();
@@ -72,12 +99,16 @@
             });
 
             tagContainer.innerHTML = '<button class="tag-button active" data-tag="all">Todos</button>';
-            allTags.forEach(tag => {
+            // Ordenar etiquetas alfabéticamente
+            [...allTags].sort().forEach(tag => {
                 tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag}</button>`;
             });
 
             document.querySelectorAll('.tag-button').forEach(button => {
                 button.addEventListener('click', (e) => {
+                    e.preventDefault(); // Evita que el enlace de la tarjeta se active si se pulsa una etiqueta
+                    e.stopPropagation(); // Detiene la propagación del evento de clic
+                    
                     const clickedTag = e.target.dataset.tag;
                     if (clickedTag === 'all') {
                         activeTags.clear();
@@ -89,7 +120,6 @@
                         }
                     }
                     
-                    // Actualizar estado visual de los botones
                     document.querySelectorAll('.tag-button').forEach(btn => {
                         if (activeTags.size === 0) {
                             btn.classList.toggle('active', btn.dataset.tag === 'all');
@@ -101,25 +131,23 @@
                             document.querySelector('.tag-button[data-tag="all"]').classList.remove('active');
                         }
                     });
-
                     filterAndRender();
                 });
             });
         }
 
+        // Función principal que filtra y renderiza los proyectos
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filteredProjects = allProjects;
 
-            // Filtrar por búsqueda
             if (searchTerm) {
                 filteredProjects = filteredProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             }
 
-            // Filtrar por etiquetas
             if (activeTags.size > 0) {
                 filteredProjects = filteredProjects.filter(p => {
-                    const projectTags = new Set(p.tags.map(t => t.trim()));
+                    const projectTags = new Set((p.tags || []).map(t => t.trim()));
                     return [...activeTags].every(activeTag => projectTags.has(activeTag));
                 });
             }
@@ -127,8 +155,12 @@
             renderCards(filteredProjects);
         }
 
+        // Carga inicial de datos
         fetch('proyectos.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) { throw new Error("Fichero proyectos.json no encontrado"); }
+                return response.json();
+            })
             .then(data => {
                 allProjects = data.items || [];
                 window.proyectos = allProjects; // Para la preview
@@ -136,11 +168,14 @@
                 filterAndRender();
             })
             .catch(error => {
+                console.error("Error al cargar los proyectos:", error);
                 document.getElementById('portfolio-grid').innerHTML = '<p class="empty-message">Error: No se pudo cargar el fichero de proyectos.</p>';
             });
 
+        // Event listener para la búsqueda en tiempo real
         searchBox.addEventListener('input', filterAndRender);
         
+        // Event listener para la previsualización en vivo desde el panel.html
         window.addEventListener('message', function(event) {
             if (event.data.type === 'previewUpdate') {
                 allProjects = event.data.payload;
@@ -148,6 +183,24 @@
                 filterAndRender();
             }
         });
+    </script>
+
+    <script>
+        (function() {
+            const requiredLength = 5;
+            let progress = 0;
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
+                    progress++;
+                } else if (!target.classList.contains('secret-letter')) {
+                    progress = 0;
+                }
+                if (progress === requiredLength) {
+                    window.location.href = 'panel.html';
+                }
+            });
+        })();
     </script>
 </body>
 </html>
