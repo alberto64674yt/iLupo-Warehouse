@@ -18,60 +18,46 @@
     </footer>
 
     <script>
-        // --- CONFIGURACIÓN DE MARKDOWN (CON SALTOS DE LÍNEA) ---
-        marked.setOptions({
-            gfm: true,
-            breaks: true
-        });
-
-        const container = document.getElementById('project-detail-content');
-
-        // --- FUNCIÓN PRINCIPAL PARA "VESTIR" LA PÁGINA ---
+        marked.setOptions({ gfm: true, breaks: true });
         function renderProjectDetails(proyecto) {
-            if (!proyecto || !proyecto.titulo) {
-                container.innerHTML = '<h1>Proyecto no encontrado</h1>';
-                return;
-            }
+            const container = document.getElementById('project-detail-content');
+            if (!proyecto || !proyecto.titulo) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
             document.title = proyecto.titulo + " | iLupo Warehouse";
-            let rawContent = proyecto.contenido_completo || '';
             
+            let rawContent = proyecto.contenido_completo || '';
             const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
             rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
-            
             const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
             rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
-            
             const finalHtml = marked.parse(rawContent);
+
+            let tagsHtml = '';
+            if (proyecto.tags && proyecto.tags.length > 0) {
+                tagsHtml = '<div class="project-tags">Etiquetas: ';
+                tagsHtml += proyecto.tags.map(tag => `<a href="tags.html?tag=${encodeURIComponent(tag.trim())}" class="tag-link">${tag.trim()}</a>`).join('');
+                tagsHtml += '</div>';
+            }
 
             container.innerHTML = `
                 <h1 class="project-title">${proyecto.titulo}</h1>
                 <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
                 <div class="project-description">${finalHtml}</div>
-                ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal del Proyecto</a>` : ''}
+                ${tagsHtml}
+                ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal</a>` : ''}
             `;
         }
+        
+        window.addEventListener('message', e => { if (e.data.type === 'detailPreviewUpdate') renderProjectDetails(e.data.payload); });
 
-        // --- "ANTENA" PARA LA PREVISUALIZACIÓN EN VIVO (ESTA ES LA PARTE RESTAURADA) ---
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'detailPreviewUpdate') {
-                renderProjectDetails(event.data.payload);
-            }
-        });
-
-        // --- LÓGICA PARA CARGAR UN PROYECTO PUBLICADO (CUANDO SE ABRE NORMALMENTE) ---
         function loadPublishedProject() {
             const params = new URLSearchParams(window.location.search);
             const proyectoId = params.get('id');
-            if (!proyectoId) return; // Si no hay ID, es que estamos en modo preview, así que no hace nada
+            if (!proyectoId) return; 
 
             fetch('proyectos.json')
-                .then(response => response.json())
-                .then(data => {
-                    const proyecto = (data.items || []).find(p => p.id === proyectoId);
-                    renderProjectDetails(proyecto);
-                });
+                .then(r => r.json())
+                .then(data => renderProjectDetails((data.items || []).find(p => p.id === proyectoId)));
         }
-        
         document.addEventListener('DOMContentLoaded', loadPublishedProject);
     </script>
 </body>
