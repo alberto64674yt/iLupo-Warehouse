@@ -29,13 +29,12 @@
     <script>
         marked.setOptions({ gfm: true, breaks: true });
         Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
-        let lightbox; // Variable global para la instancia de la galería
+        let lightbox; 
 
         function initializeGallery() {
             if (lightbox) {
-                lightbox.destroy(); // Destruye la galería anterior si existe (útil para la previsualización)
+                lightbox.destroy();
             }
-            // Inicializa la nueva galería para todas las imágenes de la descripción
             lightbox = GLightbox({
                 selector: '.project-description a[href$=".jpg"], .project-description a[href$=".jpeg"], .project-description a[href$=".png"], .project-description a[href$=".gif"], .project-description a[href$=".webp"]',
                 loop: true,
@@ -55,7 +54,6 @@
             rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
             let finalHtml = marked.parse(rawContent);
 
-            // Envuelve las imágenes del contenido Markdown en enlaces para que la galería funcione
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = finalHtml;
             tempDiv.querySelectorAll('img').forEach(img => {
@@ -69,12 +67,22 @@
             });
             finalHtml = tempDiv.innerHTML;
 
+            // --- INICIO DE LA LÓGICA DE ETIQUETAS MODIFICADA ---
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
                 tagsHtml = '<div class="project-tags">Etiquetas: ';
-                tagsHtml += proyecto.tags.map(tag => `<a href="tags.html?tag=${encodeURIComponent(tag.trim())}" class="tag-link">${tag.trim()}</a>`).join('');
+                proyecto.tags.forEach(fullTagPath => {
+                    const parts = fullTagPath.split(' > ');
+                    let currentPath = '';
+                    const breadcrumbs = parts.map(part => {
+                        currentPath += (currentPath ? ' > ' : '') + part;
+                        return `<a href="tags.html?tag=${encodeURIComponent(currentPath)}" class="tag-link">${part.trim()}</a>`;
+                    }).join(' &gt; '); // Usamos &gt; para el símbolo ">"
+                    tagsHtml += `<div style="margin-bottom: 8px;">${breadcrumbs}</div>`;
+                });
                 tagsHtml += '</div>';
             }
+            // --- FIN DE LA LÓGICA DE ETIQUETAS MODIFICADA ---
 
             container.innerHTML = `
                 <h1 class="project-title">${proyecto.titulo}</h1>
@@ -84,8 +92,8 @@
                 ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal</a>` : ''}
             `;
             
-            Prism.highlightAll(); // Resalta la sintaxis del código
-            initializeGallery(); // Pone en marcha la galería
+            Prism.highlightAll();
+            initializeGallery();
         }
         
         window.addEventListener('message', e => { 
