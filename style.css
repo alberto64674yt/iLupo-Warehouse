@@ -20,36 +20,40 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 6px; }
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
-#tag-filters-wrapper {
-    margin-top: 1.5rem;
-}
-.tag-filter-bar {
-    margin-bottom: 0.5rem;
-    position: relative;
-}
-.tag-filter-bar::before {
-    content: '↳';
-    position: absolute;
-    left: 0;
-    top: 6px;
-    color: var(--light-text);
-    font-size: 1.2rem;
-}
-.tag-filter-bar:first-child::before {
-    content: ''; /* No mostrar la flecha en la primera barra */
-}
-.tag-filter-scroller {
+.tag-filter-container {
     display: flex;
     gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 15px;
     scrollbar-width: none;
+    margin-top: 1.5rem !important;
 }
-.tag-filter-scroller::-webkit-scrollbar {
-    display: none;
-}
+.tag-filter-container::-webkit-scrollbar { display: none; }
 .tag-button { flex-shrink: 0; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
 .tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
+.hier-tag-button { display: inline-flex; align-items: center; gap: 6px; }
+.hier-tag-button .arrow { display: inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid var(--light-text); transition: transform 0.2s ease-out; }
+.hier-tag-button.expanded .arrow { transform: rotate(90deg); }
+.tag-dropdown-menu {
+    position: absolute; /* Flota sobre todo */
+    z-index: 1000;
+    padding: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-width: 220px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+.tag-dropdown-menu .tag-button {
+    width: 100%;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: flex-start;
+}
+.tag-dropdown-menu .tag-button:last-child {
+    margin-bottom: 0;
+}
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; perspective: 1000px; }
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
