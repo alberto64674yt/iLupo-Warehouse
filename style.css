@@ -147,7 +147,6 @@ main {
     text-decoration: none; 
     color: inherit;
     transform-style: preserve-3d;
-    /* --- PARTE 1 DE LA ANIMACIÓN: ESTADO INICIAL --- */
     opacity: 0;
     transform: translateY(30px) scale(0.95);
 }
@@ -157,21 +156,18 @@ main {
     gap: 1.5rem;
     padding: 1rem;
     margin-bottom: 1.5rem;
-    opacity: 1; /* Las vistas de lista no tienen animación de entrada */
+    opacity: 1;
     transform: none;
 }
-/* --- PARTE 2 DE LA ANIMACIÓN: LA CLASE QUE LA ACTIVA --- */
 .card.initial-appear {
     animation: card-drop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
-/* --- PARTE 3 DE LA ANIMACIÓN: LA DEFINICIÓN --- */
 @keyframes card-drop-in {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 }
-
 .card:hover {
     transform: translateY(-8px);
     border-color: var(--primary-color);
@@ -182,7 +178,6 @@ main {
     box-shadow: none;
     border-color: var(--primary-color);
 }
-
 .card-inner {
     transform-style: preserve-3d;
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -330,6 +325,8 @@ footer {
     color: var(--dark-bg);
     border-color: var(--primary-color);
 }
+
+/* --- Panel de Control --- */
 .panel-container { display: flex; height: 100vh; }
 .editor-pane { width: 40%; padding: 2rem; overflow-y: auto; border-right: 1px solid var(--border-color); background-color: var(--dark-bg); }
 .preview-pane { width: 60%; display: flex; flex-direction: column; }
@@ -352,7 +349,20 @@ textarea#contenido_completo { height: 200px; border-top-left-radius: 0; border-t
 #cancel-button { background-color: var(--light-text); margin-top: 0.5rem; color: var(--dark-bg); }
 .save-button { background-color: var(--success-color); color: white; }
 hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; }
-.manage-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; }
+
+/* --- ESTILOS NUEVOS PARA LA LISTA REORDENABLE --- */
+.manage-container h2 { margin-top: 0; }
+#manage-list {
+    max-height: 400px; /* Altura máxima para la lista */
+    overflow-y: auto; /* Scroll si la lista es más alta */
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+.manage-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background-color: var(--surface-color); border-radius: 8px; margin-bottom: 0.5rem; }
+.manage-item-title { flex-grow: 1; margin: 0 1rem; }
+.drag-handle { cursor: grab; padding: 0 0.5rem; color: var(--light-text); }
+.sortable-ghost { opacity: 0.4; background: var(--edit-color); }
 .manage-buttons { display: flex; gap: 0.5rem; }
 .manage-buttons button { width: auto; padding: 8px 12px; font-size: 0.8rem; }
 .edit-button { background-color: var(--edit-color); color: white; }
