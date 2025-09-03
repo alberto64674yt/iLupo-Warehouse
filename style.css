@@ -67,6 +67,8 @@ fieldset { padding: 1.5rem; border: 1px solid var(--border-color); border-radius
 legend { padding: 0 0.5rem; color: var(--primary-color); font-weight: 700; }
 label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--light-text); }
 input, textarea { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; width: 100%; padding: 12px; margin-bottom: 1rem; box-sizing: border-box; font-size: 1rem; }
+/* --- NUEVA REGLA --- */
+input.error { border-color: var(--danger-color); }
 textarea#resumen { height: 80px; }
 textarea#contenido_completo { height: 200px; border-top-left-radius: 0; border-top-right-radius: 0; margin-bottom: 0.5rem; }
 .markdown-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; background-color: var(--surface-color); padding: 0.5rem; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; }
@@ -103,4 +105,3 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .easter-egg-signature { color: var(--primary-color); font-weight: bold; }
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
-
