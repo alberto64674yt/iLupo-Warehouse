@@ -20,40 +20,95 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 6px; }
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
+
+/* --- ESTILOS PARA EL SISTEMA DE FILTROS CON CHECKBOX --- */
 .tag-filter-container {
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    padding-bottom: 15px;
-    scrollbar-width: none;
-    margin-top: 1.5rem !important;
+    margin-top: 1.5rem;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 12px;
 }
-.tag-filter-container::-webkit-scrollbar { display: none; }
-.tag-button { flex-shrink: 0; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
-.tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
-.hier-tag-button { display: inline-flex; align-items: center; gap: 6px; }
-.hier-tag-button .arrow { display: inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid var(--light-text); transition: transform 0.2s ease-out; }
-.hier-tag-button.expanded .arrow { transform: rotate(90deg); }
-.tag-dropdown-menu {
-    position: absolute; /* Flota sobre todo */
-    z-index: 1000;
-    padding: 8px;
+.tag-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+}
+.tag-item.expandable {
+    cursor: pointer;
+}
+.arrow {
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid var(--light-text);
+    margin-right: 8px;
+    transition: transform 0.2s ease-out;
+}
+.tag-item.expanded > .arrow {
+    transform: rotate(90deg);
+}
+.tag-checkbox {
+    display: none; /* Ocultamos el checkbox original */
+}
+.tag-label {
+    position: relative;
+    padding-left: 28px; /* Espacio para el checkbox personalizado */
+    cursor: pointer;
+    color: var(--light-text);
+    transition: color 0.2s ease;
+}
+.tag-label .tag-count {
+    color: #6b7280; /* Un color más tenue para el contador */
+}
+.tag-label::before { /* El cuadrado del checkbox */
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 18px;
+    height: 18px;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    min-width: 220px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    border-radius: 4px;
 }
-.tag-dropdown-menu .tag-button {
-    width: 100%;
-    margin-bottom: 4px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: flex-start;
+.tag-checkbox:checked + .tag-label {
+    color: var(--primary-color);
+    font-weight: 500;
 }
-.tag-dropdown-menu .tag-button:last-child {
-    margin-bottom: 0;
+.tag-checkbox:checked + .tag-label .tag-count {
+    color: var(--primary-color);
 }
+.tag-checkbox:checked + .tag-label::after { /* El 'tick' de dentro */
+    content: '✔';
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    color: var(--dark-bg);
+    font-size: 14px;
+}
+.tag-checkbox:checked + .tag-label::before {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.tag-children-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+.tag-children-container.visible {
+    max-height: 1000px; /* Valor grande para permitir la expansión */
+}
+/* Estilos para el botón "Todos" */
+#tag-filter-container .tag-item:first-child {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.tag-button { flex-shrink: 0; width: 100%; text-align: center; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+.tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
+/* --- FIN DE ESTILOS DE FILTROS --- */
+
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; perspective: 1000px; }
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
