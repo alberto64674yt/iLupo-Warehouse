@@ -33,16 +33,19 @@
                 return;
             }
 
-            titleElement.innerText = `Proyectos con la etiqueta: "${tagName}"`;
+            titleElement.innerText = `Proyectos en: "${tagName}"`;
             document.title = `Proyectos de ${tagName} | iLupo Warehouse`;
 
             fetch('proyectos.json')
                 .then(response => response.json())
                 .then(data => {
                     const allProjects = data.items || [];
+                    
+                    // --- LÓGICA DE FILTRADO MODIFICADA ---
                     const filteredProjects = allProjects.filter(p => 
-                        p.tags && p.tags.map(t => t.trim()).includes(tagName)
+                        p.tags && p.tags.some(projectTag => projectTag.startsWith(tagName))
                     );
+                    // --- FIN DE LA LÓGICA MODIFICADA ---
 
                     if (filteredProjects.length === 0) {
                         grid.innerHTML = '<p class="empty-message">No se encontraron proyectos con esta etiqueta.</p>';
