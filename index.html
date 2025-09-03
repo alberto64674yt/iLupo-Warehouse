@@ -159,29 +159,42 @@
             });
         }
         
+        // --- INICIO DE LA FUNCIÓN renderTagTree CORREGIDA ---
         function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
+
             sortedKeys.forEach(key => {
                 const node = tree[key];
                 const nodeName = node.path.split(' > ').pop();
                 const hasChildren = Object.keys(node.children).length > 0;
-                
-                const wrapper = (level === 0) ? document.createElement('div') : container;
-                if (level === 0) wrapper.className = 'tag-node';
 
+                // 1. Crear el contenedor principal para este nodo.
+                const nodeWrapper = document.createElement('div');
+                nodeWrapper.className = 'tag-node';
+
+                // 2. Crear el botón.
                 const button = document.createElement('button');
                 button.className = 'tag-button hier-tag-button';
                 button.dataset.path = node.path;
+                button.innerHTML = hasChildren ? `<span class="arrow"></span>${nodeName} (${node.count})` : `${nodeName} (${node.count})`;
                 
-                let buttonHTML = `${nodeName} (${node.count})`;
-                if (hasChildren) {
-                    buttonHTML = `<span class="arrow"></span>` + buttonHTML;
+                // Aplicar indentación a los botones dentro de un desplegable.
+                if (level > 0) {
+                    button.style.paddingLeft = `${12 + (level * 15)}px`;
                 }
-                button.innerHTML = buttonHTML;
                 
-                const childrenContainer = hasChildren ? document.createElement('div') : null;
-                if (childrenContainer) childrenContainer.className = 'tag-node-children';
+                nodeWrapper.appendChild(button);
+                
+                // 3. Si hay hijos, crear su contenedor y llamar a la función recursivamente.
+                let childrenContainer = null;
+                if (hasChildren) {
+                    childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tag-node-children';
+                    nodeWrapper.appendChild(childrenContainer);
+                    renderTagTree(node.children, childrenContainer, level + 1);
+                }
 
+                // 4. Añadir el listener de clic al botón.
                 button.addEventListener('click', e => {
                     e.stopPropagation();
                     const path = e.currentTarget.dataset.path;
@@ -207,22 +220,12 @@
                     currentPage = 1;
                     filterAndRender();
                 });
-
-                if (level > 0) {
-                     wrapper.appendChild(document.createElement('div')).appendChild(button);
-                } else {
-                    wrapper.appendChild(button);
-                }
-
-                if (childrenContainer) {
-                    wrapper.appendChild(childrenContainer);
-                    if (level === 0) container.appendChild(wrapper);
-                    renderTagTree(node.children, childrenContainer, level + 1);
-                } else {
-                     if (level === 0) container.appendChild(wrapper);
-                }
+                
+                // 5. Añadir el nodo completo al contenedor padre.
+                container.appendChild(nodeWrapper);
             });
         }
+        // --- FIN DE LA FUNCIÓN renderTagTree CORREGIDA ---
 
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
