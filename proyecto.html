@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
 </head>
 <body class="detail-page-body">
@@ -23,12 +24,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 
     <script>
         marked.setOptions({ gfm: true, breaks: true });
-        
-        // --- CAMBIO AQUÍ: Activamos explícitamente el autoloader de lenguajes ---
         Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+        let lightbox; // Variable global para la instancia de la galería
+
+        function initializeGallery() {
+            if (lightbox) {
+                lightbox.destroy(); // Destruye la galería anterior si existe (útil para la previsualización)
+            }
+            // Inicializa la nueva galería para todas las imágenes de la descripción
+            lightbox = GLightbox({
+                selector: '.project-description a[href$=".jpg"], .project-description a[href$=".jpeg"], .project-description a[href$=".png"], .project-description a[href$=".gif"], .project-description a[href$=".webp"]',
+                loop: true,
+                touchNavigation: true
+            });
+        }
 
         function renderProjectDetails(proyecto) {
             const container = document.getElementById('project-detail-content');
@@ -40,7 +53,21 @@
             rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
             const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
             rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
-            const finalHtml = marked.parse(rawContent);
+            let finalHtml = marked.parse(rawContent);
+
+            // Envuelve las imágenes del contenido Markdown en enlaces para que la galería funcione
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = finalHtml;
+            tempDiv.querySelectorAll('img').forEach(img => {
+                if (img.parentElement.tagName !== 'A') {
+                    const link = document.createElement('a');
+                    link.href = img.src;
+                    link.classList.add('glightbox');
+                    img.parentNode.insertBefore(link, img);
+                    link.appendChild(img);
+                }
+            });
+            finalHtml = tempDiv.innerHTML;
 
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
@@ -57,13 +84,13 @@
                 ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal</a>` : ''}
             `;
             
-            Prism.highlightAll();
+            Prism.highlightAll(); // Resalta la sintaxis del código
+            initializeGallery(); // Pone en marcha la galería
         }
         
         window.addEventListener('message', e => { 
             if (e.data.type === 'detailPreviewUpdate') {
                 renderProjectDetails(e.data.payload);
-                setTimeout(() => Prism.highlightAll(), 50);
             }
         });
 
