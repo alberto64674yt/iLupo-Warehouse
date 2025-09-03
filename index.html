@@ -146,22 +146,28 @@
             }
             processTree(tagTree);
 
-            // JAVASCRIPT CORREGIDO: Apuntar al nuevo div interior
             const tagContainer = document.getElementById('tag-filter-flex-container');
-            tagContainer.innerHTML = `<button class="tag-button active" data-path="all">Todos (${proyectos.length})</button>`;
+            tagContainer.innerHTML = ''; // Limpiamos por si acaso
+            const todosButton = document.createElement('button');
+            todosButton.className = 'tag-button active';
+            todosButton.dataset.path = 'all';
+            todosButton.innerText = `Todos (${proyectos.length})`;
+            tagContainer.appendChild(todosButton);
+            
             renderTagTree(tagTree, tagContainer, 0);
             
-            tagContainer.querySelector('[data-path="all"]').addEventListener('click', () => {
+            todosButton.addEventListener('click', () => {
                 activeTags.clear();
                 document.querySelectorAll('.hier-tag-button.active').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tag-node-children.children-visible').forEach(container => container.classList.remove('children-visible'));
                 document.querySelectorAll('.hier-tag-button.expanded').forEach(btn => btn.classList.remove('expanded'));
-                document.querySelector('[data-path="all"]').classList.add('active');
+                todosButton.classList.add('active');
                 currentPage = 1;
                 filterAndRender();
             });
         }
         
+        // --- FUNCIÓN renderTagTree REESCRITA DESDE CERO ---
         function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
 
@@ -178,6 +184,7 @@
                 button.dataset.path = node.path;
                 button.innerHTML = hasChildren ? `<span class="arrow"></span>${nodeName} (${node.count})` : `${nodeName} (${node.count})`;
                 
+                // Aplicar indentación a sub-categorías dentro del desplegable
                 if (level > 0) {
                     button.style.paddingLeft = `${12 + (level * 15)}px`;
                 }
@@ -196,6 +203,7 @@
                     e.stopPropagation();
                     const path = e.currentTarget.dataset.path;
 
+                    // Lógica de selección/deselección del filtro
                     if (activeTags.has(path)) {
                         activeTags.delete(path);
                         e.currentTarget.classList.remove('active');
@@ -204,11 +212,9 @@
                         e.currentTarget.classList.add('active');
                     }
                     
-                    document.querySelector('[data-path="all"]').classList.remove('active');
-                    if (activeTags.size === 0) {
-                         document.querySelector('[data-path="all"]').classList.add('active');
-                    }
+                    document.querySelector('[data-path="all"]').classList.toggle('active', activeTags.size === 0);
 
+                    // Lógica para mostrar/ocultar el menú desplegable
                     if (hasChildren) {
                         e.currentTarget.classList.toggle('expanded');
                         childrenContainer.classList.toggle('children-visible');
