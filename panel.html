@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body class="panel-body">
     <div class="panel-container">
@@ -62,7 +63,10 @@
                     <button id="cancel-button" onclick="cancelEdit()" style="display:none;">Cancelar</button>
                 </div>
                 <hr>
-                <div class="manage-container"><h2>Gestionar Proyectos</h2><div id="manage-list"></div></div>
+                <div class="manage-container">
+                    <h2>Gestionar Proyectos (Arrastra para ordenar)</h2>
+                    <div id="manage-list"></div>
+                </div>
                 <hr>
                 <div class="save-container"><h2>Guardar Todo</h2><button class="save-button" onclick="saveAndDownload()">Generar y Descargar</button></div>
             </div>
@@ -76,6 +80,7 @@
         let currentProjects = []; let editingIndex = -1; let previewMode = 'list';
         const previewFrame = document.getElementById('preview-frame');
         const contentTextarea = document.getElementById('contenido_completo');
+        const manageList = document.getElementById('manage-list');
 
         function applyMarkdown(type) {
             const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
@@ -101,52 +106,118 @@
             }
         }
 
-        function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();previewFrame.onload=()=>{updatePreview()}})}
-        
-        function renderManageList(){
-            const c = document.getElementById('manage-list');
-            c.innerHTML = '';
-            if (currentProjects.length === 0) { c.innerHTML = '<p>No hay proyectos.</p>'; return; }
-            [...currentProjects].reverse().forEach((p, i) => {
-                const originalIndex = currentProjects.length - 1 - i;
-                const item = document.createElement('div');
-                item.className = 'manage-item';
-                item.innerHTML = `
-                    <span>${p.titulo}</span>
-                    <div class="manage-buttons">
-                        <button class="duplicate-button" onclick="duplicateProject(${originalIndex})">Duplicar</button>
-                        <button class="edit-button" onclick="editProject(${originalIndex})">Editar</button>
-                        <button class="delete-button" onclick="deleteProject(${originalIndex})">Borrar</button>
-                    </div>`;
-                c.appendChild(item);
+        function loadInitialData(){
+            fetch('proyectos.json')
+            .then(r => r.ok ? r.json() : Promise.reject('File not found'))
+            .then(d => {
+                currentProjects = d.items || [];
+                renderManageList();
+                // Inicializar SortableJS DESPUÉS de cargar los datos
+                Sortable.create(manageList, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    onEnd: function (evt) {
+                        const newOrderIds = [...manageList.querySelectorAll('.manage-item')].map(item => item.dataset.id).reverse();
+                        currentProjects.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
+                        renderManageList();
+                        updatePreview(true);
+                        alert('Orden de proyectos actualizado. Pulsa "Generar y Descargar" para guardar.');
+                    }
+                });
+                previewFrame.onload = () => updatePreview(true);
+                if(document.readyState === "complete") { updatePreview(true); }
             });
         }
-
-        // --- NUEVA FUNCIÓN PARA DUPLICAR ---
-        function duplicateProject(index) {
-            const projectToDuplicate = JSON.parse(JSON.stringify(currentProjects[index])); // Clonación profunda
-            projectToDuplicate.titulo = projectToDuplicate.titulo + " (Copia)";
-            projectToDuplicate.id = projectToDuplicate.id + "-copia";
+        
+        function renderManageList(){
+            manageList.innerHTML = '';
+            if (currentProjects.length === 0) { manageList.innerHTML = '<p>No hay proyectos.</p>'; return; }
+            [...currentProjects].reverse().forEach((p, i) => {
+                const item = document.createElement('div');
+                item.className = 'manage-item';
+                item.dataset.id = p.id;
+                item.innerHTML = `
+                    <span class="drag-handle">::</span>
+                    <span class="manage-item-title">${p.titulo}</span>
+                    <div class="manage-buttons">
+                        <button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button>
+                        <button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button>
+                        <button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button>
+                    </div>`;
+                manageList.appendChild(item);
+            });
+        }
+        
+        function findProjectIndexById(id) { return currentProjects.findIndex(p => p.id === id); }
+        
+        function duplicateProjectById(id) {
+            const index = findProjectIndexById(id);
+            if (index === -1) return;
+            const projectToDuplicate = JSON.parse(JSON.stringify(currentProjects[index]));
+            projectToDuplicate.titulo += " (Copia)";
+            projectToDuplicate.id += "-copia-" + Date.now();
             currentProjects.push(projectToDuplicate);
             renderManageList();
-            previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: currentProjects }, '*');
-            alert(`Se ha duplicado "${projectToDuplicate.titulo}". Pulsa "Generar y Descargar" para guardar.`);
+            updatePreview(true);
+            alert(`Se ha duplicado. Pulsa "Generar y Descargar" para guardar.`);
+        }
+        
+        function editProjectById(id) {
+            const index = findProjectIndexById(id);
+            if (index === -1) return;
+            editingIndex = index;
+            const p = currentProjects[index];
+            document.getElementById('titulo').value = p.titulo;
+            document.getElementById('id').value = p.id;
+            document.getElementById('resumen').value = p.resumen;
+            document.getElementById('contenido_completo').value = p.contenido_completo;
+            document.getElementById('imagen').value = p.imagen;
+            document.getElementById('enlace').value = p.enlace || '';
+            document.getElementById('tags').value = (p.tags || []).join(', ');
+            document.getElementById('main-button').innerText = 'Guardar Cambios';
+            document.getElementById('cancel-button').style.display = 'block';
+            window.scrollTo(0, 0);
+            switchToDetailView();
+        }
+
+        function deleteProjectById(id) {
+            const index = findProjectIndexById(id);
+            if (index === -1) return;
+            if (confirm(`¿Borrar "${currentProjects[index].titulo}"?`)) {
+                currentProjects.splice(index, 1);
+                renderManageList();
+                updatePreview(true);
+                alert('Proyecto borrado.');
+            }
         }
 
         function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
-        function updatePreview(){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1){l[editingIndex]=p}else if(p.titulo){l.push(p)}
-        if(previewMode==='list'){previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}else{previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:p},'*')}}
-        function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
+        
+        function updatePreview(forceUpdate = false){
+            const p = getProjectFromForm();
+            let l = [...currentProjects];
+            if(editingIndex > -1 && !forceUpdate){ l[editingIndex] = p; }
+            else if(!forceUpdate && p.titulo){ l.push(p); }
+            if(previewMode === 'list'){ previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*'); }
+            else { const projectToShow = editingIndex > -1 ? l[editingIndex] : p; previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:projectToShow},'*'); }
+        }
+        
+        function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview(true)}else{updatePreview(true)}}
         function switchToDetailView(){previewMode='detail';document.getElementById('btn-list-view').classList.remove('active');document.getElementById('btn-detail-view').classList.add('active');if(previewFrame.src.includes('index.html')){previewFrame.src='proyecto.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
-        function editProject(i){editingIndex=i;const p=currentProjects[i];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
-        document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView();}
         function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto';document.getElementById('cancel-button').style.display='none';switchToListView();}
-        function deleteProject(i){if(confirm(`¿Borrar "${currentProjects[i].titulo}"?`)){currentProjects.splice(i,1);renderManageList();previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:currentProjects},'*');alert('Proyecto borrado.')}}
-        function submitProject(){const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
-        if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido.');clearForm()}
-        renderManageList();switchToListView();}
+        
+        function submitProject(){
+            const p = getProjectFromForm();
+            if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
+            if(editingIndex > -1){ currentProjects[editingIndex] = p; alert('Proyecto actualizado.'); cancelEdit(); }
+            else { currentProjects.push(p); alert('Proyecto añadido.'); clearForm(); }
+            renderManageList();
+            updatePreview(true);
+        }
+        
         function saveAndDownload(){const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)}
         function clearForm(){document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value=''}
+        
         loadInitialData();
     </script>
 </body>
