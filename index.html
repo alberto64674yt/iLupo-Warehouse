@@ -55,7 +55,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        let allProjects = []; let activeTags = new Set(); let currentPage = 1;
+        let allProjects = [];
+        let activeTags = new Set();
+        let currentPage = 1;
         const projectsPerPage = 9;
         const searchBox = document.getElementById('search-box');
         const grid = document.getElementById('portfolio-grid');
@@ -75,7 +77,7 @@
         function renderCards(proyectos) {
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
-                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos.</p>';
+                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
                 return;
             }
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
@@ -112,59 +114,164 @@
                 paginationContainer.appendChild(pageButton);
             }
         }
+        
+        // --- INICIO DE LA NUEVA LÓGICA DE ETIQUETAS ---
 
         function generateTags(proyectos) {
-            const tagContainer = document.getElementById('tag-filter-container');
-            const tagCounts = {};
+            const tagTree = {};
+
+            // 1. Construir el árbol de etiquetas y contar proyectos
             proyectos.forEach(p => {
-                (p.tags || []).forEach(tag => {
-                    const trimmedTag = tag.trim();
-                    tagCounts[trimmedTag] = (tagCounts[trimmedTag] || 0) + 1;
+                const projectPaths = new Set();
+                (p.tags || []).forEach(fullTag => {
+                    const parts = fullTag.split(' > ');
+                    let currentPath = '';
+                    parts.forEach(part => {
+                        currentPath += (currentPath ? ' > ' : '') + part;
+                        projectPaths.add(currentPath);
+                    });
+                });
+
+                projectPaths.forEach(path => {
+                    const parts = path.split(' > ');
+                    let currentNode = tagTree;
+                    parts.forEach((part, index) => {
+                        if (!currentNode[part]) {
+                            currentNode[part] = { children: {}, count: 0 };
+                        }
+                        if (index === parts.length - 1) { // Solo sumar en el nodo final de la ruta del proyecto
+                             // No, necesitamos contar en cada nivel.
+                        }
+                        currentNode = currentNode[part].children;
+                    });
                 });
             });
-            const sortedTags = Object.keys(tagCounts).sort();
-            tagContainer.innerHTML = `<button class="tag-button active" data-tag="all">Todos (${proyectos.length})</button>`;
-            sortedTags.forEach(tag => {
-                tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag} (${tagCounts[tag]})</button>`;
-            });
-            document.querySelectorAll('.tag-button').forEach(button => {
-                button.addEventListener('click', e => {
-                    const clickedTag = e.target.dataset.tag;
-                    if (clickedTag === 'all') {
-                        activeTags.clear();
-                    } else {
-                        if (activeTags.has(clickedTag)) {
-                            activeTags.delete(clickedTag);
-                        } else {
-                            activeTags.add(clickedTag);
-                        }
+            
+             // Contar proyectos en cada nodo del arbol
+            function countProjectsInNode(node) {
+                let count = 0;
+                allProjects.forEach(p => {
+                    if ((p.tags || []).some(tag => tag.startsWith(node.path))) {
+                        count++;
                     }
-                    document.querySelectorAll('.tag-button').forEach(btn => {
-                        const isAllButton = btn.dataset.tag === 'all';
-                        const isActive = (activeTags.size === 0 && isAllButton) || activeTags.has(btn.dataset.tag);
-                        btn.classList.toggle('active', isActive);
-                    });
+                });
+                node.count = count;
+                Object.values(node.children).forEach(child => countProjectsInNode(child));
+            }
+
+            // Asignar rutas y contar
+            function assignPathAndCount(node, path) {
+                node.path = path;
+                countProjectsInNode(node);
+            }
+            Object.keys(tagTree).forEach(key => assignPathAndCount({ children: tagTree[key].children, path: key }, key));
+
+
+            // 2. Renderizar el árbol HTML
+            const tagContainer = document.getElementById('tag-filter-container');
+            tagContainer.innerHTML = `<button class="tag-button active" data-path="all">Todos (${proyectos.length})</button>`;
+            renderTagTree(tagTree, tagContainer);
+            
+            // 3. Añadir listener al botón "Todos"
+            tagContainer.querySelector('[data-path="all"]').addEventListener('click', () => {
+                activeTags.clear();
+                document.querySelectorAll('.hier-tag-button, .tag-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-path="all"]').classList.add('active');
+                currentPage = 1;
+                filterAndRender();
+            });
+        }
+        
+        function renderTagTree(tree, container) {
+            const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
+
+            sortedKeys.forEach(key => {
+                const node = tree[key];
+                const parts = node.path.split(' > ');
+                const level = parts.length - 1;
+                const nodeName = parts[parts.length - 1];
+                const hasChildren = Object.keys(node.children).length > 0;
+
+                const nodeWrapper = document.createElement('div');
+                nodeWrapper.className = 'tag-node';
+                nodeWrapper.style.marginLeft = `${level * 20}px`;
+
+                const button = document.createElement('button');
+                button.className = 'tag-button hier-tag-button';
+                button.dataset.path = node.path;
+                
+                let buttonHTML = `${nodeName} (${node.count})`;
+                if (hasChildren) {
+                    buttonHTML = `<span class="arrow"></span>` + buttonHTML;
+                }
+                button.innerHTML = buttonHTML;
+                
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tag-node-children';
+
+                button.addEventListener('click', e => {
+                    const path = e.currentTarget.dataset.path;
+
+                    // Lógica de selección de filtro
+                    if (activeTags.has(path)) {
+                        activeTags.delete(path);
+                        e.currentTarget.classList.remove('active');
+                    } else {
+                        activeTags.add(path);
+                        e.currentTarget.classList.add('active');
+                    }
+                    
+                    document.querySelector('[data-path="all"]').classList.remove('active');
+                    if (activeTags.size === 0) {
+                         document.querySelector('[data-path="all"]').classList.add('active');
+                    }
+
+                    // Lógica de expandir/colapsar
+                    if (hasChildren) {
+                        e.currentTarget.classList.toggle('expanded');
+                        childrenContainer.classList.toggle('children-visible');
+                    }
+
                     currentPage = 1;
                     filterAndRender();
                 });
+
+                nodeWrapper.appendChild(button);
+                nodeWrapper.appendChild(childrenContainer);
+                container.appendChild(nodeWrapper);
+
+                if (hasChildren) {
+                    renderTagTree(node.children, childrenContainer);
+                }
             });
         }
 
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
+
             if (searchTerm) {
                 filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             }
+
             if (activeTags.size > 0) {
-                filtered = filtered.filter(p => { 
-                    const projectTags = new Set((p.tags || []).map(t => t.trim())); 
-                    return [...activeTags].every(tag => projectTags.has(tag)); 
+                const activeTagsArr = [...activeTags];
+                filtered = filtered.filter(p => {
+                    const projectTags = p.tags || [];
+                    // El proyecto debe cumplir con CADA filtro activo (Lógica AND)
+                    return activeTagsArr.every(activeTagPath => {
+                        // El proyecto cumple si ALGUNA de sus etiquetas comienza con la ruta del filtro
+                        return projectTags.some(projectTag => projectTag.startsWith(activeTagPath));
+                    });
                 });
             }
+
             renderCards(filtered);
             setupPagination(filtered.length);
         }
+
+        // --- FIN DE LA NUEVA LÓGICA ---
+
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
