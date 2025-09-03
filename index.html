@@ -34,7 +34,7 @@
                 </button>
             </div>
         </div>
-        <div id="tag-filters-wrapper"></div>
+        <div id="tag-filter-container" class="tag-filter-container"></div>
     </div>
 
     <main id="portfolio-grid"></main>
@@ -62,7 +62,7 @@
         const searchBox = document.getElementById('search-box');
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
-        const filtersWrapper = document.getElementById('tag-filters-wrapper');
+        const tagContainer = document.getElementById('tag-filter-container');
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -117,12 +117,14 @@
         }
         
         let tagTree = {};
+        let openDropdown = null;
 
-        function buildTagTree(proyectos) {
-            const tree = {};
+        function buildAndRenderTags(proyectos) {
+            // Construir el árbol de datos
+            tagTree = {};
             proyectos.forEach(p => {
                 (p.tags || []).forEach(fullTag => {
-                    let currentNode = tree;
+                    let currentNode = tagTree;
                     fullTag.split(' > ').forEach(part => {
                         if (!currentNode[part]) currentNode[part] = { children: {} };
                         currentNode = currentNode[part].children;
@@ -141,87 +143,120 @@
                     }
                 });
             }
-            processTree(tree);
-            return tree;
+            processTree(tagTree);
+            
+            // Renderizar los botones de nivel superior
+            tagContainer.innerHTML = ''; // Limpiar
+            const allBtn = document.createElement('button');
+            allBtn.className = 'tag-button active';
+            allBtn.innerText = `Todos (${proyectos.length})`;
+            allBtn.onclick = () => {
+                activeTags.clear();
+                closeOpenDropdown();
+                updateAllButtonStates();
+                filterAndRender();
+            };
+            tagContainer.appendChild(allBtn);
+            
+            Object.keys(tagTree).sort().forEach(key => {
+                const node = tagTree[key];
+                const button = createTagButton(node, 0);
+                tagContainer.appendChild(button);
+            });
         }
 
-        function renderFilterBars() {
-            filtersWrapper.innerHTML = '';
-            let currentTreeLevel = tagTree;
-            let level = 0;
+        function createTagButton(node, level) {
+            const hasChildren = Object.keys(node.children).length > 0;
+            const nodeName = node.path.split(' > ').pop();
 
-            const activePathParts = [...activeTags].sort((a, b) => b.length - a.length)[0]?.split(' > ') || [];
-
-            while (currentTreeLevel && Object.keys(currentTreeLevel).length > 0) {
-                const bar = createFilterBar(currentTreeLevel, level, activePathParts);
-                filtersWrapper.appendChild(bar);
-
-                const activeNodeKey = activePathParts[level];
-                if (activeNodeKey && currentTreeLevel[activeNodeKey] && Object.keys(currentTreeLevel[activeNodeKey].children).length > 0) {
-                    currentTreeLevel = currentTreeLevel[activeNodeKey].children;
-                    level++;
+            const button = document.createElement('button');
+            button.className = 'tag-button hier-tag-button';
+            button.dataset.path = node.path;
+            button.innerHTML = hasChildren ? `<span class="arrow"></span>${nodeName} (${node.count})` : `${nodeName} (${node.count})`;
+            button.style.paddingLeft = `${12 + (level * 15)}px`;
+            
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Lógica de filtrado
+                if (activeTags.has(node.path)) {
+                    activeTags.delete(node.path);
                 } else {
-                    break;
+                    activeTags.add(node.path);
                 }
+                updateAllButtonStates();
+                filterAndRender();
+                
+                // Lógica del menú desplegable
+                if (hasChildren) {
+                    const isAlreadyOpen = button.classList.contains('expanded');
+                    closeOpenDropdown();
+                    if (!isAlreadyOpen) {
+                        showDropdownFor(button, node);
+                    }
+                } else {
+                    closeOpenDropdown();
+                }
+            });
+            return button;
+        }
+
+        function showDropdownFor(button, node) {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'tag-dropdown-menu';
+
+            Object.keys(node.children).sort().forEach(key => {
+                const childNode = node.children[key];
+                const childButton = createTagButton(childNode, 1); // Asumimos un nivel más por ahora
+                dropdown.appendChild(childButton);
+            });
+            
+            document.body.appendChild(dropdown);
+            
+            const rect = button.getBoundingClientRect();
+            dropdown.style.left = `${rect.left + window.scrollX}px`;
+            dropdown.style.top = `${rect.bottom + window.scrollY + 5}px`;
+
+            button.classList.add('expanded');
+            openDropdown = { element: dropdown, button: button };
+        }
+
+        function closeOpenDropdown() {
+            if (openDropdown) {
+                openDropdown.element.remove();
+                openDropdown.button.classList.remove('expanded');
+                openDropdown = null;
             }
+        }
+
+        function updateAllButtonStates() {
+            document.querySelectorAll('.tag-button').forEach(btn => {
+                const path = btn.dataset.path;
+                if (path === 'all') {
+                    btn.classList.toggle('active', activeTags.size === 0);
+                } else if (path) {
+                    btn.classList.toggle('active', activeTags.has(path));
+                }
+            });
         }
         
-        function createFilterBar(treeLevel, level, activePathParts) {
-            const barContainer = document.createElement('div');
-            barContainer.className = 'tag-filter-bar';
-            barContainer.style.paddingLeft = `${level * 25}px`;
-
-            const scroller = document.createElement('div');
-            scroller.className = 'tag-filter-scroller';
-
-            if (level === 0) {
-                const allBtn = document.createElement('button');
-                allBtn.className = 'tag-button';
-                allBtn.innerText = `Todos (${allProjects.length})`;
-                allBtn.classList.toggle('active', activeTags.size === 0);
-                allBtn.onclick = () => {
-                    activeTags.clear();
-                    filterAndRender();
-                };
-                scroller.appendChild(allBtn);
+        document.addEventListener('click', (e) => {
+            if (openDropdown && !openDropdown.element.contains(e.target) && !e.target.closest('.hier-tag-button')) {
+                closeOpenDropdown();
             }
-
-            Object.keys(treeLevel).sort().forEach(key => {
-                const node = treeLevel[key];
-                const button = document.createElement('button');
-                button.className = 'tag-button';
-                button.innerText = `${key} (${node.count})`;
-                button.classList.toggle('active', key === activePathParts[level]);
-                
-                button.onclick = () => {
-                    if (activeTags.has(node.path)) {
-                        const parentPath = node.path.split(' > ').slice(0, -1).join(' > ');
-                        activeTags.clear();
-                        if (parentPath) activeTags.add(parentPath);
-                    } else {
-                        activeTags.clear();
-                        activeTags.add(node.path);
-                    }
-                    filterAndRender();
-                };
-                scroller.appendChild(button);
-            });
-
-            barContainer.appendChild(scroller);
-            return barContainer;
-        }
+        });
 
         function filterAndRender() {
-            renderFilterBars();
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
             if (searchTerm) {
                 filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             }
             if (activeTags.size > 0) {
-                const activeTagPath = [...activeTags][0];
+                const activeTagsArr = [...activeTags];
                 filtered = filtered.filter(p => {
-                    return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
+                    return activeTagsArr.every(activeTagPath => {
+                        return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
+                    });
                 });
             }
             renderCards(filtered);
@@ -231,16 +266,16 @@
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
             window.proyectos=allProjects;
-            tagTree = buildTagTree(allProjects);
+            buildAndRenderTags(allProjects);
             filterAndRender();
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
 
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
-        const gridBtn = document.getElementById('grid-view-btn');
-        const listBtn = document.getElementById('list-view-btn');
+        gridBtn = document.getElementById('grid-view-btn');
+        listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
-        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; tagTree = buildTagTree(allProjects); filterAndRender(); } });
+        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; buildAndRenderTags(allProjects); filterAndRender(); } });
     </script>
     
     <script>
