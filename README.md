@@ -19,7 +19,7 @@ El proceso se divide en **Generar** el fichero de datos actualizado y **Subirlo*
     * Utiliza la previsualización en vivo para ver los cambios.
 
 3.  **Descargar el Fichero Actualizado:**
-    * Cuando hayas terminado tu sesión de edición, pulsa el botón verde **"Generar y Descargar Fichero"**.
+    * Cuando hayas terminado tu sesión de edición, pulsa el botón verde **"Generar y Descargar proyectos.json"**.
     * Se descargará un `proyectos.json` a tu ordenador con todos los cambios.
 
 ### Fase 2: Publicar los Cambios en GitHub
@@ -38,10 +38,25 @@ Netlify detectará el cambio y actualizará la web automáticamente en 1-2 minut
 
 ---
 
-## ✨ Funciones Avanzadas de la Web
+## ✨ Funciones de la Web
 
+### Búsqueda y Vistas
 * **Buscador:** Filtra los proyectos en tiempo real por su título.
-* **Filtro por Etiquetas:** Haz clic en una o varias etiquetas para ver solo los proyectos que las contengan. La barra de etiquetas tiene scroll lateral si hay muchas.
-* **Paginación:** Si hay más de 9 proyectos, aparecerán controles para navegar entre las páginas.
+* **Paginación:** Si hay más de 9 proyectos (o los que queden después de filtrar), aparecerán controles para navegar entre las páginas.
 * **Selector de Vista:** Puedes cambiar entre la vista de rejilla (tarjetas) y la vista de lista (más compacta).
 * **Páginas de Etiquetas:** En la página de detalle de un proyecto, puedes hacer clic en sus etiquetas para ver todos los demás proyectos con esa misma etiqueta.
+
+### Nuevo Sistema de Filtros por Etiquetas
+
+El sistema de filtros ahora es un árbol jerárquico que te da control total.
+
+* **¿Cómo se añaden las etiquetas en el panel?**
+    * Para crear jerarquías, usa el símbolo `>` en el campo de etiquetas. Por ejemplo: `Juegos > Minecraft > Mods`.
+    * Para añadir varias etiquetas a un mismo proyecto, sepáralas por comas. Por ejemplo: `Juegos > Minecraft > Mods, Desarrollo Web > JavaScript`.
+    * Esto asignaría al proyecto dos "caminos" de etiquetas distintos.
+
+* **¿Cómo se usan los filtros en la web?**
+    * **Explorar:** Haz clic en la **flecha** o en el **nombre** de una categoría para desplegar o contraer sus sub-categorías sin activar ningún filtro.
+    * **Filtrar:** Marca la **casilla de verificación (checkbox)** de cualquier categoría o sub-categoría para activar ese filtro.
+    * **Filtro Múltiple:** Puedes marcar **tantas casillas como quieras**, incluso de ramas diferentes, para crear filtros cruzados muy específicos. El sistema mostrará solo los proyectos que cumplan **todas** las condiciones marcadas.
+    * **Ver lo que está activo:** El sistema es 100% visual. Siempre sabrás qué filtros tienes aplicados porque sus casillas estarán marcadas.
