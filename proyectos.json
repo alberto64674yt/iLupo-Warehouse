@@ -7,7 +7,10 @@
       "contenido_completo": "Este es el **contenido completo** que se ve cuando haces clic en la tarjeta.",
       "imagen": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
       "enlace": "https://google.com",
-      "tags": ["Herramienta", "Ejemplo"]
+      "tags": [
+        "Desarrollo Web > Herramientas",
+        "General > Ejemplo"
+      ]
     },
     {
       "titulo": "Otra App de Ejemplo",
@@ -16,7 +19,10 @@
       "contenido_completo": "El contenido de esta app es para la demo.",
       "imagen": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070",
       "enlace": "",
-      "tags": ["Apps Móviles", "Android", "Ejemplo"]
+      "tags": [
+        "Desarrollo Móvil > Android",
+        "General > Ejemplo"
+      ]
     },
     {
       "titulo": "Un Tercer Proyecto",
@@ -25,7 +31,10 @@
       "contenido_completo": "Este es el contenido del tercer proyecto.",
       "imagen": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070",
       "enlace": "",
-      "tags": ["Herramienta", "Python"]
+      "tags": [
+        "Programación > Python > Herramientas",
+        "Desarrollo Web > JavaScript"
+      ]
     }
   ]
 }
