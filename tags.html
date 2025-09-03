@@ -28,7 +28,6 @@
             const titleElement = document.getElementById('tag-page-title');
             const grid = document.getElementById('portfolio-grid');
 
-            // --- CÓDIGO AÑADIDO: INTERSECTION OBSERVER ---
             const cardObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -37,14 +36,13 @@
                     }
                 });
             }, { threshold: 0.1 });
-            // --- FIN DEL CÓDIGO AÑADIDO ---
 
             if (!tagName) {
                 titleElement.innerText = "Etiqueta no especificada";
                 return;
             }
 
-            titleElement.innerText = `Proyectos en: "${tagName}"`;
+            titleElement.innerText = `Proyectos con la etiqueta: "${tagName}"`;
             document.title = `Proyectos de ${tagName} | iLupo Warehouse`;
 
             fetch('proyectos.json')
@@ -52,9 +50,11 @@
                 .then(data => {
                     const allProjects = data.items || [];
                     
+                    // --- LÓGICA DE FILTRADO MODIFICADA A "INCLUDES" ---
                     const filteredProjects = allProjects.filter(p => 
-                        p.tags && p.tags.some(projectTag => projectTag.startsWith(tagName))
+                        p.tags && p.tags.some(projectTag => projectTag.includes(tagName))
                     );
+                    // --- FIN DE LA LÓGICA MODIFICADA ---
 
                     if (filteredProjects.length === 0) {
                         grid.innerHTML = '<p class="empty-message">No se encontraron proyectos con esta etiqueta.</p>';
@@ -76,7 +76,6 @@
                             </div>
                         `;
                         grid.appendChild(card);
-                        // --- LÍNEA AÑADIDA: OBSERVAR LA TARJETA ---
                         cardObserver.observe(card);
                     });
                 });
