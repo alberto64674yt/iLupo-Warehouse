@@ -34,9 +34,7 @@
                 </button>
             </div>
         </div>
-        <div id="tag-filter-scroll-container">
-            <div id="tag-filter-flex-container"></div>
-        </div>
+        <div id="tag-filters-wrapper"></div>
     </div>
 
     <main id="portfolio-grid"></main>
@@ -64,6 +62,7 @@
         const searchBox = document.getElementById('search-box');
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
+        const filtersWrapper = document.getElementById('tag-filters-wrapper');
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -117,24 +116,22 @@
             }
         }
         
-        function generateTags(proyectos) {
-            const tagTree = {};
+        let tagTree = {};
+
+        function buildTagTree(proyectos) {
+            const tree = {};
             proyectos.forEach(p => {
                 (p.tags || []).forEach(fullTag => {
-                    let currentNode = tagTree;
-                    const parts = fullTag.split(' > ');
-                    parts.forEach(part => {
-                        if (!currentNode[part]) {
-                            currentNode[part] = { children: {} };
-                        }
+                    let currentNode = tree;
+                    fullTag.split(' > ').forEach(part => {
+                        if (!currentNode[part]) currentNode[part] = { children: {} };
                         currentNode = currentNode[part].children;
                     });
                 });
             });
 
             function processTree(nodeLevel, pathPrefix = '') {
-                const sortedKeys = Object.keys(nodeLevel).sort((a, b) => a.localeCompare(b));
-                sortedKeys.forEach(key => {
+                Object.keys(nodeLevel).forEach(key => {
                     const currentNode = nodeLevel[key];
                     const currentPath = pathPrefix ? `${pathPrefix} > ${key}` : key;
                     currentNode.path = currentPath;
@@ -144,116 +141,106 @@
                     }
                 });
             }
-            processTree(tagTree);
+            processTree(tree);
+            return tree;
+        }
 
-            const tagContainer = document.getElementById('tag-filter-flex-container');
-            tagContainer.innerHTML = ''; // Limpiamos por si acaso
-            const todosButton = document.createElement('button');
-            todosButton.className = 'tag-button active';
-            todosButton.dataset.path = 'all';
-            todosButton.innerText = `Todos (${proyectos.length})`;
-            tagContainer.appendChild(todosButton);
-            
-            renderTagTree(tagTree, tagContainer, 0);
-            
-            todosButton.addEventListener('click', () => {
-                activeTags.clear();
-                document.querySelectorAll('.hier-tag-button.active').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tag-node-children.children-visible').forEach(container => container.classList.remove('children-visible'));
-                document.querySelectorAll('.hier-tag-button.expanded').forEach(btn => btn.classList.remove('expanded'));
-                todosButton.classList.add('active');
-                currentPage = 1;
-                filterAndRender();
-            });
+        function renderFilterBars() {
+            filtersWrapper.innerHTML = '';
+            let currentTreeLevel = tagTree;
+            let level = 0;
+
+            const activePathParts = [...activeTags].sort((a, b) => b.length - a.length)[0]?.split(' > ') || [];
+
+            while (currentTreeLevel && Object.keys(currentTreeLevel).length > 0) {
+                const bar = createFilterBar(currentTreeLevel, level, activePathParts);
+                filtersWrapper.appendChild(bar);
+
+                const activeNodeKey = activePathParts[level];
+                if (activeNodeKey && currentTreeLevel[activeNodeKey] && Object.keys(currentTreeLevel[activeNodeKey].children).length > 0) {
+                    currentTreeLevel = currentTreeLevel[activeNodeKey].children;
+                    level++;
+                } else {
+                    break;
+                }
+            }
         }
         
-        // --- FUNCIÓN renderTagTree REESCRITA DESDE CERO ---
-        function renderTagTree(tree, container, level) {
-            const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
+        function createFilterBar(treeLevel, level, activePathParts) {
+            const barContainer = document.createElement('div');
+            barContainer.className = 'tag-filter-bar';
+            barContainer.style.paddingLeft = `${level * 25}px`;
 
-            sortedKeys.forEach(key => {
-                const node = tree[key];
-                const nodeName = node.path.split(' > ').pop();
-                const hasChildren = Object.keys(node.children).length > 0;
+            const scroller = document.createElement('div');
+            scroller.className = 'tag-filter-scroller';
 
-                const nodeWrapper = document.createElement('div');
-                nodeWrapper.className = 'tag-node';
-
-                const button = document.createElement('button');
-                button.className = 'tag-button hier-tag-button';
-                button.dataset.path = node.path;
-                button.innerHTML = hasChildren ? `<span class="arrow"></span>${nodeName} (${node.count})` : `${nodeName} (${node.count})`;
-                
-                // Aplicar indentación a sub-categorías dentro del desplegable
-                if (level > 0) {
-                    button.style.paddingLeft = `${12 + (level * 15)}px`;
-                }
-                
-                nodeWrapper.appendChild(button);
-                
-                let childrenContainer = null;
-                if (hasChildren) {
-                    childrenContainer = document.createElement('div');
-                    childrenContainer.className = 'tag-node-children';
-                    nodeWrapper.appendChild(childrenContainer);
-                    renderTagTree(node.children, childrenContainer, level + 1);
-                }
-
-                button.addEventListener('click', e => {
-                    e.stopPropagation();
-                    const path = e.currentTarget.dataset.path;
-
-                    // Lógica de selección/deselección del filtro
-                    if (activeTags.has(path)) {
-                        activeTags.delete(path);
-                        e.currentTarget.classList.remove('active');
-                    } else {
-                        activeTags.add(path);
-                        e.currentTarget.classList.add('active');
-                    }
-                    
-                    document.querySelector('[data-path="all"]').classList.toggle('active', activeTags.size === 0);
-
-                    // Lógica para mostrar/ocultar el menú desplegable
-                    if (hasChildren) {
-                        e.currentTarget.classList.toggle('expanded');
-                        childrenContainer.classList.toggle('children-visible');
-                    }
-
-                    currentPage = 1;
+            if (level === 0) {
+                const allBtn = document.createElement('button');
+                allBtn.className = 'tag-button';
+                allBtn.innerText = `Todos (${allProjects.length})`;
+                allBtn.classList.toggle('active', activeTags.size === 0);
+                allBtn.onclick = () => {
+                    activeTags.clear();
                     filterAndRender();
-                });
+                };
+                scroller.appendChild(allBtn);
+            }
+
+            Object.keys(treeLevel).sort().forEach(key => {
+                const node = treeLevel[key];
+                const button = document.createElement('button');
+                button.className = 'tag-button';
+                button.innerText = `${key} (${node.count})`;
+                button.classList.toggle('active', key === activePathParts[level]);
                 
-                container.appendChild(nodeWrapper);
+                button.onclick = () => {
+                    if (activeTags.has(node.path)) {
+                        const parentPath = node.path.split(' > ').slice(0, -1).join(' > ');
+                        activeTags.clear();
+                        if (parentPath) activeTags.add(parentPath);
+                    } else {
+                        activeTags.clear();
+                        activeTags.add(node.path);
+                    }
+                    filterAndRender();
+                };
+                scroller.appendChild(button);
             });
+
+            barContainer.appendChild(scroller);
+            return barContainer;
         }
 
         function filterAndRender() {
+            renderFilterBars();
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
             if (searchTerm) {
                 filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             }
             if (activeTags.size > 0) {
-                const activeTagsArr = [...activeTags];
+                const activeTagPath = [...activeTags][0];
                 filtered = filtered.filter(p => {
-                    const projectTags = p.tags || [];
-                    return activeTagsArr.every(activeTagPath => {
-                        return projectTags.some(projectTag => projectTag.startsWith(activeTagPath));
-                    });
+                    return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
                 });
             }
             renderCards(filtered);
             setupPagination(filtered.length);
         }
 
-        fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
+        fetch('proyectos.json').then(r=>r.json()).then(data=>{
+            allProjects=data.items||[];
+            window.proyectos=allProjects;
+            tagTree = buildTagTree(allProjects);
+            filterAndRender();
+        }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
+
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
         const gridBtn = document.getElementById('grid-view-btn');
         const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
-        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; generateTags(allProjects); filterAndRender(); } });
+        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; tagTree = buildTagTree(allProjects); filterAndRender(); } });
     </script>
     
     <script>
