@@ -115,67 +115,61 @@
             }
         }
         
-        // --- INICIO DE LA NUEVA LÓGICA DE ETIQUETAS ---
+        // --- INICIO DE LA LÓGICA DE ETIQUETAS CORREGIDA ---
 
         function generateTags(proyectos) {
             const tagTree = {};
 
-            // 1. Construir el árbol de etiquetas y contar proyectos
+            // 1. Construir la estructura básica del árbol a partir de las etiquetas de los proyectos.
             proyectos.forEach(p => {
-                const projectPaths = new Set();
                 (p.tags || []).forEach(fullTag => {
-                    const parts = fullTag.split(' > ');
-                    let currentPath = '';
-                    parts.forEach(part => {
-                        currentPath += (currentPath ? ' > ' : '') + part;
-                        projectPaths.add(currentPath);
-                    });
-                });
-
-                projectPaths.forEach(path => {
-                    const parts = path.split(' > ');
                     let currentNode = tagTree;
-                    parts.forEach((part, index) => {
+                    const parts = fullTag.split(' > ');
+                    parts.forEach(part => {
                         if (!currentNode[part]) {
-                            currentNode[part] = { children: {}, count: 0 };
-                        }
-                        if (index === parts.length - 1) { // Solo sumar en el nodo final de la ruta del proyecto
-                             // No, necesitamos contar en cada nivel.
+                            currentNode[part] = { children: {} };
                         }
                         currentNode = currentNode[part].children;
                     });
                 });
             });
-            
-             // Contar proyectos en cada nodo del arbol
-            function countProjectsInNode(node) {
-                let count = 0;
-                allProjects.forEach(p => {
-                    if ((p.tags || []).some(tag => tag.startsWith(node.path))) {
-                        count++;
+
+            // 2. Función recursiva para procesar el árbol: asigna rutas y cuenta los proyectos.
+            function processTree(nodeLevel, pathPrefix = '') {
+                const sortedKeys = Object.keys(nodeLevel).sort((a, b) => a.localeCompare(b));
+                
+                sortedKeys.forEach(key => {
+                    const currentNode = nodeLevel[key];
+                    const currentPath = pathPrefix ? `${pathPrefix} > ${key}` : key;
+                    
+                    // Asignar la ruta completa al nodo
+                    currentNode.path = currentPath;
+                    
+                    // Contar cuántos proyectos coinciden con esta ruta
+                    currentNode.count = allProjects.filter(p => 
+                        (p.tags || []).some(tag => tag.startsWith(currentPath))
+                    ).length;
+                    
+                    // Llamar recursivamente para los hijos
+                    if (Object.keys(currentNode.children).length > 0) {
+                        processTree(currentNode.children, currentPath);
                     }
                 });
-                node.count = count;
-                Object.values(node.children).forEach(child => countProjectsInNode(child));
             }
 
-            // Asignar rutas y contar
-            function assignPathAndCount(node, path) {
-                node.path = path;
-                countProjectsInNode(node);
-            }
-            Object.keys(tagTree).forEach(key => assignPathAndCount({ children: tagTree[key].children, path: key }, key));
+            processTree(tagTree); // Iniciar el procesamiento desde la raíz del árbol.
 
-
-            // 2. Renderizar el árbol HTML
+            // 3. Renderizar el árbol ya procesado en HTML.
             const tagContainer = document.getElementById('tag-filter-container');
             tagContainer.innerHTML = `<button class="tag-button active" data-path="all">Todos (${proyectos.length})</button>`;
             renderTagTree(tagTree, tagContainer);
             
-            // 3. Añadir listener al botón "Todos"
+            // 4. Añadir el listener al botón "Todos".
             tagContainer.querySelector('[data-path="all"]').addEventListener('click', () => {
                 activeTags.clear();
-                document.querySelectorAll('.hier-tag-button, .tag-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.hier-tag-button.active').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tag-node-children.children-visible').forEach(container => container.classList.remove('children-visible'));
+                 document.querySelectorAll('.hier-tag-button.expanded').forEach(btn => btn.classList.remove('expanded'));
                 document.querySelector('[data-path="all"]').classList.add('active');
                 currentPage = 1;
                 filterAndRender();
@@ -194,10 +188,10 @@
 
                 const nodeWrapper = document.createElement('div');
                 nodeWrapper.className = 'tag-node';
-                nodeWrapper.style.marginLeft = `${level * 20}px`;
-
+                
                 const button = document.createElement('button');
                 button.className = 'tag-button hier-tag-button';
+                button.style.marginLeft = `${level * 20}px`;
                 button.dataset.path = node.path;
                 
                 let buttonHTML = `${nodeName} (${node.count})`;
@@ -210,9 +204,9 @@
                 childrenContainer.className = 'tag-node-children';
 
                 button.addEventListener('click', e => {
+                    e.stopPropagation();
                     const path = e.currentTarget.dataset.path;
 
-                    // Lógica de selección de filtro
                     if (activeTags.has(path)) {
                         activeTags.delete(path);
                         e.currentTarget.classList.remove('active');
@@ -226,7 +220,6 @@
                          document.querySelector('[data-path="all"]').classList.add('active');
                     }
 
-                    // Lógica de expandir/colapsar
                     if (hasChildren) {
                         e.currentTarget.classList.toggle('expanded');
                         childrenContainer.classList.toggle('children-visible');
@@ -258,9 +251,7 @@
                 const activeTagsArr = [...activeTags];
                 filtered = filtered.filter(p => {
                     const projectTags = p.tags || [];
-                    // El proyecto debe cumplir con CADA filtro activo (Lógica AND)
                     return activeTagsArr.every(activeTagPath => {
-                        // El proyecto cumple si ALGUNA de sus etiquetas comienza con la ruta del filtro
                         return projectTags.some(projectTag => projectTag.startsWith(activeTagPath));
                     });
                 });
@@ -270,8 +261,7 @@
             setupPagination(filtered.length);
         }
 
-        // --- FIN DE LA NUEVA LÓGICA ---
-
+        // --- FIN DE LA LÓGICA CORREGIDA ---
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
@@ -294,7 +284,6 @@
                     progress = 0;
                 }
                 if (progress === requiredLength) {
-                    // --- LÍNEA RESTAURADA ---
                     alert('Acceso correcto. Redirigiendo...');
                     window.location.href = 'panel.html';
                 }
