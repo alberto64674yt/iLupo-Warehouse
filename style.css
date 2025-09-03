@@ -1,45 +1,15 @@
 :root {
-    --primary-color: #facc15; /* Amarillo */
-    --dark-bg: #111827; /* Gris oscuro casi negro */
-    --surface-color: #1f2937; /* Gris un poco más claro */
-    --text-color: #e5e7eb; /* Texto principal (blanco roto) */
-    --light-text: #9ca3af; /* Texto secundario (gris claro) */
-    --border-color: #374151;
-    --danger-color: #ef4444;
-    --success-color: #65a30d;
-    --edit-color: #3b82f6;
-    --duplicate-color: #9333ea;
+    --primary-color: #facc15; --dark-bg: #111827; --surface-color: #1f2937; --text-color: #e5e7eb; --light-text: #9ca3af; --border-color: #374151; --danger-color: #ef4444; --success-color: #65a30d; --edit-color: #3b82f6; --duplicate-color: #9333ea;
 }
 body {
-    font-family: 'Space Grotesk', sans-serif; 
-    margin: 0; 
-    background-color: var(--dark-bg); 
-    color: var(--text-color); 
-    line-height: 1.7;
+    font-family: 'Space Grotesk', sans-serif; margin: 0; background-color: var(--dark-bg); color: var(--text-color); line-height: 1.7;
 }
-.panel-body { 
-    overflow: hidden; 
-}
-
-/* --- Estilos Generales y Cabecera --- */
-header { 
-    background-color: var(--dark-bg); 
-    text-align: center; 
-    padding: 4rem 1rem; 
-    border-bottom: 1px solid var(--border-color); 
-}
+.panel-body { overflow: hidden; }
+header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
 header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; cursor: pointer; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
-
-/* --- NUEVO: Clase para no poder seleccionar texto --- */
-.no-select {
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* --- Controles de Filtro, Búsqueda y Vista --- */
+.no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 .filter-controls { max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1.5rem; }
 .top-controls { display: flex; gap: 1rem; align-items: flex-end; }
 .search-container { flex-grow: 1; }
@@ -52,8 +22,6 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .tag-filter-container::-webkit-scrollbar { display: none; }
 .tag-button { flex-shrink: 0; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
 .tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
-
-/* --- Grid y Tarjetas con Animación --- */
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; perspective: 1000px; }
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); }
@@ -123,68 +91,15 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .duplicate-button { background-color: var(--duplicate-color); color: white; }
 .back-to-site-button { display: inline-block; padding: 8px 15px; margin-bottom: 2rem; background-color: var(--surface-color); color: var(--light-text); text-decoration: none; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; transition: all 0.2s; }
 .back-to-site-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
-.secret-letter { cursor: pointer; -webkit-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
+.secret-letter { cursor: pointer; }
 .secret-letter:hover { text-decoration: underline dotted var(--primary-color); }
 
-/* --- ESTILOS PARA EL EASTER EGG --- */
-.easter-egg-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: none; /* Oculto por defecto */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.easter-egg-content {
-    background-color: var(--dark-bg);
-    padding: 2rem;
-    border-radius: 16px;
-    text-align: center;
-    max-width: 90%;
-    width: 700px;
-    position: relative;
-    border: 1px solid var(--border-color);
-}
-.video-container-easter-egg {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
-    height: 0;
-    overflow: hidden;
-    border-radius: 8px;
-    pointer-events: none; /* Hace que el video no sea interactivo */
-}
-.video-container-easter-egg iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-.easter-egg-quote {
-    font-style: italic;
-    color: var(--light-text);
-    margin: 2rem 0 0.5rem 0;
-    font-size: 1.2rem;
-}
-.easter-egg-signature {
-    color: var(--primary-color);
-    font-weight: bold;
-}
-.close-easter-egg-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: var(--light-text);
-    font-size: 2rem;
-    cursor: pointer;
-    line-height: 1;
-}
-.close-easter-egg-button:hover {
-    color: white;
-}
+/* --- Estilos para el Easter Egg --- */
+.easter-egg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.easter-egg-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 16px; text-align: center; max-width: 90%; width: 700px; position: relative; border: 1px solid var(--border-color); }
+.video-container-easter-egg { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; pointer-events: none; }
+.video-container-easter-egg iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.easter-egg-quote { font-style: italic; color: var(--light-text); margin: 2rem 0 0.5rem 0; font-size: 1.2rem; }
+.easter-egg-signature { color: var(--primary-color); font-weight: bold; }
+.close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
+.close-easter-egg-button:hover { color: white; }
