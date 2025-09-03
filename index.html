@@ -34,7 +34,9 @@
                 </button>
             </div>
         </div>
-        <div id="tag-filter-container" class="tag-filter-container"></div>
+        <div id="tag-filter-scroll-container">
+            <div id="tag-filter-flex-container"></div>
+        </div>
     </div>
 
     <main id="portfolio-grid"></main>
@@ -144,7 +146,8 @@
             }
             processTree(tagTree);
 
-            const tagContainer = document.getElementById('tag-filter-container');
+            // JAVASCRIPT CORREGIDO: Apuntar al nuevo div interior
+            const tagContainer = document.getElementById('tag-filter-flex-container');
             tagContainer.innerHTML = `<button class="tag-button active" data-path="all">Todos (${proyectos.length})</button>`;
             renderTagTree(tagTree, tagContainer, 0);
             
@@ -159,7 +162,6 @@
             });
         }
         
-        // --- INICIO DE LA FUNCIÓN renderTagTree CORREGIDA ---
         function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
 
@@ -168,24 +170,20 @@
                 const nodeName = node.path.split(' > ').pop();
                 const hasChildren = Object.keys(node.children).length > 0;
 
-                // 1. Crear el contenedor principal para este nodo.
                 const nodeWrapper = document.createElement('div');
                 nodeWrapper.className = 'tag-node';
 
-                // 2. Crear el botón.
                 const button = document.createElement('button');
                 button.className = 'tag-button hier-tag-button';
                 button.dataset.path = node.path;
                 button.innerHTML = hasChildren ? `<span class="arrow"></span>${nodeName} (${node.count})` : `${nodeName} (${node.count})`;
                 
-                // Aplicar indentación a los botones dentro de un desplegable.
                 if (level > 0) {
                     button.style.paddingLeft = `${12 + (level * 15)}px`;
                 }
                 
                 nodeWrapper.appendChild(button);
                 
-                // 3. Si hay hijos, crear su contenedor y llamar a la función recursivamente.
                 let childrenContainer = null;
                 if (hasChildren) {
                     childrenContainer = document.createElement('div');
@@ -194,7 +192,6 @@
                     renderTagTree(node.children, childrenContainer, level + 1);
                 }
 
-                // 4. Añadir el listener de clic al botón.
                 button.addEventListener('click', e => {
                     e.stopPropagation();
                     const path = e.currentTarget.dataset.path;
@@ -221,11 +218,9 @@
                     filterAndRender();
                 });
                 
-                // 5. Añadir el nodo completo al contenedor padre.
                 container.appendChild(nodeWrapper);
             });
         }
-        // --- FIN DE LA FUNCIÓN renderTagTree CORREGIDA ---
 
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
