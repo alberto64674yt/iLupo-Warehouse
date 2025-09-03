@@ -22,7 +22,8 @@
                         <label for="titulo">Título del Proyecto</label>
                         <input type="text" id="titulo" oninput="updatePreview()">
                         <label for="id">ID para la URL (ej: mi-proyecto-1)</label>
-                        <input type="text" id="id" oninput="updatePreview()">
+                        <input type="text" id="id" oninput="updatePreview(); validateId();">
+                        <small id="id-error" style="color: var(--danger-color); margin-top: -0.75rem; display: block; height: 1rem;"></small>
                         <label for="resumen">Resumen Corto (para la tarjeta)</label>
                         <textarea id="resumen" oninput="updatePreview()"></textarea>
                         <label for="imagen">URL de la Imagen Principal</label>
@@ -84,7 +85,30 @@
         const contentTextarea = document.getElementById('contenido_completo');
         const manageList = document.getElementById('manage-list');
 
-        // FUNCIÓN 'APPLYMARKDOWN' CON LÓGICA PARA BLOQUES DE CÓDIGO
+        function validateId() {
+            const idInput = document.getElementById('id');
+            const idError = document.getElementById('id-error');
+            const currentId = idInput.value.trim();
+
+            if (!currentId) {
+                idInput.classList.remove('error');
+                idError.textContent = '';
+                return;
+            }
+
+            const isDuplicate = currentProjects.some((project, index) => {
+                return index !== editingIndex && project.id === currentId;
+            });
+
+            if (isDuplicate) {
+                idInput.classList.add('error');
+                idError.textContent = 'Este ID ya existe.';
+            } else {
+                idInput.classList.remove('error');
+                idError.textContent = '';
+            }
+        }
+
         function applyMarkdown(type) {
             const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
             const selectedText = contentTextarea.value.substring(start, end);
@@ -139,7 +163,7 @@
         function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
         function duplicateProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(!0);alert(`Duplicado.`)}
         function editProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
-        document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()}
+        validateId();document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()}
         function deleteProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(!0);alert('Proyecto borrado.')}}
         function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
         function updatePreview(f=!1){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1&&!f){l[editingIndex]=p}else if(!f&&p.titulo){l.push(p)}
@@ -148,10 +172,11 @@
         function switchToDetailView(){previewMode='detail';document.getElementById('btn-list-view').classList.remove('active');document.getElementById('btn-detail-view').classList.add('active');if(previewFrame.src.includes('index.html')){previewFrame.src='proyecto.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
         function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto';document.getElementById('cancel-button').style.display='none';switchToListView();}
         function submitProject(){const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
+        const isDuplicate=currentProjects.some((project,index)=>index!==editingIndex&&project.id===p.id);if(isDuplicate){alert('El ID del proyecto ya está en uso. Por favor, elige un ID único.');document.getElementById('id').focus();return}
         if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido.');clearForm()}
         renderManageList();updatePreview(!0)}
         function saveAndDownload(){const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)}
-        function clearForm(){document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value=''}
+        function clearForm(){document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value='';validateId();}
         loadInitialData();
     </script>
 </body>
