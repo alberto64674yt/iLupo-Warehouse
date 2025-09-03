@@ -161,7 +161,6 @@
             renderTagTree(tagTree, tagContainer, 0);
         }
 
-        // --- LÓGICA DE RENDERIZADO CORREGIDA Y FINAL ---
         function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort();
 
@@ -195,25 +194,24 @@
                 itemWrapper.appendChild(checkbox);
                 itemWrapper.appendChild(label);
                 
-                // Se añade el item al contenedor padre
                 container.appendChild(itemWrapper);
 
-                // Y AHORA, SI TIENE HIJOS, CREAMOS SU CONTENEDOR Y LO AÑADIMOS DENTRO DEL ITEM
                 if (hasChildren) {
                     const childrenContainer = document.createElement('div');
                     childrenContainer.className = 'tag-children-container';
-                    // LA CORRECCIÓN CLAVE: El contenedor de hijos va DENTRO del item actual
+                    // La estructura correcta: el contenedor de hijos va DENTRO del item wrapper.
                     itemWrapper.appendChild(childrenContainer);
 
                     itemWrapper.classList.add('expandable');
                     itemWrapper.addEventListener('click', (e) => {
                         if (e.target.type !== 'checkbox') {
+                           // BUG ARREGLADO: Detenemos la propagación para que el clic no "burbujee" a los padres.
+                           e.stopPropagation(); 
                            itemWrapper.classList.toggle('expanded');
                            childrenContainer.classList.toggle('visible');
                         }
                     });
 
-                    // La recursión ahora renderiza dentro del nuevo contenedor anidado
                     renderTagTree(node.children, childrenContainer, level + 1);
                 }
 
