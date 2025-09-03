@@ -27,7 +27,6 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     border: 1px solid var(--border-color);
     padding: 1rem;
     border-radius: 12px;
-    /* --- LÍNEAS AÑADIDAS PARA EL SCROLL --- */
     max-height: 400px; /* Altura máxima antes de que aparezca el scroll */
     overflow-y: auto; /* Activa el scroll vertical si es necesario */
     scrollbar-width: none; /* Oculta la barra de scroll en Firefox */
@@ -202,3 +201,22 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .easter-egg-signature { color: var(--primary-color); font-weight: bold; }
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
+
+/* --- NUEVOS ESTILOS PARA IMÁGENES EN MARKDOWN --- */
+/* Afecta a imágenes en la página "Sobre Mí" y en los detalles de proyectos */
+.project-detail-container .project-description img,
+.project-detail-container .about-content img {
+    max-width: 100%; 
+    height: auto;
+    vertical-align: middle; 
+    margin-right: 8px;
+    display: inline-block;
+}
+
+/* Estilo específico para los iconos de redes sociales */
+.project-detail-container .project-description a > img,
+.project-detail-container .about-content a > img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
