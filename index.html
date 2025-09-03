@@ -185,8 +185,9 @@
                 label.htmlFor = inputId;
                 label.innerHTML = `${nodeName} <span class="tag-count">(${node.count})</span>`;
 
+                let arrow = null;
                 if (hasChildren) {
-                    const arrow = document.createElement('span');
+                    arrow = document.createElement('span');
                     arrow.className = 'arrow';
                     itemWrapper.appendChild(arrow);
                 }
@@ -199,19 +200,18 @@
                 if (hasChildren) {
                     const childrenContainer = document.createElement('div');
                     childrenContainer.className = 'tag-children-container';
-                    // La estructura correcta: el contenedor de hijos va DENTRO del item wrapper.
                     itemWrapper.appendChild(childrenContainer);
 
-                    itemWrapper.classList.add('expandable');
-                    itemWrapper.addEventListener('click', (e) => {
-                        if (e.target.type !== 'checkbox') {
-                           // BUG ARREGLADO: Detenemos la propagación para que el clic no "burbujee" a los padres.
-                           e.stopPropagation(); 
-                           itemWrapper.classList.toggle('expanded');
-                           childrenContainer.classList.toggle('visible');
-                        }
-                    });
+                    const toggleFunc = (e) => {
+                        e.stopPropagation();
+                        itemWrapper.classList.toggle('expanded');
+                        childrenContainer.classList.toggle('visible');
+                    };
 
+                    // El clic para expandir es más preciso ahora
+                    label.addEventListener('click', toggleFunc);
+                    arrow.addEventListener('click', toggleFunc);
+                    
                     renderTagTree(node.children, childrenContainer, level + 1);
                 }
 
