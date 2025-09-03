@@ -115,12 +115,8 @@
             }
         }
         
-        // --- INICIO DE LA LÓGICA DE ETIQUETAS CORREGIDA ---
-
         function generateTags(proyectos) {
             const tagTree = {};
-
-            // 1. Construir la estructura básica del árbol a partir de las etiquetas de los proyectos.
             proyectos.forEach(p => {
                 (p.tags || []).forEach(fullTag => {
                     let currentNode = tagTree;
@@ -134,64 +130,47 @@
                 });
             });
 
-            // 2. Función recursiva para procesar el árbol: asigna rutas y cuenta los proyectos.
             function processTree(nodeLevel, pathPrefix = '') {
                 const sortedKeys = Object.keys(nodeLevel).sort((a, b) => a.localeCompare(b));
-                
                 sortedKeys.forEach(key => {
                     const currentNode = nodeLevel[key];
                     const currentPath = pathPrefix ? `${pathPrefix} > ${key}` : key;
-                    
-                    // Asignar la ruta completa al nodo
                     currentNode.path = currentPath;
-                    
-                    // Contar cuántos proyectos coinciden con esta ruta
-                    currentNode.count = allProjects.filter(p => 
-                        (p.tags || []).some(tag => tag.startsWith(currentPath))
-                    ).length;
-                    
-                    // Llamar recursivamente para los hijos
+                    currentNode.count = allProjects.filter(p => (p.tags || []).some(tag => tag.startsWith(currentPath))).length;
                     if (Object.keys(currentNode.children).length > 0) {
                         processTree(currentNode.children, currentPath);
                     }
                 });
             }
+            processTree(tagTree);
 
-            processTree(tagTree); // Iniciar el procesamiento desde la raíz del árbol.
-
-            // 3. Renderizar el árbol ya procesado en HTML.
             const tagContainer = document.getElementById('tag-filter-container');
             tagContainer.innerHTML = `<button class="tag-button active" data-path="all">Todos (${proyectos.length})</button>`;
-            renderTagTree(tagTree, tagContainer);
+            renderTagTree(tagTree, tagContainer, 0);
             
-            // 4. Añadir el listener al botón "Todos".
             tagContainer.querySelector('[data-path="all"]').addEventListener('click', () => {
                 activeTags.clear();
                 document.querySelectorAll('.hier-tag-button.active').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tag-node-children.children-visible').forEach(container => container.classList.remove('children-visible'));
-                 document.querySelectorAll('.hier-tag-button.expanded').forEach(btn => btn.classList.remove('expanded'));
+                document.querySelectorAll('.hier-tag-button.expanded').forEach(btn => btn.classList.remove('expanded'));
                 document.querySelector('[data-path="all"]').classList.add('active');
                 currentPage = 1;
                 filterAndRender();
             });
         }
         
-        function renderTagTree(tree, container) {
+        function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort((a, b) => a.localeCompare(b));
-
             sortedKeys.forEach(key => {
                 const node = tree[key];
-                const parts = node.path.split(' > ');
-                const level = parts.length - 1;
-                const nodeName = parts[parts.length - 1];
+                const nodeName = node.path.split(' > ').pop();
                 const hasChildren = Object.keys(node.children).length > 0;
-
-                const nodeWrapper = document.createElement('div');
-                nodeWrapper.className = 'tag-node';
                 
+                const wrapper = (level === 0) ? document.createElement('div') : container;
+                if (level === 0) wrapper.className = 'tag-node';
+
                 const button = document.createElement('button');
                 button.className = 'tag-button hier-tag-button';
-                button.style.marginLeft = `${level * 20}px`;
                 button.dataset.path = node.path;
                 
                 let buttonHTML = `${nodeName} (${node.count})`;
@@ -200,8 +179,8 @@
                 }
                 button.innerHTML = buttonHTML;
                 
-                const childrenContainer = document.createElement('div');
-                childrenContainer.className = 'tag-node-children';
+                const childrenContainer = hasChildren ? document.createElement('div') : null;
+                if (childrenContainer) childrenContainer.className = 'tag-node-children';
 
                 button.addEventListener('click', e => {
                     e.stopPropagation();
@@ -229,12 +208,18 @@
                     filterAndRender();
                 });
 
-                nodeWrapper.appendChild(button);
-                nodeWrapper.appendChild(childrenContainer);
-                container.appendChild(nodeWrapper);
+                if (level > 0) {
+                     wrapper.appendChild(document.createElement('div')).appendChild(button);
+                } else {
+                    wrapper.appendChild(button);
+                }
 
-                if (hasChildren) {
-                    renderTagTree(node.children, childrenContainer);
+                if (childrenContainer) {
+                    wrapper.appendChild(childrenContainer);
+                    if (level === 0) container.appendChild(wrapper);
+                    renderTagTree(node.children, childrenContainer, level + 1);
+                } else {
+                     if (level === 0) container.appendChild(wrapper);
                 }
             });
         }
@@ -242,11 +227,9 @@
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
-
             if (searchTerm) {
                 filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             }
-
             if (activeTags.size > 0) {
                 const activeTagsArr = [...activeTags];
                 filtered = filtered.filter(p => {
@@ -256,12 +239,9 @@
                     });
                 });
             }
-
             renderCards(filtered);
             setupPagination(filtered.length);
         }
-
-        // --- FIN DE LA LÓGICA CORREGIDA ---
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
@@ -274,7 +254,6 @@
     
     <script>
         (function() {
-            // Acceso Secreto al Panel
             const requiredLength = 5; let progress = 0;
             document.addEventListener('click', function(e) {
                 const target = e.target;
@@ -289,7 +268,6 @@
                 }
             });
 
-            // Easter Egg
             const titleElement = document.querySelector('#main-header h1');
             const overlay = document.getElementById('easter-egg-overlay');
             const videoContainer = document.getElementById('video-container');
