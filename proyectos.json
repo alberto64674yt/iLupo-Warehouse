@@ -1,39 +1,16 @@
 {
   "items": [
     {
-      "titulo": "Mi Primer Proyecto de Ejemplo",
-      "id": "mi-primer-proyecto",
-      "resumen": "Este es el texto corto que se ve en la tarjeta de la página principal. Sirve para captar la atención.",
-      "contenido_completo": "Este es el **contenido completo** que se ve cuando haces clic en la tarjeta.",
-      "imagen": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
-      "enlace": "https://google.com",
-      "tags": [
-        "Desarrollo Web > Herramientas",
-        "General > Ejemplo"
-      ]
-    },
-    {
-      "titulo": "Otra App de Ejemplo",
-      "id": "otra-app",
-      "resumen": "Esta es otra app para demostrar el sistema de etiquetas y búsqueda.",
-      "contenido_completo": "El contenido de esta app es para la demo.",
-      "imagen": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070",
+      "titulo": "¡Microsoft Visual C++ Redistributables All in One 2022!",
+      "id": "ms-visual-cpp-aio-2022",
+      "resumen": "Un instalador todo en uno que reúne todos los **Microsoft Visual C++ Redistributables**. Imprescindible para instalaciones limpias de Windows y para asegurar que todos tus juegos y programas funcionen sin errores.",
+      "contenido_completo": "Capturas:\n\n![Captura principal del programa](https://i.imgur.com/7wjry1u.png)\n![Captura secundaria del programa](https://i.imgur.com/ttTFNJT.png)\n\nEste programa es un instalador que agrupa en un solo paquete todos los **Microsoft Visual C++ Redistributables**, desde la versión 2005 a la 2022. Es una herramienta esencial después de formatear un ordenador o al configurar un PC nuevo, ya que soluciona los errores más comunes de librerías (.dll) que impiden que muchos juegos y aplicaciones se inicien.\n\n### Características Principales:\n\n* **Detección Automática de Arquitectura**: El programa incluye un detector que identifica si tu sistema operativo es de 32 o 64 bits para recomendarte la instalación correcta.\n* **Instalación Completa**: Para sistemas de 64 bits, se recomienda instalar tanto las versiones de x64 como las de x86 (32 bits) para garantizar la máxima compatibilidad.\n* **Ligero y Eficiente**: La aplicación completa ocupa menos de 200 MB.\n* **.NET Framework Incluido**: También integra el instalador para .NET Framework 4.8, la versión más reciente.\n\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=u_db17GWfmg\n\n---\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://playpaste.net/?v=nBz)",
+      "imagen": "https://i.imgur.com/tEbsYUy.jpeg",
       "enlace": "",
       "tags": [
-        "Desarrollo Móvil > Android",
-        "General > Ejemplo"
-      ]
-    },
-    {
-      "titulo": "Un Tercer Proyecto",
-      "id": "tercer-proyecto",
-      "resumen": "Añadido para tener más elementos en la lista y poder probar el scroll y el drag and drop.",
-      "contenido_completo": "Este es el contenido del tercer proyecto.",
-      "imagen": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070",
-      "enlace": "",
-      "tags": [
-        "Programación > Python > Herramientas",
-        "Desarrollo Web > JavaScript"
+        "Software > Utilidades",
+        "Software > Windows",
+        "Programación > Herramientas"
       ]
     }
   ]
