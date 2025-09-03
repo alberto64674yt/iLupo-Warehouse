@@ -198,8 +198,8 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
 
-/* --- ESTILOS PARA IMÁGENES EN MARKDOWN (CORREGIDO) --- */
-/* Afecta a imágenes en la página "Sobre Mí" y en la descripción de proyectos */
+/* --- ESTILOS PARA IMÁGENES EN MARKDOWN --- */
+/* Regla general para todas las imágenes en el contenido. */
 #about-content-container img,
 .project-description img {
     max-width: 100%;
@@ -209,10 +209,17 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
     display: inline-block;
 }
 
-/* Tamaño específico para los ICONOS que son enlaces */
-#about-content-container a > img,
-.project-description a > img {
+/* Regla específica para ICONOS (alt="Icono...") */
+#about-content-container img[alt*="Icono"],
+.project-description img[alt*="Icono"] {
     width: 32px;
     height: 32px;
     object-fit: contain;
+}
+
+/* REGLA NUEVA para BOTONES DE DESCARGA (alt="Descarga...") */
+#about-content-container img[alt*="Descarga"],
+.project-description img[alt*="Descarga"] {
+    max-height: 64px; /* Un tamaño más grande para botones, pero sin pasarse */
+    width: auto; /* Mantenemos la proporción */
 }
