@@ -104,24 +104,52 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
 
-/* --- NUEVOS ESTILOS PARA FILTROS JERÁRQUICOS --- */
-#tag-filter-container {
-    display: block; overflow-x: visible;
-}
+/* --- ESTILOS PARA FILTROS JERÁRQUICOS (NUEVA VERSIÓN) --- */
 .tag-node {
-    margin-bottom: 4px;
+    position: relative; /* Padre para el menú desplegable */
+    flex-shrink: 0;
 }
 .tag-node-children {
-    padding-left: 25px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+    display: none; /* Oculto por defecto */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    margin-top: 8px;
+    padding: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 .tag-node-children.children-visible {
-    max-height: 1000px; /* Un valor alto para permitir que el contenido se expanda */
+    display: block; /* El JS lo hace visible */
+}
+.tag-node-children .tag-button {
+    display: flex; /* Para alinear flecha y texto */
+    width: 100%;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.tag-node-children .tag-button:last-child {
+    margin-bottom: 0;
 }
 .hier-tag-button {
-    display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 .hier-tag-button .arrow {
-    display: inline-block; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid var(--light-text); transition: transform 0.2s ease-out;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid var(--light-text);
+    transition: transform 0.2s ease-out;
 }
 .hier-tag-button.expanded .arrow {
     transform: rotate(90deg);
