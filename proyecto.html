@@ -67,22 +67,21 @@
             });
             finalHtml = tempDiv.innerHTML;
 
-            // --- INICIO DE LA LÓGICA DE ETIQUETAS MODIFICADA ---
+            // --- LÓGICA DE ETIQUETAS MODIFICADA ---
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
                 tagsHtml = '<div class="project-tags">Etiquetas: ';
                 proyecto.tags.forEach(fullTagPath => {
                     const parts = fullTagPath.split(' > ');
-                    let currentPath = '';
                     const breadcrumbs = parts.map(part => {
-                        currentPath += (currentPath ? ' > ' : '') + part;
-                        return `<a href="tags.html?tag=${encodeURIComponent(currentPath)}" class="tag-link">${part.trim()}</a>`;
-                    }).join(' &gt; '); // Usamos &gt; para el símbolo ">"
+                        // AHORA CADA ENLACE BUSCA LA PALABRA EXACTA
+                        return `<a href="tags.html?tag=${encodeURIComponent(part.trim())}" class="tag-link">${part.trim()}</a>`;
+                    }).join(' &gt; ');
                     tagsHtml += `<div style="margin-bottom: 8px;">${breadcrumbs}</div>`;
                 });
                 tagsHtml += '</div>';
             }
-            // --- FIN DE LA LÓGICA DE ETIQUETAS MODIFICADA ---
+            // --- FIN DE LA LÓGICA MODIFICADA ---
 
             container.innerHTML = `
                 <h1 class="project-title">${proyecto.titulo}</h1>
