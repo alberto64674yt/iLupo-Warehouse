@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iLupo Warehouse</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+    <header id="main-header">
         <h1>iLupo Warehouse</h1>
         <p class="subtitle">
-            Un port<span class="secret-letter" data-key="0" onselectstart="return false;">a</span>folio 
-            <span class="secret-letter" data-key="1" onselectstart="return false;">d</span>e herra<span class="secret-letter" data-key="2" onselectstart="return false;">m</span>ientas 
-            e <span class="secret-letter" data-key="3" onselectstart="return false;">i</span>nve<span class="secret-letter" data-key="4" onselectstart="return false;">n</span>ciones.
+            Un port<span class="secret-letter" data-key="0">a</span>folio 
+            <span class="secret-letter" data-key="1">d</span>e herra<span class="secret-letter" data-key="2">m</span>ientas 
+            e <span class="secret-letter" data-key="3">i</span>nve<span class="secret-letter" data-key="4">n</span>ciones.
         </p>
     </header>
 
@@ -43,6 +43,16 @@
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
+    <div id="easter-egg-overlay" class="easter-egg-overlay">
+        <div class="easter-egg-content">
+            <div id="video-container" class="video-container-easter-egg">
+                </div>
+            <p class="easter-egg-quote">"A veces es mejor dejar ciertas cosas sin descubrir"</p>
+            <p class="easter-egg-signature">2025 - alberto64674yt</p>
+            <button id="close-easter-egg" class="close-easter-egg-button">&times;</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         let allProjects = [];
@@ -61,16 +71,11 @@
                 grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos.</p>';
                 return;
             }
-
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-
             paginatedProjects.forEach((proyecto, index) => {
                 const card = document.createElement('a');
-                // --- ARREGLO AQUÍ: Añadimos la clase para la animación inicial ---
                 card.className = 'card';
-                card.style.opacity = 0; // Ocultar inicialmente para la animación
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                
                 card.addEventListener('mousemove', (e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = e.clientX - rect.left;
@@ -85,7 +90,6 @@
                 card.addEventListener('mouseleave', (e) => {
                     e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)';
                 });
-
                 card.innerHTML = `
                     <div class="card-inner">
                         <img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
@@ -96,12 +100,6 @@
                         </div>
                     </div>`;
                 grid.appendChild(card);
-                
-                // --- ARREGLO AQUÍ: Se restaura el temporizador para la animación escalonada ---
-                setTimeout(() => {
-                    card.style.opacity = 1;
-                    card.classList.add('initial-appear');
-                }, index * 100);
             });
         }
 
@@ -109,7 +107,6 @@
             paginationContainer.innerHTML = '';
             const totalPages = Math.ceil(totalProjects / projectsPerPage);
             if (totalPages <= 1) return;
-
             for (let i = 1; i <= totalPages; i++) {
                 const pageButton = document.createElement('button');
                 pageButton.innerText = i;
@@ -129,16 +126,13 @@
             const tagContainer = document.getElementById('tag-filter-container');
             const allTags = new Set();
             proyectos.forEach(p => (p.tags || []).forEach(tag => allTags.add(tag.trim())));
-            
             tagContainer.innerHTML = '<button class="tag-button active" data-tag="all">Todos</button>';
             [...allTags].sort().forEach(tag => tagContainer.innerHTML += `<button class="tag-button" data-tag="${tag}">${tag}</button>`);
-
             document.querySelectorAll('.tag-button').forEach(button => {
                 button.addEventListener('click', e => {
                     const clickedTag = e.target.dataset.tag;
                     if (clickedTag === 'all') activeTags.clear();
                     else activeTags.has(clickedTag) ? activeTags.delete(clickedTag) : activeTags.add(clickedTag);
-                    
                     document.querySelectorAll('.tag-button').forEach(btn => {
                         btn.classList.toggle('active', (activeTags.size === 0 && btn.dataset.tag === 'all') || activeTags.has(btn.dataset.tag));
                     });
@@ -151,7 +145,6 @@
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
-
             if (searchTerm) filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
             if (activeTags.size > 0) {
                 filtered = filtered.filter(p => {
@@ -165,25 +158,52 @@
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{allProjects=data.items||[];window.proyectos=allProjects;generateTags(allProjects);filterAndRender()}).catch(e=>{grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
-        
         const gridBtn = document.getElementById('grid-view-btn');
         const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
-
         window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; generateTags(allProjects); filterAndRender(); } });
     </script>
+    
     <script>
+        // SCRIPT PARA ACCESO SECRETO Y EASTER EGG
         (function() {
-            const requiredLength = 5; let progress = 0;
-            document.addEventListener('click', e => {
+            // --- Acceso al Panel ---
+            const requiredLength = 5; 
+            let progress = 0;
+            document.addEventListener('click', function(e) {
                 const target = e.target;
                 if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) progress++;
                 else if (!target.classList.contains('secret-letter')) progress = 0;
-                if (progress === requiredLength) {
-                    alert('Acceso correcto. Redirigiendo...');
-                    window.location.href = 'panel.html';
+                if (progress === requiredLength) window.location.href = 'panel.html';
+            });
+
+            // --- Easter Egg ---
+            const titleElement = document.querySelector('#main-header h1');
+            const overlay = document.getElementById('easter-egg-overlay');
+            const videoContainer = document.getElementById('video-container');
+            const closeButton = document.getElementById('close-easter-egg');
+            let clickCount = 0;
+            let timer;
+
+            titleElement.addEventListener('click', function() {
+                clickCount++;
+                clearTimeout(timer);
+                timer = setTimeout(() => { clickCount = 0; }, 1000); // 1 segundo para hacer los 5 clics
+
+                if (clickCount === 5) {
+                    clickCount = 0;
+                    alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
+                    
+                    // Cargar y mostrar el vídeo
+                    videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+                    overlay.style.display = 'flex';
                 }
+            });
+
+            closeButton.addEventListener('click', function() {
+                overlay.style.display = 'none';
+                videoContainer.innerHTML = ''; // Detener el vídeo
             });
         })();
     </script>
