@@ -36,23 +36,25 @@
                     <legend>Parte 2: Contenido de la Página de Detalle</legend>
                     <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (Markdown)</label>
+                        
                         <div class="markdown-toolbar">
-                            <button onclick="applyMarkdown('bold')"><b>B</b></button>
-                            <button onclick="applyMarkdown('italic')"><i>I</i></button>
-                            <button onclick="applyMarkdown('h2')">Tít 2</button>
-                            <button onclick="applyMarkdown('h3')">Tít 3</button>
-                            <button onclick="applyMarkdown('link')">Enlace</button>
-                            <button onclick="applyMarkdown('image')">Imagen</button>
-                            <button onclick="applyMarkdown('ul')">Lista</button>
-                            <button onclick="applyMarkdown('ol')">Lista Num.</button>
-                            <button onclick="applyMarkdown('quote')">Cita</button>
-                            <button onclick="applyMarkdown('hr')">Línea</button>
+                            <button onclick="applyMarkdown('bold')" title="Negrita"><b>B</b></button>
+                            <button onclick="applyMarkdown('italic')" title="Cursiva"><i>I</i></button>
+                            <button onclick="applyMarkdown('strike')" title="Tachado"><s>S</s></button>
+                            <button onclick="applyMarkdown('link')" title="Enlace">Enlace</button>
+                            <button onclick="applyMarkdown('image')" title="Imagen">Imagen</button>
+                            <button onclick="applyMarkdown('quote')" title="Cita">Cita</button>
+                            <button onclick="applyMarkdown('code')" title="Código">`</>`</button>
+                            <button onclick="applyMarkdown('hr')" title="Línea horizontal">Línea</button>
+                            <button onclick="applyMarkdown('h2')" title="Título 2">Tít 2</button>
+                            <button onclick="applyMarkdown('h3')" title="Título 3">Tít 3</button>
+                            <button onclick="applyMarkdown('ul')" title="Lista">Lista</button>
+                            <button onclick="applyMarkdown('ol')" title="Lista Num.">Lista Num.</button>
+                            <button onclick="applyMarkdown('download-image')" title="Imagen con Descarga">[Img-DL]</button>
                         </div>
+                        
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
-                        <div class="markdown-ayuda">
-                            <p><b>YouTube:</b> Pega el link en una línea nueva.</p>
-                            <p><b>Img Descarga:</b> `[IMAGEN-DESCARGA](url_img, url_zip)`</p>
-                        </div>
+                        
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
@@ -82,142 +84,72 @@
         const contentTextarea = document.getElementById('contenido_completo');
         const manageList = document.getElementById('manage-list');
 
+        // FUNCIÓN 'APPLYMARKDOWN' ACTUALIZADA CON LAS NUEVAS OPCIONES
         function applyMarkdown(type) {
             const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
             const selectedText = contentTextarea.value.substring(start, end);
-            let markdownText = '';
+            let markdownText = '', preText = '', postText = '';
+
             switch(type) {
-                case 'bold': markdownText = `**${selectedText||'negrita'}**`; break;
-                case 'italic': markdownText = `*${selectedText||'cursiva'}*`; break;
-                case 'h2': markdownText = `\n## ${selectedText||'Título 2'}\n`; break;
-                case 'h3': markdownText = `\n### ${selectedText||'Título 3'}\n`; break;
-                case 'link': const url = prompt('URL del enlace:', 'https://'); if(url) markdownText = `[${selectedText||'texto'}](${url})`; break;
-                case 'image': const imgUrl = prompt('URL de la imagen:', 'https://'); if(imgUrl) markdownText = `![${selectedText||'alt text'}](${imgUrl})`; break;
-                case 'ul': markdownText = `\n- Punto 1\n- Punto 2`; break;
-                case 'ol': markdownText = `\n1. Punto 1\n2. Punto 2`; break;
-                case 'quote': markdownText = `\n> ${selectedText||'Cita'}\n`; break;
-                case 'hr': markdownText = `\n\n---\n\n`; break;
+                case 'bold': preText = '**'; postText = '**'; break;
+                case 'italic': preText = '*'; postText = '*'; break;
+                case 'strike': preText = '~~'; postText = '~~'; break;
+                case 'h2': preText = '\n## '; postText = '\n'; break;
+                case 'h3': preText = '\n### '; postText = '\n'; break;
+                case 'link': 
+                    const url = prompt('Introduce la URL del enlace:', 'https://');
+                    if (url) { preText = '['; postText = `](${url})`; }
+                    break;
+                case 'image': 
+                    const imgUrl = prompt('Introduce la URL de la imagen:', 'https://');
+                    if (imgUrl) { preText = `![${selectedText || 'alt text'}](${imgUrl})`; }
+                    break;
+                case 'download-image':
+                    const d_imgUrl = prompt('Introduce la URL de la IMAGEN que se verá:', 'https://');
+                    if(d_imgUrl){
+                        const d_downloadUrl = prompt('Introduce la URL del ARCHIVO a descargar:');
+                        if(d_downloadUrl) { preText = `\n[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})\n`; }
+                    }
+                    break;
+                case 'ul': preText = '\n- Punto 1\n- Punto 2'; break;
+                case 'ol': preText = '\n1. Punto 1\n2. Punto 2'; break;
+                case 'quote': preText = '\n> '; postText = '\n'; break;
+                case 'code': preText = '`'; postText = '`'; break;
+                case 'hr': preText = `\n\n---\n\n`; break;
             }
-            if(markdownText) {
-                contentTextarea.value = contentTextarea.value.substring(0, start) + markdownText + contentTextarea.value.substring(end);
+
+            if (preText) {
+                if (markdownText) { // Casos especiales como 'image' que construyen todo el texto
+                    contentTextarea.value = contentTextarea.value.substring(0, start) + markdownText + contentTextarea.value.substring(end);
+                    contentTextarea.selectionEnd = start + markdownText.length;
+                } else {
+                    contentTextarea.value = contentTextarea.value.substring(0, start) + preText + selectedText + postText + contentTextarea.value.substring(end);
+                    contentTextarea.selectionEnd = start + preText.length + selectedText.length + postText.length;
+                }
                 contentTextarea.focus();
-                contentTextarea.selectionEnd = start + markdownText.length;
                 updatePreview();
             }
         }
 
-        function loadInitialData(){
-            fetch('proyectos.json')
-            .then(r => r.ok ? r.json() : Promise.reject('File not found'))
-            .then(d => {
-                currentProjects = d.items || [];
-                renderManageList();
-                // Inicializar SortableJS DESPUÉS de cargar los datos
-                Sortable.create(manageList, {
-                    animation: 150,
-                    handle: '.drag-handle',
-                    onEnd: function (evt) {
-                        const newOrderIds = [...manageList.querySelectorAll('.manage-item')].map(item => item.dataset.id).reverse();
-                        currentProjects.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
-                        renderManageList();
-                        updatePreview(true);
-                        alert('Orden de proyectos actualizado. Pulsa "Generar y Descargar" para guardar.');
-                    }
-                });
-                previewFrame.onload = () => updatePreview(true);
-                if(document.readyState === "complete") { updatePreview(true); }
-            });
-        }
-        
-        function renderManageList(){
-            manageList.innerHTML = '';
-            if (currentProjects.length === 0) { manageList.innerHTML = '<p>No hay proyectos.</p>'; return; }
-            [...currentProjects].reverse().forEach((p, i) => {
-                const item = document.createElement('div');
-                item.className = 'manage-item';
-                item.dataset.id = p.id;
-                item.innerHTML = `
-                    <span class="drag-handle">::</span>
-                    <span class="manage-item-title">${p.titulo}</span>
-                    <div class="manage-buttons">
-                        <button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button>
-                        <button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button>
-                        <button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button>
-                    </div>`;
-                manageList.appendChild(item);
-            });
-        }
-        
-        function findProjectIndexById(id) { return currentProjects.findIndex(p => p.id === id); }
-        
-        function duplicateProjectById(id) {
-            const index = findProjectIndexById(id);
-            if (index === -1) return;
-            const projectToDuplicate = JSON.parse(JSON.stringify(currentProjects[index]));
-            projectToDuplicate.titulo += " (Copia)";
-            projectToDuplicate.id += "-copia-" + Date.now();
-            currentProjects.push(projectToDuplicate);
-            renderManageList();
-            updatePreview(true);
-            alert(`Se ha duplicado. Pulsa "Generar y Descargar" para guardar.`);
-        }
-        
-        function editProjectById(id) {
-            const index = findProjectIndexById(id);
-            if (index === -1) return;
-            editingIndex = index;
-            const p = currentProjects[index];
-            document.getElementById('titulo').value = p.titulo;
-            document.getElementById('id').value = p.id;
-            document.getElementById('resumen').value = p.resumen;
-            document.getElementById('contenido_completo').value = p.contenido_completo;
-            document.getElementById('imagen').value = p.imagen;
-            document.getElementById('enlace').value = p.enlace || '';
-            document.getElementById('tags').value = (p.tags || []).join(', ');
-            document.getElementById('main-button').innerText = 'Guardar Cambios';
-            document.getElementById('cancel-button').style.display = 'block';
-            window.scrollTo(0, 0);
-            switchToDetailView();
-        }
-
-        function deleteProjectById(id) {
-            const index = findProjectIndexById(id);
-            if (index === -1) return;
-            if (confirm(`¿Borrar "${currentProjects[index].titulo}"?`)) {
-                currentProjects.splice(index, 1);
-                renderManageList();
-                updatePreview(true);
-                alert('Proyecto borrado.');
-            }
-        }
-
+        function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:function(e){const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(!0);alert('Orden actualizado. Pulsa "Generar y Descargar".')}});previewFrame.onload=()=>updatePreview(!0);if(document.readyState==="complete"){updatePreview(!0)}})}
+        function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
+        [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.dataset.id=p.id;t.innerHTML=`<span class="drag-handle">::</span><span class="manage-item-title">${p.titulo}</span><div class="manage-buttons"><button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button><button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button><button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button></div>`;c.appendChild(t)})}
+        function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
+        function duplicateProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(!0);alert(`Duplicado. Pulsa "Generar y Descargar".`)}
+        function editProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
+        document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()}
+        function deleteProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(!0);alert('Proyecto borrado.')}}
         function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
-        
-        function updatePreview(forceUpdate = false){
-            const p = getProjectFromForm();
-            let l = [...currentProjects];
-            if(editingIndex > -1 && !forceUpdate){ l[editingIndex] = p; }
-            else if(!forceUpdate && p.titulo){ l.push(p); }
-            if(previewMode === 'list'){ previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*'); }
-            else { const projectToShow = editingIndex > -1 ? l[editingIndex] : p; previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:projectToShow},'*'); }
-        }
-        
-        function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview(true)}else{updatePreview(true)}}
+        function updatePreview(f=!1){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1&&!f){l[editingIndex]=p}else if(!f&&p.titulo){l.push(p)}
+        if(previewMode==='list'){previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}else{const d=editingIndex>-1?l[editingIndex]:p;previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:d},'*')}}
+        function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview(!0)}else{updatePreview(!0)}}
         function switchToDetailView(){previewMode='detail';document.getElementById('btn-list-view').classList.remove('active');document.getElementById('btn-detail-view').classList.add('active');if(previewFrame.src.includes('index.html')){previewFrame.src='proyecto.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
         function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto';document.getElementById('cancel-button').style.display='none';switchToListView();}
-        
-        function submitProject(){
-            const p = getProjectFromForm();
-            if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
-            if(editingIndex > -1){ currentProjects[editingIndex] = p; alert('Proyecto actualizado.'); cancelEdit(); }
-            else { currentProjects.push(p); alert('Proyecto añadido.'); clearForm(); }
-            renderManageList();
-            updatePreview(true);
-        }
-        
+        function submitProject(){const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
+        if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido.');clearForm()}
+        renderManageList();updatePreview(!0)}
         function saveAndDownload(){const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)}
         function clearForm(){document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value=''}
-        
         loadInitialData();
     </script>
 </body>
