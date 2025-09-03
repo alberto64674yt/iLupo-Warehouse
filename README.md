@@ -11,7 +11,7 @@ El proceso se divide en **Generar** el fichero de datos actualizado y **Subirlo*
 ### Fase 1: Generar el `proyectos.json`
 
 1.  **Abrir el Panel de Control:**
-    * Ve a la dirección de tu panel: **`https://[TU_DIRECCIÓN_WEB].netlify.app/panel.html`**
+    * Ve a la dirección de tu panel: **`https://ilupowarehouse.netlify.app/panel.html`**
     * El panel cargará automáticamente la última lista de proyectos.
 
 2.  **Añadir, Editar o Borrar:**
