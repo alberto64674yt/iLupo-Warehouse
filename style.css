@@ -11,7 +11,8 @@ header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 .no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 .filter-controls { max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1.5rem; }
-.about-me-button { display: block; width: -moz-fit-content; width: fit-content; margin: -1rem auto 2.5rem auto; padding: 12px 24px; text-decoration: none; background-color: var(--surface-color); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 25px; font-weight: 500; transition: all 0.2s ease; }
+/* --- REGLA CORREGIDA --- */
+.about-me-button { display: block; width: -moz-fit-content; width: fit-content; margin: 1.5rem auto 2.5rem auto; padding: 12px 24px; text-decoration: none; background-color: var(--surface-color); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 25px; font-weight: 500; transition: all 0.2s ease; }
 .about-me-button:hover { background-color: var(--primary-color); color: var(--dark-bg); }
 .top-controls { display: flex; gap: 1rem; align-items: flex-end; }
 .search-container { flex-grow: 1; }
@@ -20,23 +21,25 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 6px; }
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
+
+/* --- ESTILOS PARA EL SISTEMA DE FILTROS CON CHECKBOX (VERTICAL) --- */
 .tag-filter-container {
     margin-top: 1.5rem;
     border: 1px solid var(--border-color);
     padding: 1rem;
     border-radius: 12px;
-    max-height: 400px;
-    overflow-y: auto;
-    scrollbar-width: none;
+    max-height: 400px; /* Altura máxima antes de que aparezca el scroll */
+    overflow-y: auto; /* Activa el scroll vertical si es necesario */
+    scrollbar-width: none; /* Oculta la barra de scroll en Firefox */
 }
 .tag-filter-container::-webkit-scrollbar {
-    display: none;
+    display: none; /* Oculta la barra de scroll en Chrome/Safari */
 }
 .tag-item {
     display: flex;
     align-items: center;
     padding: 4px 0;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Permite que los hijos salten a la línea de abajo */
 }
 .tag-item.expandable > .tag-label, .tag-item.expandable > .arrow {
     cursor: pointer;
@@ -105,7 +108,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
-    width: 100%;
+    width: 100%; /* Ocupa todo el ancho para colocarse debajo */
 }
 .tag-children-container.visible {
     max-height: 1000px;
@@ -114,10 +117,12 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     padding-bottom: 1rem;
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
-    flex-wrap: nowrap;
+    flex-wrap: nowrap; /* Evitamos que el botón "Todos" se rompa */
 }
 .tag-button { flex-shrink: 0; width: 100%; text-align: center; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
 .tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
+/* --- FIN DE ESTILOS DE FILTROS --- */
+
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; perspective: 1000px; }
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
