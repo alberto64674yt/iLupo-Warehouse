@@ -161,6 +161,7 @@
             renderTagTree(tagTree, tagContainer, 0);
         }
 
+        // --- LÓGICA DE RENDERIZADO CORREGIDA Y FINAL ---
         function renderTagTree(tree, container, level) {
             const sortedKeys = Object.keys(tree).sort();
 
@@ -194,14 +195,27 @@
                 itemWrapper.appendChild(checkbox);
                 itemWrapper.appendChild(label);
                 
-                // LÓGICA CORREGIDA: El contenedor de hijos AHORA se añade al wrapper del item.
-                const childrenContainer = document.createElement('div');
-                childrenContainer.className = 'tag-children-container';
-                
-                // Se añade el item al contenedor principal
+                // Se añade el item al contenedor padre
                 container.appendChild(itemWrapper);
-                // Y el contenedor de sus hijos también, justo después.
-                container.appendChild(childrenContainer);
+
+                // Y AHORA, SI TIENE HIJOS, CREAMOS SU CONTENEDOR Y LO AÑADIMOS DENTRO DEL ITEM
+                if (hasChildren) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tag-children-container';
+                    // LA CORRECCIÓN CLAVE: El contenedor de hijos va DENTRO del item actual
+                    itemWrapper.appendChild(childrenContainer);
+
+                    itemWrapper.classList.add('expandable');
+                    itemWrapper.addEventListener('click', (e) => {
+                        if (e.target.type !== 'checkbox') {
+                           itemWrapper.classList.toggle('expanded');
+                           childrenContainer.classList.toggle('visible');
+                        }
+                    });
+
+                    // La recursión ahora renderiza dentro del nuevo contenedor anidado
+                    renderTagTree(node.children, childrenContainer, level + 1);
+                }
 
                 checkbox.addEventListener('change', () => {
                     if (checkbox.checked) {
@@ -212,17 +226,6 @@
                     updateAllButtonStates();
                     filterAndRender();
                 });
-                
-                if (hasChildren) {
-                    itemWrapper.classList.add('expandable');
-                    itemWrapper.addEventListener('click', (e) => {
-                        if (e.target.type !== 'checkbox') {
-                           itemWrapper.classList.toggle('expanded');
-                           childrenContainer.classList.toggle('visible');
-                        }
-                    });
-                    renderTagTree(node.children, childrenContainer, level + 1);
-                }
             });
         }
 
