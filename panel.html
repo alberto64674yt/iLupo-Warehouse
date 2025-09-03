@@ -17,7 +17,7 @@
                 <h1>Panel de Control</h1>
                 
                 <fieldset>
-                    <legend>Parte 1: Datos para la Tarjeta (Resumen)</legend>
+                    <legend>Gestionar Proyectos</legend>
                     <div class="form-section">
                         <label for="titulo">Título del Proyecto</label>
                         <input type="text" id="titulo" oninput="updatePreview()">
@@ -30,59 +30,76 @@
                         <input type="text" id="imagen" oninput="updatePreview()">
                         <label for="tags">Etiquetas (separadas por comas)</label>
                         <input type="text" id="tags" placeholder="Ej: Herramienta, Python, Android" oninput="updatePreview()">
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Parte 2: Contenido de la Página de Detalle</legend>
-                    <div class="form-section">
                         <label for="contenido_completo">Descripción Completa (Markdown)</label>
-                        
                         <div class="markdown-toolbar">
-                            <button onclick="applyMarkdown('bold')" title="Negrita"><b>B</b></button>
-                            <button onclick="applyMarkdown('italic')" title="Cursiva"><i>I</i></button>
-                            <button onclick="applyMarkdown('strike')" title="Tachado"><s>S</s></button>
-                            <button onclick="applyMarkdown('link')" title="Enlace">Enlace</button>
-                            <button onclick="applyMarkdown('image')" title="Imagen">Imagen</button>
-                            <button onclick="applyMarkdown('quote')" title="Cita">Cita</button>
-                            <button onclick="applyMarkdown('code_block')" title="Bloque de Código">Bloque</button>
-                            <button onclick="applyMarkdown('hr')" title="Línea horizontal">Línea</button>
-                            <button onclick="applyMarkdown('h2')" title="Título 2">Tít 2</button>
-                            <button onclick="applyMarkdown('h3')" title="Título 3">Tít 3</button>
-                            <button onclick="applyMarkdown('ul')" title="Lista">Lista</button>
-                            <button onclick="applyMarkdown('ol')" title="Lista Num.">Lista Num.</button>
-                            <button onclick="applyMarkdown('download-image')" title="Imagen con Descarga">[Img-DL]</button>
+                            <button onclick="applyMarkdown('bold', 'contenido_completo')" title="Negrita"><b>B</b></button>
+                            <button onclick="applyMarkdown('italic', 'contenido_completo')" title="Cursiva"><i>I</i></button>
+                            <button onclick="applyMarkdown('strike', 'contenido_completo')" title="Tachado"><s>S</s></button>
+                            <button onclick="applyMarkdown('link', 'contenido_completo')" title="Enlace">Enlace</button>
+                            <button onclick="applyMarkdown('image', 'contenido_completo')" title="Imagen">Imagen</button>
+                            <button onclick="applyMarkdown('quote', 'contenido_completo')" title="Cita">Cita</button>
+                            <button onclick="applyMarkdown('code_block', 'contenido_completo')" title="Bloque de Código">Bloque</button>
+                            <button onclick="applyMarkdown('hr', 'contenido_completo')" title="Línea horizontal">Línea</button>
+                            <button onclick="applyMarkdown('h2', 'contenido_completo')" title="Título 2">Tít 2</button>
+                            <button onclick="applyMarkdown('h3', 'contenido_completo')" title="Título 3">Tít 3</button>
+                            <button onclick="applyMarkdown('ul', 'contenido_completo')" title="Lista">Lista</button>
+                            <button onclick="applyMarkdown('ol', 'contenido_completo')" title="Lista Num.">Lista Num.</button>
+                            <button onclick="applyMarkdown('download-image', 'contenido_completo')" title="Imagen con Descarga">[Img-DL]</button>
                         </div>
-                        
                         <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
-                        
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
+                    <div class="form-actions">
+                        <button id="main-button" onclick="submitProject()">Añadir Proyecto</button>
+                        <button id="cancel-button" onclick="cancelEdit()" style="display:none;">Cancelar</button>
+                    </div>
                 </fieldset>
 
-                <div class="form-actions">
-                    <button id="main-button" onclick="submitProject()">Añadir</button>
-                    <button id="cancel-button" onclick="cancelEdit()" style="display:none;">Cancelar</button>
-                </div>
-                <hr>
                 <div class="manage-container">
-                    <h2>Gestionar Proyectos (Arrastra para ordenar)</h2>
+                    <h2>Proyectos Existentes (Arrastra para ordenar)</h2>
                     <div id="manage-list"></div>
                 </div>
                 <hr>
-                <div class="save-container"><h2>Guardar Todo</h2><button class="save-button" onclick="saveAndDownload()">Generar y Descargar</button></div>
+                <div class="save-container">
+                    <button class="save-button" onclick="saveProjects()">Generar y Descargar proyectos.json</button>
+                </div>
+                <hr>
+                 <fieldset>
+                    <legend>Editar Página "Sobre Mí"</legend>
+                    <label for="contenido_sobre_mi">Contenido de la página (Markdown)</label>
+                    <div class="markdown-toolbar">
+                        <button onclick="applyMarkdown('bold', 'contenido_sobre_mi')" title="Negrita"><b>B</b></button>
+                        <button onclick="applyMarkdown('italic', 'contenido_sobre_mi')" title="Cursiva"><i>I</i></button>
+                        <button onclick="applyMarkdown('strike', 'contenido_sobre_mi')" title="Tachado"><s>S</s></button>
+                        <button onclick="applyMarkdown('link', 'contenido_sobre_mi')" title="Enlace">Enlace</button>
+                        <button onclick="applyMarkdown('image', 'contenido_sobre_mi')" title="Imagen">Imagen</button>
+                        <button onclick="applyMarkdown('quote', 'contenido_sobre_mi')" title="Cita">Cita</button>
+                        <button onclick="applyMarkdown('code_block', 'contenido_sobre_mi')" title="Bloque de Código">Bloque</button>
+                        <button onclick="applyMarkdown('hr', 'contenido_sobre_mi')" title="Línea horizontal">Línea</button>
+                        <button onclick="applyMarkdown('h2', 'contenido_sobre_mi')" title="Título 2">Tít 2</button>
+                        <button onclick="applyMarkdown('h3', 'contenido_sobre_mi')" title="Título 3">Tít 3</button>
+                        <button onclick="applyMarkdown('ul', 'contenido_sobre_mi')" title="Lista">Lista</button>
+                        <button onclick="applyMarkdown('ol', 'contenido_sobre_mi')" title="Lista Num.">Lista Num.</button>
+                    </div>
+                    <textarea id="contenido_sobre_mi" oninput="updatePreview()"></textarea>
+                    <button class="save-button" onclick="saveAboutMe()">Guardar y Descargar info.json</button>
+                </fieldset>
             </div>
         </div>
         <div class="preview-pane">
-            <div class="preview-switcher"><button id="btn-list-view" class="active" onclick="switchToListView()">Vista Tarjetas</button><button id="btn-detail-view" onclick="switchToDetailView()">Vista Detalle</button></div>
+            <div class="preview-switcher">
+                <button id="btn-list-view" class="active" onclick="switchToListView()">Vista Tarjetas</button>
+                <button id="btn-detail-view" onclick="switchToDetailView()">Vista Detalle</button>
+                <button id="btn-about-view" onclick="switchToAboutView()">Vista 'Sobre Mí'</button>
+            </div>
             <iframe id="preview-frame" src="index.html"></iframe>
         </div>
     </div>
     <script>
-        let currentProjects = []; let editingIndex = -1; let previewMode = 'list';
+        let currentProjects = []; let aboutMeContent = { contenido: '' };
+        let editingIndex = -1; let previewMode = 'list';
         const previewFrame = document.getElementById('preview-frame');
-        const contentTextarea = document.getElementById('contenido_completo');
         const manageList = document.getElementById('manage-list');
 
         function validateId() {
@@ -109,9 +126,10 @@
             }
         }
 
-        function applyMarkdown(type) {
-            const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
-            const selectedText = contentTextarea.value.substring(start, end);
+        function applyMarkdown(type, textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const start = textarea.selectionStart, end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
             let markdownText = '', preText = '', postText = '';
 
             switch(type) {
@@ -150,33 +168,114 @@
                 if (!finalText) {
                     finalText = preText + (selectedText || (type === 'link' ? 'texto' : '')) + postText;
                 }
-                contentTextarea.value = contentTextarea.value.substring(0, start) + finalText + contentTextarea.value.substring(end);
-                contentTextarea.focus();
-                contentTextarea.selectionEnd = start + finalText.length;
+                textarea.value = textarea.value.substring(0, start) + finalText + textarea.value.substring(end);
+                textarea.focus();
+                textarea.selectionEnd = start + finalText.length;
                 updatePreview();
             }
         }
 
-        function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:function(e){const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(!0);alert('Orden actualizado.')}});previewFrame.onload=()=>updatePreview(!0);if(document.readyState==="complete"){updatePreview(!0)}})}
-        function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
-        [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.dataset.id=p.id;t.innerHTML=`<span class="drag-handle">::</span><span class="manage-item-title">${p.titulo}</span><div class="manage-buttons"><button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button><button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button><button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button></div>`;c.appendChild(t)})}
+        function loadInitialData(){
+            fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:function(e){const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(true)}})});
+            fetch('info.json').then(r=>r.json()).then(d=>{aboutMeContent=d;document.getElementById('contenido_sobre_mi').value=aboutMeContent.contenido||''}).catch(e=>console.log("info.json no encontrado, se creará uno nuevo."));
+            previewFrame.onload=()=>updatePreview(true);
+            if(document.readyState==="complete"){updatePreview(true)}
+        }
+        
+        function renderManageList(){
+            const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
+            [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.dataset.id=p.id;t.innerHTML=`<span class="drag-handle">::</span><span class="manage-item-title">${p.titulo}</span><div class="manage-buttons"><button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button><button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button><button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button></div>`;c.appendChild(t)})
+        }
+        
         function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
-        function duplicateProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(!0);alert(`Duplicado.`)}
-        function editProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
-        validateId();document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()}
-        function deleteProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(!0);alert('Proyecto borrado.')}}
-        function getProjectFromForm(){const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}}
-        function updatePreview(f=!1){const p=getProjectFromForm();let l=[...currentProjects];if(editingIndex>-1&&!f){l[editingIndex]=p}else if(!f&&p.titulo){l.push(p)}
-        if(previewMode==='list'){previewFrame.contentWindow.postMessage({type:'previewUpdate',payload:l},'*')}else{const d=editingIndex>-1?l[editingIndex]:p;previewFrame.contentWindow.postMessage({type:'detailPreviewUpdate',payload:d},'*')}}
-        function switchToListView(){previewMode='list';document.getElementById('btn-list-view').classList.add('active');document.getElementById('btn-detail-view').classList.remove('active');if(previewFrame.src.includes('proyecto.html')){previewFrame.src='index.html';previewFrame.onload=()=>updatePreview(!0)}else{updatePreview(!0)}}
-        function switchToDetailView(){previewMode='detail';document.getElementById('btn-list-view').classList.remove('active');document.getElementById('btn-detail-view').classList.add('active');if(previewFrame.src.includes('index.html')){previewFrame.src='proyecto.html';previewFrame.onload=()=>updatePreview()}else{updatePreview()}}
-        function cancelEdit(){editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto';document.getElementById('cancel-button').style.display='none';switchToListView();}
-        function submitProject(){const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
-        const isDuplicate=currentProjects.some((project,index)=>index!==editingIndex&&project.id===p.id);if(isDuplicate){alert('El ID del proyecto ya está en uso. Por favor, elige un ID único.');document.getElementById('id').focus();return}
-        if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido.');clearForm()}
-        renderManageList();updatePreview(!0)}
-        function saveAndDownload(){const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)}
-        function clearForm(){document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value='';validateId();}
+        
+        function duplicateProjectById(i){
+            const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(true);alert(`Duplicado.`)
+        }
+        
+        function editProjectById(i){
+            const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
+            validateId();document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()
+        }
+        
+        function deleteProjectById(i){
+            const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(true);alert('Proyecto borrado.')}
+        }
+        
+        function getProjectFromForm(){
+            const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}
+        }
+        
+        function updatePreview(forceProjectList = false) {
+            if (previewMode === 'list') {
+                const p = getProjectFromForm();
+                let l = [...currentProjects];
+                if (editingIndex > -1 && !forceProjectList) { l[editingIndex] = p; } 
+                else if (!forceProjectList && p.titulo) { l.push(p); }
+                previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: l }, '*');
+            } else if (previewMode === 'detail') {
+                const d = editingIndex > -1 ? currentProjects[editingIndex] : getProjectFromForm();
+                previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: d }, '*');
+            } else if (previewMode === 'about') {
+                 previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: document.getElementById('contenido_sobre_mi').value }, '*');
+            }
+        }
+
+        function setActiveView(view) {
+            previewMode = view;
+            ['btn-list-view', 'btn-detail-view', 'btn-about-view'].forEach(id => {
+                const button = document.getElementById(id);
+                button.classList.toggle('active', button.id.startsWith('btn-' + view));
+            });
+        }
+        
+        function switchToListView() {
+            setActiveView('list');
+            if (!previewFrame.src.includes('index.html')) {
+                previewFrame.src = 'index.html';
+                previewFrame.onload = () => updatePreview(true);
+            } else { updatePreview(true); }
+        }
+        
+        function switchToDetailView() {
+            setActiveView('detail');
+            if (!previewFrame.src.includes('proyecto.html')) {
+                previewFrame.src = 'proyecto.html';
+                previewFrame.onload = () => updatePreview();
+            } else { updatePreview(); }
+        }
+
+        function switchToAboutView() {
+            setActiveView('about');
+            if (!previewFrame.src.includes('sobre-mi.html')) {
+                previewFrame.src = 'sobre-mi.html';
+                previewFrame.onload = () => updatePreview();
+            } else { updatePreview(); }
+        }
+        
+        function cancelEdit(){
+            editingIndex=-1;clearForm();document.getElementById('main-button').innerText='Añadir Proyecto';document.getElementById('cancel-button').style.display='none';switchToListView();
+        }
+        
+        function submitProject(){
+            const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){alert('Faltan campos obligatorios.');return}
+            const isDuplicate=currentProjects.some((project,index)=>index!==editingIndex&&project.id===p.id);if(isDuplicate){alert('El ID del proyecto ya está en uso. Por favor, elige un ID único.');document.getElementById('id').focus();return}
+            if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.');cancelEdit()}else{currentProjects.push(p);alert('Proyecto añadido.');clearForm()}
+            renderManageList();updatePreview(true)
+        }
+        
+        function saveProjects(){
+            const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)
+        }
+
+        function saveAboutMe(){
+            const c={contenido:document.getElementById('contenido_sobre_mi').value};const f=JSON.stringify(c,null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='info.json';a.click();URL.revokeObjectURL(a.href)
+        }
+        
+        function clearForm(){
+            document.getElementById('titulo').value='';document.getElementById('id').value='';document.getElementById('resumen').value='';document.getElementById('contenido_completo').value='';document.getElementById('imagen').value='';document.getElementById('enlace').value='';document.getElementById('tags').value='';validateId();
+        }
+
         loadInitialData();
     </script>
 </body>
