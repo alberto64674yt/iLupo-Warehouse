@@ -44,7 +44,7 @@
                             <button onclick="applyMarkdown('link')" title="Enlace">Enlace</button>
                             <button onclick="applyMarkdown('image')" title="Imagen">Imagen</button>
                             <button onclick="applyMarkdown('quote')" title="Cita">Cita</button>
-                            <button onclick="applyMarkdown('code')" title="Código">`</>`</button>
+                            <button onclick="applyMarkdown('code_block')" title="Bloque de Código">Bloque</button>
                             <button onclick="applyMarkdown('hr')" title="Línea horizontal">Línea</button>
                             <button onclick="applyMarkdown('h2')" title="Título 2">Tít 2</button>
                             <button onclick="applyMarkdown('h3')" title="Título 3">Tít 3</button>
@@ -84,7 +84,7 @@
         const contentTextarea = document.getElementById('contenido_completo');
         const manageList = document.getElementById('manage-list');
 
-        // FUNCIÓN 'APPLYMARKDOWN' ACTUALIZADA CON LAS NUEVAS OPCIONES
+        // FUNCIÓN 'APPLYMARKDOWN' CON LÓGICA PARA BLOQUES DE CÓDIGO
         function applyMarkdown(type) {
             const start = contentTextarea.selectionStart, end = contentTextarea.selectionEnd;
             const selectedText = contentTextarea.value.substring(start, end);
@@ -101,41 +101,43 @@
                     if (url) { preText = '['; postText = `](${url})`; }
                     break;
                 case 'image': 
-                    const imgUrl = prompt('Introduce la URL de la imagen:', 'https://');
-                    if (imgUrl) { preText = `![${selectedText || 'alt text'}](${imgUrl})`; }
+                    const imgUrl = prompt('URL de la imagen:', 'https://');
+                    if (imgUrl) { markdownText = `![${selectedText || 'alt text'}](${imgUrl})`; }
                     break;
                 case 'download-image':
-                    const d_imgUrl = prompt('Introduce la URL de la IMAGEN que se verá:', 'https://');
+                    const d_imgUrl = prompt('URL de la IMAGEN:', 'https://');
                     if(d_imgUrl){
-                        const d_downloadUrl = prompt('Introduce la URL del ARCHIVO a descargar:');
-                        if(d_downloadUrl) { preText = `\n[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})\n`; }
+                        const d_downloadUrl = prompt('URL del ARCHIVO a descargar:');
+                        if(d_downloadUrl) { markdownText = `\n[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})\n`; }
                     }
                     break;
-                case 'ul': preText = '\n- Punto 1\n- Punto 2'; break;
-                case 'ol': preText = '\n1. Punto 1\n2. Punto 2'; break;
+                case 'ul': markdownText = `\n- Punto 1\n- Punto 2`; break;
+                case 'ol': markdownText = `\n1. Punto 1\n2. Punto 2`; break;
                 case 'quote': preText = '\n> '; postText = '\n'; break;
-                case 'code': preText = '`'; postText = '`'; break;
-                case 'hr': preText = `\n\n---\n\n`; break;
+                case 'code_block':
+                    const lang = prompt('¿Qué lenguaje de programación? (ej: python, csharp, javascript, css...)', 'python');
+                    markdownText = "\n```" + lang + "\n" + (selectedText || 'tu código aquí') + "\n```\n";
+                    break;
+                case 'hr': markdownText = `\n\n---\n\n`; break;
             }
 
-            if (preText) {
-                if (markdownText) { // Casos especiales como 'image' que construyen todo el texto
-                    contentTextarea.value = contentTextarea.value.substring(0, start) + markdownText + contentTextarea.value.substring(end);
-                    contentTextarea.selectionEnd = start + markdownText.length;
-                } else {
-                    contentTextarea.value = contentTextarea.value.substring(0, start) + preText + selectedText + postText + contentTextarea.value.substring(end);
-                    contentTextarea.selectionEnd = start + preText.length + selectedText.length + postText.length;
+            if (preText || markdownText) {
+                let finalText = markdownText;
+                if (!finalText) {
+                    finalText = preText + (selectedText || (type === 'link' ? 'texto' : '')) + postText;
                 }
+                contentTextarea.value = contentTextarea.value.substring(0, start) + finalText + contentTextarea.value.substring(end);
                 contentTextarea.focus();
+                contentTextarea.selectionEnd = start + finalText.length;
                 updatePreview();
             }
         }
 
-        function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:function(e){const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(!0);alert('Orden actualizado. Pulsa "Generar y Descargar".')}});previewFrame.onload=()=>updatePreview(!0);if(document.readyState==="complete"){updatePreview(!0)}})}
+        function loadInitialData(){fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:function(e){const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(!0);alert('Orden actualizado.')}});previewFrame.onload=()=>updatePreview(!0);if(document.readyState==="complete"){updatePreview(!0)}})}
         function renderManageList(){const c=document.getElementById('manage-list');c.innerHTML='';if(currentProjects.length===0){c.innerHTML='<p>No hay proyectos.</p>';return}
         [...currentProjects].reverse().forEach((p,i)=>{const o=currentProjects.length-1-i;const t=document.createElement('div');t.className='manage-item';t.dataset.id=p.id;t.innerHTML=`<span class="drag-handle">::</span><span class="manage-item-title">${p.titulo}</span><div class="manage-buttons"><button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button><button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button><button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button></div>`;c.appendChild(t)})}
         function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
-        function duplicateProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(!0);alert(`Duplicado. Pulsa "Generar y Descargar".`)}
+        function duplicateProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(!0);alert(`Duplicado.`)}
         function editProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
         document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()}
         function deleteProjectById(i){const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(!0);alert('Proyecto borrado.')}}
