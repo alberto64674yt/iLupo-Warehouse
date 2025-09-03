@@ -6,7 +6,7 @@ body {
 }
 .panel-body { overflow: hidden; }
 header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
-header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; cursor: pointer; }
+header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; cursor: pointer; display: inline-block; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 .no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
@@ -103,3 +103,4 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .easter-egg-signature { color: var(--primary-color); font-weight: bold; }
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
+
