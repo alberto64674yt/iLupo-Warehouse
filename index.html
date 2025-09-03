@@ -193,10 +193,14 @@
 
                 itemWrapper.appendChild(checkbox);
                 itemWrapper.appendChild(label);
-                container.appendChild(itemWrapper);
                 
+                // LÓGICA CORREGIDA: El contenedor de hijos AHORA se añade al wrapper del item.
                 const childrenContainer = document.createElement('div');
                 childrenContainer.className = 'tag-children-container';
+                
+                // Se añade el item al contenedor principal
+                container.appendChild(itemWrapper);
+                // Y el contenedor de sus hijos también, justo después.
                 container.appendChild(childrenContainer);
 
                 checkbox.addEventListener('change', () => {
