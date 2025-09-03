@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Mí | iLupo Warehouse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="detail-page-body">
+    <a href="index.html" class="back-link">&larr; Volver a todos los proyectos</a>
+    <main id="about-content-container" class="project-detail-container"></main>
+    <footer>
+        <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            marked.setOptions({ gfm: true, breaks: true });
+            
+            // Cargar contenido desde el archivo JSON
+            fetch('info.json')
+                .then(response => response.json())
+                .then(data => {
+                    renderAboutContent(data.contenido);
+                })
+                .catch(error => {
+                    console.error('Error al cargar info.json:', error);
+                    renderAboutContent('# Error\n\nNo se pudo cargar el contenido de la página.');
+                });
+        });
+
+        function renderAboutContent(markdownContent) {
+            const container = document.getElementById('about-content-container');
+            if (markdownContent) {
+                container.innerHTML = marked.parse(markdownContent);
+            }
+        }
+
+        // Escuchar mensajes del panel para la previsualización en vivo
+        window.addEventListener('message', e => {
+            if (e.data.type === 'aboutPreviewUpdate') {
+                renderAboutContent(e.data.payload);
+            }
+        });
+    </script>
+</body>
+</html>
