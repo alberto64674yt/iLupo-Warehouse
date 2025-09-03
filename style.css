@@ -20,19 +20,33 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 6px; }
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
-/* He renombrado .tag-filter-container a #tag-filter-scroll-container */
-#tag-filter-scroll-container {
+#tag-filters-wrapper {
+    margin-top: 1.5rem;
+}
+.tag-filter-bar {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+.tag-filter-bar::before {
+    content: '↳';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    color: var(--light-text);
+    font-size: 1.2rem;
+}
+.tag-filter-bar:first-child::before {
+    content: ''; /* No mostrar la flecha en la primera barra */
+}
+.tag-filter-scroller {
+    display: flex;
+    gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 15px;
     scrollbar-width: none;
-    margin-top: 1.5rem !important;
 }
-#tag-filter-scroll-container::-webkit-scrollbar { display: none; }
-#tag-filter-flex-container { /* Nuevo contenedor interior */
-    display: inline-flex; /* Usamos inline-flex para que el contenedor no ocupe todo el ancho */
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 4px; /* Pequeño padding para que no se corte la sombra del botón */
+.tag-filter-scroller::-webkit-scrollbar {
+    display: none;
 }
 .tag-button { flex-shrink: 0; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
 .tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
@@ -115,58 +129,3 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .easter-egg-signature { color: var(--primary-color); font-weight: bold; }
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
-
-/* --- ESTILOS PARA FILTROS JERÁRQUICOS (VERSIÓN FINAL) --- */
-.tag-node {
-    position: relative;
-    flex-shrink: 0;
-}
-.tag-node-children {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 10;
-    margin-top: 8px;
-    padding: 8px;
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    min-width: 220px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-}
-.tag-node-children.children-visible {
-    display: block;
-}
-.tag-node-children .tag-node {
-    display: block;
-    width: 100%;
-    margin-bottom: 4px;
-}
-.tag-node-children .tag-node:last-child {
-    margin-bottom: 0;
-}
-.tag-node-children .tag-button {
-    width: 100%;
-    border-radius: 8px;
-    display: flex;
-    justify-content: flex-start;
-}
-.hier-tag-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.hier-tag-button .arrow {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid var(--light-text);
-    transition: transform 0.2s ease-out;
-    flex-shrink: 0; /* Para que la flecha no se encoja */
-}
-.hier-tag-button.expanded .arrow {
-    transform: rotate(90deg);
-}
