@@ -21,7 +21,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
 
-/* --- ESTILOS PARA EL SISTEMA DE FILTROS CON CHECKBOX --- */
+/* --- ESTILOS PARA EL SISTEMA DE FILTROS CON CHECKBOX (VERTICAL) --- */
 .tag-filter-container {
     margin-top: 1.5rem;
     border: 1px solid var(--border-color);
@@ -33,7 +33,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     align-items: center;
     padding: 4px 0;
 }
-.tag-item.expandable {
+.tag-item.expandable > .tag-label, .tag-item.expandable > .arrow {
     cursor: pointer;
 }
 .arrow {
@@ -44,6 +44,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     border-left: 5px solid var(--light-text);
     margin-right: 8px;
     transition: transform 0.2s ease-out;
+    flex-shrink: 0;
 }
 .tag-item.expanded > .arrow {
     transform: rotate(90deg);
@@ -57,6 +58,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     cursor: pointer;
     color: var(--light-text);
     transition: color 0.2s ease;
+    flex-grow: 1;
 }
 .tag-label .tag-count {
     color: #6b7280; /* Un color más tenue para el contador */
@@ -65,7 +67,8 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     content: '';
     position: absolute;
     left: 0;
-    top: 2px;
+    top: 50%;
+    transform: translateY(-50%);
     width: 18px;
     height: 18px;
     background-color: var(--surface-color);
@@ -83,9 +86,11 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     content: '✔';
     position: absolute;
     left: 4px;
-    top: 2px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--dark-bg);
     font-size: 14px;
+    line-height: 1;
 }
 .tag-checkbox:checked + .tag-label::before {
     background-color: var(--primary-color);
@@ -100,7 +105,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     max-height: 1000px; /* Valor grande para permitir la expansión */
 }
 /* Estilos para el botón "Todos" */
-#tag-filter-container .tag-item:first-child {
+#tag-filter-container > .tag-item:first-child {
     padding-bottom: 1rem;
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
