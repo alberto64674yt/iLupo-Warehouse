@@ -4,13 +4,26 @@
       "titulo": "¡Microsoft Visual C++ Redistributables All in One 2022!",
       "id": "ms-visual-cpp-aio-2022",
       "resumen": "Un instalador todo en uno que reúne todos los **Microsoft Visual C++ Redistributables**. Imprescindible para instalaciones limpias de Windows y para asegurar que todos tus juegos y programas funcionen sin errores.",
-      "contenido_completo": "Capturas:\n\n![Captura principal del programa](https://i.imgur.com/7wjry1u.png)\n![Captura secundaria del programa](https://i.imgur.com/ttTFNJT.png)\n\nEste programa es un instalador que agrupa en un solo paquete todos los **Microsoft Visual C++ Redistributables**, desde la versión 2005 a la 2022. Es una herramienta esencial después de formatear un ordenador o al configurar un PC nuevo, ya que soluciona los errores más comunes de librerías (.dll) que impiden que muchos juegos y aplicaciones se inicien.\n\n### Características Principales:\n\n* **Detección Automática de Arquitectura**: El programa incluye un detector que identifica si tu sistema operativo es de 32 o 64 bits para recomendarte la instalación correcta.\n* **Instalación Completa**: Para sistemas de 64 bits, se recomienda instalar tanto las versiones de x64 como las de x86 (32 bits) para garantizar la máxima compatibilidad.\n* **Ligero y Eficiente**: La aplicación completa ocupa menos de 200 MB.\n* **.NET Framework Incluido**: También integra el instalador para .NET Framework 4.8, la versión más reciente.\n\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=u_db17GWfmg\n\n---\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://playpaste.net/?v=nBz)",
+      "contenido_completo": "### Capturas:\n\n![Captura principal del programa](https://i.imgur.com/7wjry1u.png)\n![Captura secundaria del programa](https://i.imgur.com/ttTFNJT.png)\n\nEste programa es un instalador que agrupa en un solo paquete todos los **Microsoft Visual C++ Redistributables**, desde la versión 2005 a la 2022. Es una herramienta esencial después de formatear un ordenador o al configurar un PC nuevo, ya que soluciona los errores más comunes de librerías (.dll) que impiden que muchos juegos y aplicaciones se inicien.\n\n### Características Principales:\n\n* **Detección Automática de Arquitectura**: El programa incluye un detector que identifica si tu sistema operativo es de 32 o 64 bits para recomendarte la instalación correcta.\n* **Instalación Completa**: Para sistemas de 64 bits, se recomienda instalar tanto las versiones de x64 como las de x86 (32 bits) para garantizar la máxima compatibilidad.\n* **Ligero y Eficiente**: La aplicación completa ocupa menos de 200 MB.\n* **.NET Framework Incluido**: También integra el instalador para .NET Framework 4.8, la versión más reciente.\n\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=u_db17GWfmg\n\n---\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://playpaste.net/?v=nBz)",
       "imagen": "https://i.imgur.com/tEbsYUy.jpeg",
       "enlace": "",
       "tags": [
         "Software > Utilidades",
         "Software > Windows",
         "Programación > Herramientas"
+      ]
+    },
+    {
+      "titulo": "Mi Primer Juego con Game Maker: Versión de 'The World's Hardest Game'",
+      "id": "mi-primer-juego-game-maker",
+      "resumen": "Mi primer proyecto de desarrollo de videojuegos. Creado con el clásico Game Maker 8, este juego es mi propia versión del adictivo y popular 'The World's Hardest Game'. ¡Prepárate para poner a prueba tus reflejos y tu paciencia!",
+      "contenido_completo": "### Capturas:\n\n![alt text](https://i.ibb.co/39y2W2WQ/3s4s2r.png)\n![alt text](https://i.ibb.co/rRb7r6m9/fl4bO4.png)\n\nEste fue mi primer juego completo, creado por pura nostalgia y como un desafío personal usando Game Maker 8. Se trata de una recreación del famoso \"The World's Hardest Game\", un juego que puso a prueba la paciencia de millones de jugadores hace años. El objetivo es simple: mueve el cuadrado rojo a través del nivel, recoge las monedas y llega a la zona verde sin que te toquen los obstáculos azules.\n\nCaracterísticas Principales:\nJugabilidad Clásica: La mecánica es fiel al original, ofreciendo un reto de habilidad y precisión.\n\nNiveles Desafiantes: Incluye varios niveles diseñados para aumentar la dificultad progresivamente.\n\nDesarrollo Retro: Programado íntegramente en Game Maker 8, demostrando lo que se podía hacer con herramientas clásicas.\n\nLigero y Portátil: El juego es un ejecutable simple que no requiere instalación y funciona en cualquier PC.\n\nA continuación puedes ver el juego en acción:\n\nhttps://www.youtube.com/watch?v=dk4LFT5zWuw\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://alberto64674yt.itch.io/the-worlds-hardest-game-custom-edition)",
+      "imagen": "https://i.ibb.co/Nn2wvy2c/Ros7nJ.png",
+      "enlace": "",
+      "tags": [
+        "Juegos > Arcade",
+        "Software > Windows",
+        "Motores de Juego > Game Maker"
       ]
     }
   ]
