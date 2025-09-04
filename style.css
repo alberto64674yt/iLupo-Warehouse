@@ -435,3 +435,17 @@ summary::marker {
 .tab-content.active {
     display: block;
 }
+/* --- ESTILOS PARA TABLAS GRANDES (RESPONSIVE) --- */
+.table-wrapper {
+    max-height: 70vh; /* Altura máxima de la tabla (70% de la pantalla) */
+    overflow: auto;   /* Activa AMBOS scrolls (vertical y horizontal) si son necesarios */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    background-color: #161f2d; /* Un fondo ligeramente distinto para el contenedor */
+}
+/* Quitar el margen por defecto de la tabla cuando está envuelta */
+.project-description .table-wrapper table,
+#about-content-container .table-wrapper table {
+    margin-bottom: 0;
+}
