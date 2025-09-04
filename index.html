@@ -69,6 +69,10 @@
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
         const tagContainer = document.getElementById('tag-filter-container');
+        
+        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+        // Detectamos si la página está dentro del iframe del panel
+        const isPreview = (window.self !== window.top);
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -81,7 +85,7 @@
             });
         }, { threshold: 0.1 });
 
-        // FUNCIÓN DE RENDERIZADO SIMPLIFICADA (SIN ANIMACIONES)
+        // Se restaura la función de renderizado simple y robusta
         function renderCards(proyectos) {
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
@@ -95,16 +99,19 @@
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                card.addEventListener('mousemove', e => {
-                    const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
-                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                });
-                card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
                 card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
-                cardObserver.observe(card);
+
+                if (isPreview) {
+                    // Si estamos en la vista previa, hacemos la tarjeta visible al instante.
+                    card.classList.add('is-visible');
+                } else {
+                    // Si estamos en la web pública, usamos el observer para el efecto de scroll.
+                    cardObserver.observe(card);
+                }
             });
         }
+        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
 
         function setupPagination(totalProjects) {
             paginationContainer.innerHTML = '';
@@ -258,7 +265,7 @@
         window.addEventListener('message', e => {
             if (e.data.type === 'previewUpdate') {
                 allProjects = e.data.payload;
-                // Siempre reconstruimos todo para la preview, es la forma más robusta
+                // Siempre reconstruimos todo para la preview, es la forma más robusta y ahora rápida
                 buildAndRenderTags(allProjects);
                 filterAndRender();
             }
