@@ -96,10 +96,25 @@
         function renderAboutContent(markdownContent) {
             const container = document.getElementById('about-content-container');
             if (markdownContent) {
-                // --- CAMBIO: Aplicar el traductor de shortcodes ---
                 let processedContent = parseCustomShortcodes(markdownContent);
-                container.innerHTML = marked.parse(processedContent);
-                // --- CAMBIO: Inicializar las pestañas (tabs) ---
+                let finalHtml = marked.parse(processedContent);
+                
+                // --- INICIO: LÓGICA MEJORADA PARA TABLAS ---
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = finalHtml;
+                
+                // Envolver tablas para hacerlas scrollables
+                tempDiv.querySelectorAll('table').forEach(table => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'table-wrapper';
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(table);
+                });
+
+                finalHtml = tempDiv.innerHTML;
+                // --- FIN: LÓGICA MEJORADA ---
+
+                container.innerHTML = finalHtml;
                 initializeTabs();
             }
         }
