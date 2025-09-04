@@ -207,7 +207,6 @@
             const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
             let markdownText = '', preText = '', postText = '';
             
-            // --- INICIO: LÓGICA PARA NUEVOS BOTONES DE COMPONENTES ---
             switch(type) {
                 case 'alert':
                     let alertType = prompt("Introduce el tipo de alerta (nota, aviso, info):", "info");
@@ -226,19 +225,39 @@
                 case 'tabs':
                     markdownText = `\n[tabs]\n[tab:Pestaña 1]\nContenido de la primera pestaña...\n[tab:Pestaña 2]\nContenido de la segunda pestaña...\n[/tabs]\n`;
                     break;
+                
+                // --- INICIO: LÓGICA DE TABLA ACTUALIZADA ---
                 case 'table':
-                    const cols = parseInt(prompt("Número de columnas para la tabla:", "3"));
-                    if (cols > 0) {
-                        let header = '|', divider = '|', row = '|';
-                        for(let i = 0; i < cols; i++) {
-                            header += ` Encabezado ${i+1} |`;
-                            divider += `---|`;
-                            row += ` Celda ${i+1} |`;
+                    const dims = prompt("Introduce las dimensiones (Columnas x Filas):\n\n- Columnas: de izquierda a derecha\n- Filas: de arriba a abajo", "3x4");
+                    if (dims) {
+                        const parts = dims.toLowerCase().split('x');
+                        if (parts.length === 2) {
+                            const cols = parseInt(parts[0]);
+                            const rows = parseInt(parts[1]);
+
+                            if (cols > 0 && rows > 0) {
+                                let header = '|', divider = '|', tableRows = '';
+                                for(let i = 0; i < cols; i++) {
+                                    header += ` Encabezado ${i+1} |`;
+                                    divider += `---|`;
+                                }
+                                for (let r = 0; r < rows; r++) {
+                                    let row = '|';
+                                    for (let c = 0; c < cols; c++) {
+                                        row += ` Celda ${c+1} |`;
+                                    }
+                                    tableRows += row + '\n';
+                                }
+                                markdownText = `\n${header}\n${divider}\n${tableRows}`;
+                            } else {
+                                alert("Las dimensiones deben ser números mayores que cero.");
+                            }
+                        } else {
+                            alert("Formato incorrecto. Usa el formato 'Columnas x Filas', por ejemplo: 4x5.");
                         }
-                        markdownText = `\n${header}\n${divider}\n${row}\n`;
                     }
                     break;
-            // --- FIN: LÓGICA PARA NUEVOS BOTONES ---
+                // --- FIN: LÓGICA DE TABLA ACTUALIZADA ---
 
                 case 'bold': preText = '**'; postText = '**'; break;
                 case 'italic': preText = '*'; postText = '*'; break;
@@ -251,13 +270,13 @@
                     break;
                 case 'image': 
                     const imgUrl = prompt('URL de la imagen:', 'https://');
-                    if (imgUrl) markdownText = `![${selectedText || 'alt text'}](${imgUrl})`;
+                    if (imgUrl) { markdownText = `![${selectedText || 'alt text'}](${imgUrl})`; }
                     break;
                 case 'download-image':
                     const d_imgUrl = prompt('URL de la IMAGEN:', 'https://');
                     if(d_imgUrl){
                         const d_downloadUrl = prompt('URL del ARCHIVO a descargar:');
-                        if(d_downloadUrl) markdownText = `[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})`;
+                        if(d_downloadUrl) { markdownText = `[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})`; }
                     }
                     break;
                 case 'ul': markdownText = `\n- Punto 1\n- Punto 2`; break;
