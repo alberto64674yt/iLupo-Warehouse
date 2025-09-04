@@ -42,6 +42,74 @@
             });
         }
 
+        // --- INICIO: NUEVAS FUNCIONES PARA COMPONENTES ---
+
+        // Función para inicializar la interactividad de las pestañas (Tabs)
+        function initializeTabs() {
+            const tabContainers = document.querySelectorAll('.tabs-container');
+            tabContainers.forEach(container => {
+                const navButtons = container.querySelectorAll('.tab-button');
+                const contentPanels = container.querySelectorAll('.tab-content');
+
+                navButtons.forEach((button, index) => {
+                    button.addEventListener('click', () => {
+                        // Ocultar todos y quitar 'active'
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        contentPanels.forEach(panel => panel.classList.remove('active'));
+
+                        // Mostrar el seleccionado
+                        button.classList.add('active');
+                        contentPanels[index].classList.add('active');
+                    });
+                });
+            });
+        }
+
+        // "Traductor" de Shortcodes a HTML
+        function parseCustomShortcodes(content) {
+            let processedContent = content;
+
+            // 1. Spoilers: [spoiler:título]...[/spoiler]
+            processedContent = processedContent.replace(/\[spoiler:([^\]]+)\]([\s\S]*?)\[\/spoiler\]/g, (match, title, innerContent) => {
+                return `<details><summary>${title}</summary>${marked.parse(innerContent)}</details>`;
+            });
+
+            // 2. Alertas: [tipo]...[/tipo]
+            processedContent = processedContent.replace(/\[(nota|aviso|info)\]([\s\S]*?)\[\/\1\]/g, (match, type, innerContent) => {
+                return `<div class="alert alert-${type}">${marked.parse(innerContent)}</div>`;
+            });
+
+            // 3. Pestañas (Tabs)
+            processedContent = processedContent.replace(/\[tabs\]([\s\S]*?)\[\/tabs\]/g, (match, innerContent) => {
+                const navLinks = [];
+                const tabContents = [];
+                const tabRegex = /\[tab:([^\]]+)\]([\s\S]*?)(?=\[tab:|$)/g;
+                let tabMatch;
+                
+                while ((tabMatch = tabRegex.exec(innerContent)) !== null) {
+                    navLinks.push(tabMatch[1]); // Título de la pestaña
+                    tabContents.push(marked.parse(tabMatch[2])); // Contenido de la pestaña
+                }
+
+                if (navLinks.length === 0) return '';
+
+                const navHtml = navLinks.map((title, index) => 
+                    `<button class="tab-button ${index === 0 ? 'active' : ''}">${title}</button>`
+                ).join('');
+
+                const contentHtml = tabContents.map((content, index) =>
+                    `<div class="tab-content ${index === 0 ? 'active' : ''}">${content}</div>`
+                ).join('');
+
+                return `<div class="tabs-container"><div class="tabs-nav">${navHtml}</div>${contentHtml}</div>`;
+            });
+            
+            return processedContent;
+        }
+
+        // --- FIN: NUEVAS FUNCIONES PARA COMPONENTES ---
+
+
         function renderProjectDetails(proyecto) {
             const container = document.getElementById('project-detail-content');
             if (!proyecto || !proyecto.titulo) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
@@ -52,6 +120,10 @@
             rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
             const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
             rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
+            
+            // --- CAMBIO: APLICAR EL TRADUCTOR DE SHORTCODES ANTES DE PROCESAR MARKDOWN ---
+            rawContent = parseCustomShortcodes(rawContent);
+
             let finalHtml = marked.parse(rawContent);
 
             const tempDiv = document.createElement('div');
@@ -66,23 +138,20 @@
                 }
             });
             finalHtml = tempDiv.innerHTML;
-
-            // --- LÓGICA DE ETIQUETAS MODIFICADA ---
+            
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
                 tagsHtml = '<div class="project-tags">Etiquetas: ';
                 proyecto.tags.forEach(fullTagPath => {
                     const parts = fullTagPath.split(' > ');
                     const breadcrumbs = parts.map(part => {
-                        // AHORA CADA ENLACE BUSCA LA PALABRA EXACTA
                         return `<a href="tags.html?tag=${encodeURIComponent(part.trim())}" class="tag-link">${part.trim()}</a>`;
                     }).join(' &gt; ');
                     tagsHtml += `<div style="margin-bottom: 8px;">${breadcrumbs}</div>`;
                 });
                 tagsHtml += '</div>';
             }
-            // --- FIN DE LA LÓGICA MODIFICADA ---
-
+            
             container.innerHTML = `
                 <h1 class="project-title">${proyecto.titulo}</h1>
                 <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
@@ -93,6 +162,8 @@
             
             Prism.highlightAll();
             initializeGallery();
+            // --- CAMBIO: INICIALIZAR LAS PESTAÑAS (TABS) TRAS RENDERIZAR ---
+            initializeTabs();
         }
         
         window.addEventListener('message', e => { 
