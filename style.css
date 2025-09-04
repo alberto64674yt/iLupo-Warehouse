@@ -516,15 +516,15 @@ summary::marker {
 
     /* --- Panel de Control (panel.html) --- */
     .panel-body {
-        overflow-y: auto; /* Permite el scroll vertical en la página del panel */
+        overflow-y: auto;
     }
-    .panel-container {
-        display: flex; /* Aseguramos que es flexbox */
-        flex-direction: column; /* Apilamos los elementos verticalmente */
-        height: auto; /* La altura se ajusta al contenido */
+    /* Corrección 'agresiva' para forzar el apilamiento vertical */
+    body.panel-body .panel-container {
+        flex-direction: column !important;
+        height: auto;
     }
     .editor-pane, .preview-pane {
-        width: 100%; /* Cada sección ocupa todo el ancho */
+        width: 100%;
         box-sizing: border-box;
     }
     .editor-pane {
