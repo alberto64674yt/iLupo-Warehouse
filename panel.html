@@ -45,6 +45,10 @@
                             <button onclick="applyMarkdown('quote', 'contenido_completo')" title="Cita">Cita</button>
                             <button onclick="applyMarkdown('code_block', 'contenido_completo')" title="Bloque de Código">Bloque</button>
                             <button onclick="applyMarkdown('hr', 'contenido_completo')" title="Línea horizontal">Línea</button>
+                            <button onclick="applyMarkdown('alert', 'contenido_completo')" title="Caja de Alerta">Alerta</button>
+                            <button onclick="applyMarkdown('spoiler', 'contenido_completo')" title="Contenido Desplegable">Spoiler</button>
+                            <button onclick="applyMarkdown('tabs', 'contenido_completo')" title="Pestañas">Tabs</button>
+                            <button onclick="applyMarkdown('table', 'contenido_completo')" title="Tabla">Tabla</button>
                             <button onclick="applyMarkdown('h2', 'contenido_completo')" title="Título 2">Tít 2</button>
                             <button onclick="applyMarkdown('h3', 'contenido_completo')" title="Título 3">Tít 3</button>
                             <button onclick="applyMarkdown('ul', 'contenido_completo')" title="Lista">Lista</button>
@@ -84,6 +88,10 @@
                         <button onclick="applyMarkdown('quote', 'contenido_sobre_mi')" title="Cita">Cita</button>
                         <button onclick="applyMarkdown('code_block', 'contenido_sobre_mi')" title="Bloque de Código">Bloque</button>
                         <button onclick="applyMarkdown('hr', 'contenido_sobre_mi')" title="Línea horizontal">Línea</button>
+                        <button onclick="applyMarkdown('alert', 'contenido_sobre_mi')" title="Caja de Alerta">Alerta</button>
+                        <button onclick="applyMarkdown('spoiler', 'contenido_sobre_mi')" title="Contenido Desplegable">Spoiler</button>
+                        <button onclick="applyMarkdown('tabs', 'contenido_sobre_mi')" title="Pestañas">Tabs</button>
+                        <button onclick="applyMarkdown('table', 'contenido_sobre_mi')" title="Tabla">Tabla</button>
                         <button onclick="applyMarkdown('h2', 'contenido_sobre_mi')" title="Título 2">Tít 2</button>
                         <button onclick="applyMarkdown('h3', 'contenido_sobre_mi')" title="Título 3">Tít 3</button>
                         <button onclick="applyMarkdown('ul', 'contenido_sobre_mi')" title="Lista">Lista</button>
@@ -198,7 +206,40 @@
             const textarea = document.getElementById(textareaId);
             const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
             let markdownText = '', preText = '', postText = '';
+            
+            // --- INICIO: LÓGICA PARA NUEVOS BOTONES DE COMPONENTES ---
             switch(type) {
+                case 'alert':
+                    let alertType = prompt("Introduce el tipo de alerta (nota, aviso, info):", "info");
+                    if (['nota', 'aviso', 'info'].includes(alertType)) {
+                        markdownText = `\n[${alertType}]\n${selectedText || 'Texto de la alerta...'}\n[/${alertType}]\n`;
+                    } else {
+                        alert("Tipo de alerta no válido. Usa 'nota', 'aviso' o 'info'.");
+                    }
+                    break;
+                case 'spoiler':
+                    const spoilerTitle = prompt("Introduce el título del spoiler (lo que se ve antes de hacer clic):", "Haz clic para mostrar");
+                    if (spoilerTitle) {
+                        markdownText = `\n[spoiler:${spoilerTitle}]\n${selectedText || 'Contenido oculto...'}\n[/spoiler]\n`;
+                    }
+                    break;
+                case 'tabs':
+                    markdownText = `\n[tabs]\n[tab:Pestaña 1]\nContenido de la primera pestaña...\n[tab:Pestaña 2]\nContenido de la segunda pestaña...\n[/tabs]\n`;
+                    break;
+                case 'table':
+                    const cols = parseInt(prompt("Número de columnas para la tabla:", "3"));
+                    if (cols > 0) {
+                        let header = '|', divider = '|', row = '|';
+                        for(let i = 0; i < cols; i++) {
+                            header += ` Encabezado ${i+1} |`;
+                            divider += `---|`;
+                            row += ` Celda ${i+1} |`;
+                        }
+                        markdownText = `\n${header}\n${divider}\n${row}\n`;
+                    }
+                    break;
+            // --- FIN: LÓGICA PARA NUEVOS BOTONES ---
+
                 case 'bold': preText = '**'; postText = '**'; break;
                 case 'italic': preText = '*'; postText = '*'; break;
                 case 'strike': preText = '~~'; postText = '~~'; break;
