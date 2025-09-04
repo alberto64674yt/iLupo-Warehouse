@@ -412,6 +412,10 @@ summary::marker {
     display: flex;
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
+    /* --- INICIO DE CAMBIOS --- */
+    overflow-x: auto; /* Permite el scroll horizontal si hay muchas pestañas */
+    white-space: nowrap; /* Evita que los botones salten a la línea de abajo */
+    /* --- FIN DE CAMBIOS --- */
 }
 .tab-button {
     padding: 12px 20px;
