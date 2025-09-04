@@ -192,8 +192,6 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .duplicate-button { background-color: var(--duplicate-color); color: white; }
 .back-to-site-button { display: inline-block; padding: 8px 15px; margin-bottom: 2rem; background-color: var(--surface-color); color: var(--light-text); text-decoration: none; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; transition: all 0.2s; }
 .back-to-site-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
-.secret-letter { cursor: pointer; }
-.secret-letter:hover { text-decoration: underline dotted var(--primary-color); }
 .easter-egg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
 .easter-egg-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 16px; text-align: center; max-width: 90%; width: 700px; position: relative; border: 1px solid var(--border-color); }
 .video-container-easter-egg { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; pointer-events: none; }
