@@ -28,7 +28,7 @@
                         <textarea id="resumen" oninput="updatePreview()"></textarea>
                         <label for="imagen">URL de la Imagen Principal</label>
                         <input type="text" id="imagen" oninput="updatePreview()">
-                        <button class="upload-button" onclick="triggerUpload('imagen-uploader', 'imagen')">Subir a ImgBB</button>
+                        <button class="upload-button" onclick="triggerUpload('imagen', 'input')">Subir a ImgBB</button>
 
                         <label for="tags">Etiquetas (separadas por comas)</label>
                         <input type="text" id="tags" placeholder="Ej: Programación > Python, Juegos > Minecraft > Mods" oninput="updatePreview()">
@@ -107,8 +107,6 @@
 
     <script>
         // --- CONFIGURACIÓN DE IMGBB ---
-        // ❗ IMPORTANTE: Reemplaza 'TU_API_KEY_DE_IMGBB_AQUI' con tu clave real de ImgBB.
-        // Puedes obtener una gratis en https://api.imgbb.com
         const IMGBB_API_KEY = 'b8a4f499248761bcdc6789718a1eb1d2';
         
         let currentProjects = []; let aboutMeContent = { contenido: '' };
@@ -142,13 +140,12 @@
         
         // --- LÓGICA DE SUBIDA A IMGBB ---
         function triggerUpload(targetId, type) {
-            if (IMGBB_API_KEY === 'TU_API_KEY_DE_IMGBB_AQUI') {
+            if (IMGBB_API_KEY === 'TU_API_KEY_DE_IMGBB_AQUI' || !IMGBB_API_KEY) {
                 alert('Error: Debes configurar tu clave API de ImgBB en el archivo panel.html');
                 return;
             }
             const uploader = document.getElementById('image-uploader');
             
-            // Cada vez que se dispara la subida, se le asigna la función correcta
             uploader.onchange = (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -176,7 +173,7 @@
             } catch (error) {
                 alert(`Error al subir a ImgBB: ${error.message}`);
             } finally {
-                button.innerHTML = originalText;
+                button.innerHTML = 'Subir a ImgBB';
                 button.disabled = false;
                 document.getElementById('image-uploader').value = '';
             }
@@ -237,9 +234,7 @@
             textarea.selectionEnd = start + text.length;
         }
 
-        // --- LÓGICA DE MARKDOWN (ACTUALIZADA) ---
         function applyMarkdown(type, textareaId) {
-            // La lógica de subida ahora se maneja con triggerUpload
             if (type === 'imgbb-image') {
                 triggerUpload(textareaId, 'markdown-image');
                 return;
@@ -272,8 +267,7 @@
                     if(d_imgUrl){
                         const d_downloadUrl = prompt('URL del ARCHIVO a descargar:');
                         if(d_downloadUrl) { 
-                             // Envolvemos en un enlace para que sea clicable en la preview
-                            markdownText = `\n<a href="${d_downloadUrl}" target="_blank"><img src="${d_imgUrl}" alt="Imagen de descarga"/></a>\n`;
+                            markdownText = `[IMAGEN-DESCARGA](${d_imgUrl}, ${d_downloadUrl})`;
                         }
                     }
                     break;
@@ -329,18 +323,30 @@
         }
         
         function updatePreview(forceProjectList = false) {
-            if (previewMode === 'list') {
-                const p = getProjectFromForm();
-                let l = [...currentProjects];
-                if (editingIndex > -1 && !forceProjectList) { l[editingIndex] = p; } 
-                else if (!forceProjectList && p.titulo) { l.push(p); }
-                previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: l }, '*');
-            } else if (previewMode === 'detail') {
-                const d = editingIndex > -1 ? currentProjects[editingIndex] : getProjectFromForm();
-                previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: d }, '*');
-            } else if (previewMode === 'about') {
-                 previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: document.getElementById('contenido_sobre_mi').value }, '*');
+            // -- INICIO DE LA CORRECCIÓN --
+            if (!previewFrame.contentWindow) return; // Salir si el iframe no está listo
+            
+            try {
+                if (previewMode === 'list') {
+                    const p = getProjectFromForm();
+                    let l = [...currentProjects];
+                    if (editingIndex > -1 && !forceProjectList) { 
+                        l[editingIndex] = p; 
+                    } else if (editingIndex === -1 && !forceProjectList && p.titulo) { 
+                        // Corregido: solo añadir si NO estamos editando y hay un título
+                        l.push(p); 
+                    }
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: l }, '*');
+                } else if (previewMode === 'detail') {
+                    const d = (editingIndex > -1 && !forceProjectList) ? currentProjects[editingIndex] : getProjectFromForm();
+                    previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: d }, '*');
+                } else if (previewMode === 'about') {
+                     previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: document.getElementById('contenido_sobre_mi').value }, '*');
+                }
+            } catch(e) {
+                console.warn("Error de seguridad al acceder al iframe (probablemente esté cargando). Se reintentará pronto.", e);
             }
+            // -- FIN DE LA CORRECCIÓN --
         }
 
         function setActiveView(view) {
