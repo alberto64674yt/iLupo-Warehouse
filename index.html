@@ -81,37 +81,25 @@
             });
         }, { threshold: 0.1 });
 
-        // FUNCIÓN DE RENDERIZADO CON ANIMACIÓN (PARA FILTROS Y PAGINACIÓN)
+        // FUNCIÓN DE RENDERIZADO CON ANIMACIÓN (PARA FILTROS Y PAGINACIÓN DEL USUARIO)
         function renderCards(proyectos) {
-            const animationDuration = 300; // Debe coincidir con la transición en CSS
+            const animationDuration = 300;
             const existingCards = grid.querySelectorAll('.card');
-
             existingCards.forEach(card => card.classList.add('card-hiding'));
-
-            setTimeout(() => {
-                renderLive(proyectos); // Llama a la función de renderizado sin animación interna
-            }, animationDuration);
+            setTimeout(() => renderLive(proyectos), animationDuration);
         }
 
-        // FUNCIÓN DE RENDERIZADO SIN ANIMACIÓN (PARA VISTA PREVIA EN VIVO)
+        // FUNCIÓN DE RENDERIZADO INSTANTÁNEO (PARA VISTA PREVIA EN VIVO)
         function renderLive(proyectos) {
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
-                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
-                return;
+                return grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con los filtros.</p>';
             }
-            
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-            
-            paginatedProjects.forEach((proyecto) => {
+            paginatedProjects.forEach(proyecto => {
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                card.addEventListener('mousemove', e => {
-                    const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
-                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                });
-                card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
                 card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
                 cardObserver.observe(card);
@@ -137,10 +125,8 @@
             }
         }
         
-        let tagTree = {};
-
         function buildAndRenderTags(proyectos) {
-            tagTree = {};
+            let tagTree = {};
             proyectos.forEach(p => {
                 (p.tags || []).forEach(fullTag => {
                     let currentNode = tagTree;
@@ -150,96 +136,62 @@
                     });
                 });
             });
-
             function processTree(nodeLevel, pathPrefix = '') {
                 Object.keys(nodeLevel).forEach(key => {
                     const currentNode = nodeLevel[key];
                     const currentPath = pathPrefix ? `${pathPrefix} > ${key}` : key;
                     currentNode.path = currentPath;
                     currentNode.count = allProjects.filter(p => (p.tags || []).some(tag => tag.startsWith(currentPath))).length;
-                    if (Object.keys(currentNode.children).length > 0) {
-                        processTree(currentNode.children, currentPath);
-                    }
+                    if (Object.keys(currentNode.children).length > 0) processTree(currentNode.children, currentPath);
                 });
             }
             processTree(tagTree);
-            
             tagContainer.innerHTML = '';
             const allBtnContainer = document.createElement('div');
             allBtnContainer.className = 'tag-item';
             const allBtn = document.createElement('button');
             allBtn.className = 'tag-button';
             allBtn.innerText = `Todos (${proyectos.length})`;
-            allBtn.onclick = () => {
-                activeTags.clear();
-                currentPage = 1;
-                filterAndRender();
-            };
+            allBtn.onclick = () => { currentPage = 1; activeTags.clear(); filterAndRender(); };
             allBtnContainer.appendChild(allBtn);
             tagContainer.appendChild(allBtnContainer);
-
             renderTagTree(tagTree, tagContainer, 0);
         }
 
         function renderTagTree(tree, container, level) {
-            const sortedKeys = Object.keys(tree).sort();
-
-            sortedKeys.forEach(key => {
-                const node = tree[key];
-                const nodeName = node.path.split(' > ').pop();
-                const hasChildren = Object.keys(node.children).length > 0;
-                const inputId = `cb-${node.path.replace(/\s|>/g, '-')}`;
-
+            Object.keys(tree).sort().forEach(key => {
+                const node = tree[key], nodeName = node.path.split(' > ').pop(), hasChildren = Object.keys(node.children).length > 0;
                 const itemWrapper = document.createElement('div');
                 itemWrapper.className = 'tag-item';
                 itemWrapper.style.marginLeft = `${level * 20}px`;
-                
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.id = inputId;
+                checkbox.id = `cb-${node.path.replace(/\s|>/g, '-')}`;
                 checkbox.className = 'tag-checkbox';
                 checkbox.dataset.tagPath = node.path;
-                
                 const label = document.createElement('label');
                 label.className = 'tag-label';
-                label.htmlFor = inputId;
+                label.htmlFor = checkbox.id;
                 label.innerHTML = `${nodeName} <span class="tag-count">(${node.count})</span>`;
-
-                let arrow = null;
                 if (hasChildren) {
-                    arrow = document.createElement('span');
+                    const arrow = document.createElement('span');
                     arrow.className = 'arrow';
                     itemWrapper.appendChild(arrow);
                 }
-
                 itemWrapper.appendChild(checkbox);
                 itemWrapper.appendChild(label);
-                
                 container.appendChild(itemWrapper);
-
                 if (hasChildren) {
                     const childrenContainer = document.createElement('div');
                     childrenContainer.className = 'tag-children-container';
                     itemWrapper.appendChild(childrenContainer);
-
-                    const toggleFunc = (e) => {
-                        e.stopPropagation();
-                        itemWrapper.classList.toggle('expanded');
-                        childrenContainer.classList.toggle('visible');
-                    };
-
+                    const toggleFunc = e => { e.stopPropagation(); itemWrapper.classList.toggle('expanded'); childrenContainer.classList.toggle('visible'); };
                     label.addEventListener('click', toggleFunc);
-                    arrow.addEventListener('click', toggleFunc);
-                    
+                    if (itemWrapper.querySelector('.arrow')) itemWrapper.querySelector('.arrow').addEventListener('click', toggleFunc);
                     renderTagTree(node.children, childrenContainer, level + 1);
                 }
-
                 checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) {
-                        activeTags.add(node.path);
-                    } else {
-                        activeTags.delete(node.path);
-                    }
+                    if (checkbox.checked) activeTags.add(node.path); else activeTags.delete(node.path);
                     currentPage = 1;
                     filterAndRender();
                 });
@@ -247,41 +199,34 @@
         }
 
         function updateAllButtonStates() {
-            const hasActiveTags = activeTags.size > 0;
-            document.querySelector('.tag-button').classList.toggle('active', !hasActiveTags);
-            
-            document.querySelectorAll('.tag-checkbox').forEach(cb => {
-                cb.checked = activeTags.has(cb.dataset.tagPath);
-            });
+            document.querySelector('.tag-button').classList.toggle('active', activeTags.size === 0);
+            document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = activeTags.has(cb.dataset.tagPath));
+        }
+
+        function filterProjects() {
+            const searchTerm = searchBox.value.toLowerCase();
+            let filtered = allProjects;
+            if (searchTerm) filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+            if (activeTags.size > 0) {
+                const activeTagsArr = [...activeTags];
+                filtered = filtered.filter(p => activeTagsArr.every(atp => (p.tags || []).some(pt => pt.startsWith(atp))));
+            }
+            return filtered;
         }
 
         function filterAndRender() {
-            const searchTerm = searchBox.value.toLowerCase();
-            let filtered = allProjects;
-
-            if (searchTerm) {
-                filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
-            }
-            if (activeTags.size > 0) {
-                const activeTagsArr = [...activeTags];
-                filtered = filtered.filter(p => {
-                    return activeTagsArr.every(activeTagPath => {
-                        return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
-                    });
-                });
-            }
-            renderCards(filtered); // Esta función ya tiene la animación
+            const filtered = filterProjects();
+            renderCards(filtered); // Animado
             setupPagination(filtered.length);
             updateAllButtonStates();
             updateURLParameters();
         }
-
+        
         function updateURLParameters() {
             const params = new URLSearchParams();
             if (searchBox.value) params.set('buscar', searchBox.value);
             if (activeTags.size > 0) params.set('etiquetas', [...activeTags].join(','));
             if (currentPage > 1) params.set('pagina', currentPage);
-            
             const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
             history.pushState({ path: newUrl }, '', newUrl);
         }
@@ -290,19 +235,15 @@
             const params = new URLSearchParams(window.location.search);
             searchBox.value = params.get('buscar') || '';
             currentPage = parseInt(params.get('pagina')) || 1;
-            
             activeTags.clear();
             const tagsParam = params.get('etiquetas');
-            if (tagsParam) {
-                tagsParam.split(',').forEach(tag => activeTags.add(tag));
-            }
+            if (tagsParam) tagsParam.split(',').forEach(tag => activeTags.add(tag));
         }
 
         // --- INICIALIZACIÓN ---
         applyStateFromURL();
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
-            window.proyectos=allProjects;
             buildAndRenderTags(allProjects);
             filterAndRender();
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
@@ -312,154 +253,82 @@
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
         
-        // --- LISTENER DE PREVIEW CORREGIDO ---
+        window.addEventListener('popstate', () => { applyStateFromURL(); filterAndRender(); });
+
+        // --- LISTENER DE PREVIEW CORREGIDO Y DEFINITIVO ---
         window.addEventListener('message', e => {
             if (e.data.type === 'previewUpdate') {
-                const isLiveUpdate = e.data.isLive !== false; // Será true a menos que se especifique lo contrario
                 allProjects = e.data.payload;
-                
-                // Si es un refresco completo (ej. al cargar), reconstruimos todo
-                if (!isLiveUpdate) {
+                if (e.data.isLive) {
+                    // Actualización en vivo: renderizado instantáneo sin tocar los filtros de etiquetas
+                    const filtered = filterProjects();
+                    renderLive(filtered);
+                    setupPagination(filtered.length);
+                    updateAllButtonStates();
+                } else {
+                    // Refresco completo: reconstruye todo, incluyendo las etiquetas
                     buildAndRenderTags(allProjects);
+                    filterAndRender();
                 }
-                
-                // Para la PREVIEW EN VIVO, usamos renderLive para una actualización instantánea
-                // Para los filtros de usuario, se seguirá usando filterAndRender que llama a renderCards con animación
-                const searchTerm = searchBox.value.toLowerCase();
-                let filtered = allProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
-                
-                // Hacemos un renderizado instantáneo para la preview
-                renderLive(filtered);
-                setupPagination(filtered.length);
-                updateAllButtonStates();
             }
-        });
-
-        window.addEventListener('popstate', () => {
-            applyStateFromURL();
-            filterAndRender();
         });
     </script>
     
     <script>
         (function() {
-            // --- LÓGICA DE EASTER EGGS Y CÓDIGOS SECRETOS ---
             let userInput = "";
             const subtitleElement = document.getElementById('subtitle');
-            
-            const secretActions = {
-                "admin": () => {
-                    alert('Acceso correcto. Redirigiendo...');
-                    window.location.href = 'panel.html';
-                },
-                "boykisser": () => {
-                    showBoykisserEasterEgg();
-                }
-            };
-
+            const secretActions = {"admin": () => {alert('Acceso correcto. Redirigiendo...');window.location.href = 'panel.html';},"boykisser": () => {showBoykisserEasterEgg();}};
             if (subtitleElement) {
                 const text = subtitleElement.innerText;
                 subtitleElement.innerHTML = '';
-                text.split('').forEach(char => {
-                    const charSpan = document.createElement('span');
-                    charSpan.textContent = char;
-                    subtitleElement.appendChild(charSpan);
-                });
-
-                document.addEventListener('click', function(e) {
+                text.split('').forEach(char => {const span = document.createElement('span');span.textContent = char;subtitleElement.appendChild(span);});
+                document.addEventListener('click', e => {
                     if (e.target.parentElement === subtitleElement) {
-                        const letter = e.target.textContent.toLowerCase();
-                        userInput += letter;
-
-                        let matchFound = false;
+                        userInput += e.target.textContent.toLowerCase();
+                        let match = false;
                         for (const word in secretActions) {
                             if (word.startsWith(userInput)) {
-                                matchFound = true;
-                                if (userInput === word) {
-                                    secretActions[word]();
-                                    userInput = "";
-                                    break;
-                                }
+                                match = true;
+                                if (userInput === word) { secretActions[word](); userInput = ""; break; }
                             }
                         }
-                        if (!matchFound) {
-                            userInput = "";
-                        }
+                        if (!match) userInput = "";
                     }
                 });
             }
-
-            const titleElement = document.querySelector('#main-header h1');
-            const videoOverlay = document.getElementById('easter-egg-overlay');
-            const videoContainer = document.getElementById('video-container');
-            const closeVideoBtn = document.getElementById('close-easter-egg');
-            let clickCount = 0; let timer;
-
-            titleElement.addEventListener('click', function() {
-                clickCount++;
-                clearTimeout(timer);
-                timer = setTimeout(() => { clickCount = 0; }, 1000);
+            const titleElement = document.querySelector('#main-header h1'), videoOverlay = document.getElementById('easter-egg-overlay'), videoContainer = document.getElementById('video-container'), closeVideoBtn = document.getElementById('close-easter-egg');
+            let clickCount = 0, timer;
+            titleElement.addEventListener('click', () => {
+                clickCount++; clearTimeout(timer); timer = setTimeout(() => { clickCount = 0; }, 1000);
                 if (clickCount === 5) {
-                    clickCount = 0;
-                    alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
+                    clickCount = 0; alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
                     videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
                     videoOverlay.style.display = 'flex';
                 }
             });
-            closeVideoBtn.addEventListener('click', function() {
-                videoOverlay.style.display = 'none';
-                videoContainer.innerHTML = '';
-            });
-
-            const bkOverlay = document.getElementById('boykisser-overlay');
-            const bkChar = document.getElementById('boykisser-char');
-            const bkAudio = document.getElementById('boykisser-audio');
-            const bkTextElement = document.getElementById('boykisser-text');
-            const bkCloseBtn = document.getElementById('boykisser-close');
-            let typewriterInterval;
-            let startTypingTimeout;
-
+            closeVideoBtn.addEventListener('click', () => {videoOverlay.style.display = 'none'; videoContainer.innerHTML = '';});
+            const bkOverlay = document.getElementById('boykisser-overlay'), bkChar = document.getElementById('boykisser-char'), bkAudio = document.getElementById('boykisser-audio'), bkTextElement = document.getElementById('boykisser-text'), bkCloseBtn = document.getElementById('boykisser-close');
+            let typewriterInterval, startTypingTimeout;
             function showBoykisserEasterEgg() {
-                bkTextElement.innerHTML = '';
-                bkCloseBtn.style.display = 'none';
-                bkChar.style.transition = 'none';
-                bkChar.style.left = '-100%';
-                bkAudio.currentTime = 0;
-                clearInterval(typewriterInterval);
-                clearTimeout(startTypingTimeout);
+                bkTextElement.innerHTML = ''; bkCloseBtn.style.display = 'none'; bkChar.style.transition = 'none'; bkChar.style.left = '-100%'; bkAudio.currentTime = 0; clearInterval(typewriterInterval); clearTimeout(startTypingTimeout);
                 bkOverlay.classList.add('visible');
                 setTimeout(() => {
                     bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)'; 
-                    bkChar.style.left = '35%';
-                    bkAudio.play();
+                    bkChar.style.left = '35%'; bkAudio.play();
                 }, 20); 
-
-                const text = "you like kissing boys, don't you?";
-                let i = 0;
+                const text = "you like kissing boys, don't you?"; let i = 0;
                 startTypingTimeout = setTimeout(() => {
                     typewriterInterval = setInterval(() => {
-                        if (i < text.length) {
-                            bkTextElement.innerHTML += text.charAt(i);
-                            i++;
-                        } else {
-                            clearInterval(typewriterInterval);
-                        }
+                        if (i < text.length) { bkTextElement.innerHTML += text.charAt(i); i++; } 
+                        else { clearInterval(typewriterInterval); }
                     }, 65);
                 }, 1400);
             }
-
-            bkAudio.onended = function() {
-                clearInterval(typewriterInterval);
-                bkTextElement.innerHTML = "you like kissing boys, don't you?";
-                bkCloseBtn.style.display = 'block';
-            };
-            
-            bkCloseBtn.addEventListener('click', function() {
-                bkOverlay.classList.remove('visible');
-                clearInterval(typewriterInterval);
-                clearTimeout(startTypingTimeout);
-                bkAudio.pause();
-                bkAudio.currentTime = 0;
+            bkAudio.onended = () => {clearInterval(typewriterInterval); bkTextElement.innerHTML = "you like kissing boys, don't you?"; bkCloseBtn.style.display = 'block';};
+            bkCloseBtn.addEventListener('click', () => {
+                bkOverlay.classList.remove('visible'); clearInterval(typewriterInterval); clearTimeout(startTypingTimeout);
+                bkAudio.pause(); bkAudio.currentTime = 0;
             });
         })();
     </script>
