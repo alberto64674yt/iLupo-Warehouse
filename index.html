@@ -12,10 +12,8 @@
 <body>
     <header id="main-header" class="no-select">
         <h1>iLupo Warehouse</h1>
-        <p class="subtitle">
-            Un port<span class="secret-letter" data-key="0">a</span>folio 
-            <span class="secret-letter" data-key="1">d</span>e herra<span class="secret-letter" data-key="2">m</span>ientas 
-            e <span class="secret-letter" data-key="3">i</span>nve<span class="secret-letter" data-key="4">n</span>ciones.
+        <p class="subtitle" id="subtitle">
+            Un portafolio de herramientas e invenciones.
         </p>
     </header>
 
@@ -268,20 +266,46 @@
     
     <script>
         (function() {
-            const requiredLength = 5; let progress = 0;
-            document.addEventListener('click', function(e) {
-                const target = e.target;
-                if (target.classList.contains('secret-letter') && parseInt(target.dataset.key) === progress) {
-                    progress++;
-                } else if (!target.classList.contains('secret-letter')) {
-                    progress = 0;
-                }
-                if (progress === requiredLength) {
-                    alert('Acceso correcto. Redirigiendo...');
-                    window.location.href = 'panel.html';
-                }
-            });
+            // --- NUEVO SISTEMA DE ACCESO SECRETO ---
+            const secretWord = "admin";
+            let userInput = "";
+            const subtitleElement = document.getElementById('subtitle');
 
+            if (subtitleElement) {
+                // 1. Hacer cada letra un span individual para detectar clics
+                const text = subtitleElement.innerText;
+                subtitleElement.innerHTML = '';
+                text.split('').forEach(char => {
+                    const charSpan = document.createElement('span');
+                    charSpan.textContent = char;
+                    subtitleElement.appendChild(charSpan);
+                });
+
+                // 2. Escuchar clics en todo el documento
+                document.addEventListener('click', function(e) {
+                    // Solo nos interesa si se ha hecho clic en una de nuestras letras
+                    if (e.target.parentElement === subtitleElement) {
+                        const letter = e.target.textContent.toLowerCase();
+                        userInput += letter;
+
+                        // 3. Comprobar si la secuencia es correcta
+                        if (secretWord.startsWith(userInput)) {
+                            // Si la secuencia coincide con la palabra secreta, ¡éxito!
+                            if (userInput === secretWord) {
+                                alert('Acceso correcto. Redirigiendo...');
+                                window.location.href = 'panel.html';
+                                userInput = ""; // Reiniciar por si acaso
+                            }
+                            // Si no, la secuencia es correcta hasta ahora, esperamos la siguiente letra.
+                        } else {
+                            // 4. Si la secuencia es incorrecta, reiniciar
+                            userInput = "";
+                        }
+                    }
+                });
+            }
+
+            // --- SISTEMA EASTER EGG (SIN CAMBIOS) ---
             const titleElement = document.querySelector('#main-header h1');
             const overlay = document.getElementById('easter-egg-overlay');
             const videoContainer = document.getElementById('video-container');
