@@ -471,7 +471,7 @@ summary::marker {
     height: 100%;
     border: 0;
 }
-/* --- INICIO: ESTILOS RESPONSIVE PARA MÓVILES (CORREGIDO) --- */
+/* --- INICIO: ESTILOS RESPONSIVE PARA MÓVILES (VERSIÓN DEFINITIVA) --- */
 @media (max-width: 768px) {
 
     /* --- Ajustes Generales --- */
@@ -515,18 +515,16 @@ summary::marker {
     }
 
     /* --- Panel de Control (panel.html) --- */
-    
-    /* CORRECCIÓN CLAVE: Permitir el scroll en el body del panel en móvil */
     .panel-body {
-        overflow: auto;
+        overflow-y: auto; /* Permite el scroll vertical en la página del panel */
     }
-
     .panel-container {
-        flex-direction: column;
-        height: auto;
+        display: flex; /* Aseguramos que es flexbox */
+        flex-direction: column; /* Apilamos los elementos verticalmente */
+        height: auto; /* La altura se ajusta al contenido */
     }
     .editor-pane, .preview-pane {
-        width: 100%;
+        width: 100%; /* Cada sección ocupa todo el ancho */
         box-sizing: border-box;
     }
     .editor-pane {
@@ -534,7 +532,7 @@ summary::marker {
         border-right: none;
         border-bottom: 2px solid var(--border-color);
         padding: 1.5rem;
-        overflow-y: visible; /* Quitar el scroll interno en móvil */
+        overflow-y: visible;
     }
     .preview-pane {
         height: 100vh;
