@@ -138,7 +138,6 @@
             }
         }
         
-        // --- LÓGICA DE SUBIDA A IMGBB ---
         function triggerUpload(targetId, type) {
             if (IMGBB_API_KEY === 'TU_API_KEY_DE_IMGBB_AQUI' || !IMGBB_API_KEY) {
                 alert('Error: Debes configurar tu clave API de ImgBB en el archivo panel.html');
@@ -162,9 +161,11 @@
 
         async function uploadForInput(file, inputId) {
             const button = document.querySelector(`button[onclick*="'${inputId}'"]`);
-            const originalText = button.innerHTML;
-            button.innerHTML = 'Subiendo...';
-            button.disabled = true;
+            const originalText = button ? button.innerHTML : '';
+            if (button) {
+                button.innerHTML = 'Subiendo...';
+                button.disabled = true;
+            }
 
             try {
                 const imgUrl = await uploadToImgBB(file);
@@ -173,8 +174,10 @@
             } catch (error) {
                 alert(`Error al subir a ImgBB: ${error.message}`);
             } finally {
-                button.innerHTML = 'Subir a ImgBB';
-                button.disabled = false;
+                if (button) {
+                    button.innerHTML = 'Subir a ImgBB';
+                    button.disabled = false;
+                }
                 document.getElementById('image-uploader').value = '';
             }
         }
@@ -322,32 +325,47 @@
             const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}
         }
         
+        // --- INICIO DE LA FUNCIÓN CORREGIDA ---
         function updatePreview(forceProjectList = false) {
-            // -- INICIO DE LA CORRECCIÓN --
-            if (!previewFrame.contentWindow) return; // Salir si el iframe no está listo
-            
+            // Medida de seguridad para evitar errores si el iframe no está listo
+            if (!previewFrame.contentWindow) {
+                console.warn("Vista previa no lista, saltando actualización.");
+                return;
+            }
+
             try {
                 if (previewMode === 'list') {
-                    const p = getProjectFromForm();
-                    let l = [...currentProjects];
-                    if (editingIndex > -1 && !forceProjectList) { 
-                        l[editingIndex] = p; 
-                    } else if (editingIndex === -1 && !forceProjectList && p.titulo) { 
-                        // Corregido: solo añadir si NO estamos editando y hay un título
-                        l.push(p); 
+                    const projectFromForm = getProjectFromForm();
+                    let projectsForPreview = [...currentProjects];
+
+                    // Si estamos editando, actualiza el proyecto en la lista de previsualización.
+                    if (editingIndex > -1 && !forceProjectList) {
+                        projectsForPreview[editingIndex] = projectFromForm;
+                    } 
+                    // Si estamos creando uno nuevo (no editando) y hay al menos un título,
+                    // lo añadimos al final de la lista para que se vea la nueva tarjeta.
+                    else if (editingIndex === -1 && !forceProjectList && projectFromForm.titulo) {
+                        projectsForPreview.push(projectFromForm);
                     }
-                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: l }, '*');
+                    
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview }, '*');
+
                 } else if (previewMode === 'detail') {
-                    const d = (editingIndex > -1 && !forceProjectList) ? currentProjects[editingIndex] : getProjectFromForm();
-                    previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: d }, '*');
+                    // Para la vista de detalle, siempre mostramos los datos que están en el formulario.
+                    const projectForDetailPreview = getProjectFromForm();
+                    previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: projectForDetailPreview }, '*');
+
                 } else if (previewMode === 'about') {
-                     previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: document.getElementById('contenido_sobre_mi').value }, '*');
+                    // Para la vista "Sobre Mí", enviamos el contenido del textarea correspondiente.
+                    const aboutContent = document.getElementById('contenido_sobre_mi').value;
+                    previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: aboutContent }, '*');
                 }
-            } catch(e) {
-                console.warn("Error de seguridad al acceder al iframe (probablemente esté cargando). Se reintentará pronto.", e);
+            } catch (e) {
+                console.warn("No se pudo enviar el mensaje a la vista previa. Esto puede ocurrir durante recargas.", e);
             }
-            // -- FIN DE LA CORRECCIÓN --
         }
+        // --- FIN DE LA FUNCIÓN CORREGIDA ---
+
 
         function setActiveView(view) {
             previewMode = view;
