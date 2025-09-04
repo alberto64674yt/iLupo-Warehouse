@@ -124,6 +124,12 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 .card.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+/* --- ÚNICO CAMBIO: CLASE AÑADIDA PARA LA ANIMACIÓN DE SALIDA --- */
+.card.card-hiding {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
 #portfolio-grid.view-list .card { flex-direction: row; align-items: center; gap: 1.5rem; padding: 1rem; margin-bottom: 1.5rem; opacity: 1; transform: none; }
 .card:hover { transform: translateY(-8px); border-color: var(--primary-color); box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3); }
 #portfolio-grid.view-list .card:hover { transform: none; box-shadow: none; border-color: var(--primary-color); }
@@ -339,4 +345,3 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
         transform: translateX(-50%) rotate(0deg);
     }
 }
-
