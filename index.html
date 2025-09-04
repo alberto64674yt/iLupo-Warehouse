@@ -88,7 +88,8 @@
                 return;
             }
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-            paginatedProjects.forEach((proyecto) => {
+            
+            paginatedProjects.forEach((proyecto, index) => {
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
@@ -97,13 +98,15 @@
                     e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
                 });
                 card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
-                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
+                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
                 
                 const isPreview = (window.self !== window.top);
-                if (isPreview) {
+                if (isPreview || index < 3) {
+                    // Si estamos en la vista previa O es una de las 3 primeras tarjetas, hazla visible al instante.
                     card.classList.add('is-visible');
                 } else {
+                    // Para el resto, usa el observer para el efecto de scroll.
                     cardObserver.observe(card);
                 }
             });
@@ -415,3 +418,4 @@
     </script>
 </body>
 </html>
+
