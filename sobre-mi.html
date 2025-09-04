@@ -21,7 +21,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             marked.setOptions({ gfm: true, breaks: true });
             
-            // Cargar contenido desde el archivo JSON
             fetch('info.json')
                 .then(response => response.json())
                 .then(data => {
@@ -33,14 +32,78 @@
                 });
         });
 
+        // --- INICIO: NUEVAS FUNCIONES PARA COMPONENTES ---
+
+        // Función para inicializar la interactividad de las pestañas (Tabs)
+        function initializeTabs() {
+            const tabContainers = document.querySelectorAll('.tabs-container');
+            tabContainers.forEach(container => {
+                const navButtons = container.querySelectorAll('.tab-button');
+                const contentPanels = container.querySelectorAll('.tab-content');
+
+                navButtons.forEach((button, index) => {
+                    button.addEventListener('click', () => {
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        contentPanels.forEach(panel => panel.classList.remove('active'));
+                        button.classList.add('active');
+                        contentPanels[index].classList.add('active');
+                    });
+                });
+            });
+        }
+
+        // "Traductor" de Shortcodes a HTML
+        function parseCustomShortcodes(content) {
+            let processedContent = content || '';
+
+            processedContent = processedContent.replace(/\[spoiler:([^\]]+)\]([\s\S]*?)\[\/spoiler\]/g, (match, title, innerContent) => {
+                return `<details><summary>${title}</summary>${marked.parse(innerContent)}</details>`;
+            });
+
+            processedContent = processedContent.replace(/\[(nota|aviso|info)\]([\s\S]*?)\[\/\1\]/g, (match, type, innerContent) => {
+                return `<div class="alert alert-${type}">${marked.parse(innerContent)}</div>`;
+            });
+
+            processedContent = processedContent.replace(/\[tabs\]([\s\S]*?)\[\/tabs\]/g, (match, innerContent) => {
+                const navLinks = [];
+                const tabContents = [];
+                const tabRegex = /\[tab:([^\]]+)\]([\s\S]*?)(?=\[tab:|$)/g;
+                let tabMatch;
+                
+                while ((tabMatch = tabRegex.exec(innerContent)) !== null) {
+                    navLinks.push(tabMatch[1]);
+                    tabContents.push(marked.parse(tabMatch[2]));
+                }
+
+                if (navLinks.length === 0) return '';
+
+                const navHtml = navLinks.map((title, index) => 
+                    `<button class="tab-button ${index === 0 ? 'active' : ''}">${title}</button>`
+                ).join('');
+
+                const contentHtml = tabContents.map((content, index) =>
+                    `<div class="tab-content ${index === 0 ? 'active' : ''}">${content}</div>`
+                ).join('');
+
+                return `<div class="tabs-container"><div class="tabs-nav">${navHtml}</div>${contentHtml}</div>`;
+            });
+            
+            return processedContent;
+        }
+
+        // --- FIN: NUEVAS FUNCIONES PARA COMPONENTES ---
+
         function renderAboutContent(markdownContent) {
             const container = document.getElementById('about-content-container');
             if (markdownContent) {
-                container.innerHTML = marked.parse(markdownContent);
+                // --- CAMBIO: Aplicar el traductor de shortcodes ---
+                let processedContent = parseCustomShortcodes(markdownContent);
+                container.innerHTML = marked.parse(processedContent);
+                // --- CAMBIO: Inicializar las pestañas (tabs) ---
+                initializeTabs();
             }
         }
 
-        // Escuchar mensajes del panel para la previsualización en vivo
         window.addEventListener('message', e => {
             if (e.data.type === 'aboutPreviewUpdate') {
                 renderAboutContent(e.data.payload);
