@@ -367,17 +367,19 @@
                 bkOverlay.classList.add('visible');
 
                 // 3. Forzar al navegador a que aplique el reseteo antes de animar
-                // Esto soluciona el problema de que todo ocurra "demasiado rápido"
                 setTimeout(() => {
-                    bkChar.style.transition = 'left 1.2s cubic-bezier(0.25, 1, 0.5, 1)'; // Reactivar transición
-                    bkChar.style.left = '50%'; // Iniciar la animación de entrada
+                    // Aumentar la duración de la transición para que se deslice más lentamente
+                    bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)'; 
+                    // Ajustar la posición final para que no esté tan a la derecha
+                    bkChar.style.left = '35%'; // Esto se ajustará con el transform en CSS
                     bkAudio.play();
-                }, 20); // Un pequeño retraso es suficiente
+                }, 20); 
 
                 const text = "you like kissing boys, don't you?";
                 let i = 0;
                 
-                // 4. Programar el inicio del tipeo para que coincida con el audio
+                // 4. Programar el inicio del tipeo para que coincida con el audio y la animación del personaje
+                // Ajustar este tiempo para que el bocadillo y el texto aparezcan una vez el personaje esté en su lugar
                 startTypingTimeout = setTimeout(() => {
                     typewriterInterval = setInterval(() => {
                         if (i < text.length) {
@@ -387,7 +389,7 @@
                             clearInterval(typewriterInterval);
                         }
                     }, 65);
-                }, 1400);
+                }, 2200); // Aumentado el retraso para que el personaje llegue y se asiente primero
             }
 
             bkAudio.onended = function() {
