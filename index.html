@@ -279,7 +279,6 @@
             let userInput = "";
             const subtitleElement = document.getElementById('subtitle');
             
-            // Definimos las palabras secretas y sus acciones
             const secretActions = {
                 "admin": () => {
                     alert('Acceso correcto. Redirigiendo...');
@@ -345,24 +344,41 @@
                 videoContainer.innerHTML = '';
             });
 
-            // --- EASTER EGG #2: BOYKISSER ---
+            // --- EASTER EGG #2: BOYKISSER (LÓGICA CORREGIDA) ---
             const bkOverlay = document.getElementById('boykisser-overlay');
+            const bkChar = document.getElementById('boykisser-char');
             const bkAudio = document.getElementById('boykisser-audio');
             const bkTextElement = document.getElementById('boykisser-text');
             const bkCloseBtn = document.getElementById('boykisser-close');
             let typewriterInterval;
+            let startTypingTimeout;
 
             function showBoykisserEasterEgg() {
+                // 1. Reiniciar estado antes de empezar
+                bkTextElement.innerHTML = '';
+                bkCloseBtn.style.display = 'none';
+                bkChar.style.transition = 'none'; // Desactivar transición para el reseteo
+                bkChar.style.left = '-100%'; // Posición inicial fuera de pantalla
+                bkAudio.currentTime = 0;
+                clearInterval(typewriterInterval);
+                clearTimeout(startTypingTimeout);
+
+                // 2. Mostrar el overlay (fondo oscuro y borroso)
                 bkOverlay.classList.add('visible');
-                bkAudio.play();
+
+                // 3. Forzar al navegador a que aplique el reseteo antes de animar
+                // Esto soluciona el problema de que todo ocurra "demasiado rápido"
+                setTimeout(() => {
+                    bkChar.style.transition = 'left 1.2s cubic-bezier(0.25, 1, 0.5, 1)'; // Reactivar transición
+                    bkChar.style.left = '50%'; // Iniciar la animación de entrada
+                    bkAudio.play();
+                }, 20); // Un pequeño retraso es suficiente
 
                 const text = "you like kissing boys, don't you?";
                 let i = 0;
-                bkTextElement.innerHTML = '';
-                bkCloseBtn.style.display = 'none';
-
-                // Iniciar el efecto de máquina de escribir tras una breve pausa para la risa inicial
-                setTimeout(() => {
+                
+                // 4. Programar el inicio del tipeo para que coincida con el audio
+                startTypingTimeout = setTimeout(() => {
                     typewriterInterval = setInterval(() => {
                         if (i < text.length) {
                             bkTextElement.innerHTML += text.charAt(i);
@@ -370,19 +386,20 @@
                         } else {
                             clearInterval(typewriterInterval);
                         }
-                    }, 70); // Velocidad de tipeo
-                }, 1400); // Retraso de 1.4 segundos antes de que empiece el texto
+                    }, 65);
+                }, 1400);
             }
 
             bkAudio.onended = function() {
-                clearInterval(typewriterInterval); // Asegurarse de que el tipeo ha terminado
-                bkTextElement.innerHTML = "you like kissing boys, don't you?"; // Mostrar texto completo por si acaso
-                bkCloseBtn.style.display = 'block'; // Mostrar el botón de cierre
+                clearInterval(typewriterInterval);
+                bkTextElement.innerHTML = "you like kissing boys, don't you?";
+                bkCloseBtn.style.display = 'block';
             };
             
             bkCloseBtn.addEventListener('click', function() {
                 bkOverlay.classList.remove('visible');
                 clearInterval(typewriterInterval);
+                clearTimeout(startTypingTimeout);
                 bkAudio.pause();
                 bkAudio.currentTime = 0;
             });
