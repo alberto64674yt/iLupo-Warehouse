@@ -121,13 +121,15 @@
             const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
             rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
             
-            // --- CAMBIO: APLICAR EL TRADUCTOR DE SHORTCODES ANTES DE PROCESAR MARKDOWN ---
             rawContent = parseCustomShortcodes(rawContent);
 
             let finalHtml = marked.parse(rawContent);
 
+            // --- INICIO: LÓGICA MEJORADA PARA GALERÍA Y TABLAS ---
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = finalHtml;
+            
+            // Envolver imágenes en enlaces para la galería (si no lo están ya)
             tempDiv.querySelectorAll('img').forEach(img => {
                 if (img.parentElement.tagName !== 'A') {
                     const link = document.createElement('a');
@@ -137,7 +139,17 @@
                     link.appendChild(img);
                 }
             });
+
+            // Envolver tablas para hacerlas scrollables
+            tempDiv.querySelectorAll('table').forEach(table => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-wrapper';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+
             finalHtml = tempDiv.innerHTML;
+            // --- FIN: LÓGICA MEJORADA ---
             
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
@@ -162,7 +174,6 @@
             
             Prism.highlightAll();
             initializeGallery();
-            // --- CAMBIO: INICIALIZAR LAS PESTAÑAS (TABS) TRAS RENDERIZAR ---
             initializeTabs();
         }
         
