@@ -81,25 +81,25 @@
             });
         }, { threshold: 0.1 });
 
-        // FUNCIÓN DE RENDERIZADO CON ANIMACIÓN (PARA FILTROS Y PAGINACIÓN DEL USUARIO)
+        // FUNCIÓN DE RENDERIZADO SIMPLIFICADA (SIN ANIMACIONES)
         function renderCards(proyectos) {
-            const animationDuration = 300;
-            const existingCards = grid.querySelectorAll('.card');
-            existingCards.forEach(card => card.classList.add('card-hiding'));
-            setTimeout(() => renderLive(proyectos), animationDuration);
-        }
-
-        // FUNCIÓN DE RENDERIZADO INSTANTÁNEO (PARA VISTA PREVIA EN VIVO)
-        function renderLive(proyectos) {
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
-                return grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con los filtros.</p>';
+                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
+                return;
             }
+            
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-            paginatedProjects.forEach(proyecto => {
+            
+            paginatedProjects.forEach((proyecto) => {
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
+                card.addEventListener('mousemove', e => {
+                    const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
+                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
                 card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
                 cardObserver.observe(card);
@@ -125,8 +125,10 @@
             }
         }
         
+        let tagTree = {};
+
         function buildAndRenderTags(proyectos) {
-            let tagTree = {};
+            tagTree = {};
             proyectos.forEach(p => {
                 (p.tags || []).forEach(fullTag => {
                     let currentNode = tagTree;
@@ -136,6 +138,7 @@
                     });
                 });
             });
+
             function processTree(nodeLevel, pathPrefix = '') {
                 Object.keys(nodeLevel).forEach(key => {
                     const currentNode = nodeLevel[key];
@@ -146,6 +149,7 @@
                 });
             }
             processTree(tagTree);
+            
             tagContainer.innerHTML = '';
             const allBtnContainer = document.createElement('div');
             allBtnContainer.className = 'tag-item';
@@ -203,7 +207,7 @@
             document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = activeTags.has(cb.dataset.tagPath));
         }
 
-        function filterProjects() {
+        function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
             if (searchTerm) filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
@@ -211,12 +215,7 @@
                 const activeTagsArr = [...activeTags];
                 filtered = filtered.filter(p => activeTagsArr.every(atp => (p.tags || []).some(pt => pt.startsWith(atp))));
             }
-            return filtered;
-        }
-
-        function filterAndRender() {
-            const filtered = filterProjects();
-            renderCards(filtered); // Animado
+            renderCards(filtered);
             setupPagination(filtered.length);
             updateAllButtonStates();
             updateURLParameters();
@@ -255,21 +254,13 @@
         
         window.addEventListener('popstate', () => { applyStateFromURL(); filterAndRender(); });
 
-        // --- LISTENER DE PREVIEW CORREGIDO Y DEFINITIVO ---
+        // LISTENER DE PREVIEW SIMPLIFICADO Y CORREGIDO
         window.addEventListener('message', e => {
             if (e.data.type === 'previewUpdate') {
                 allProjects = e.data.payload;
-                if (e.data.isLive) {
-                    // Actualización en vivo: renderizado instantáneo sin tocar los filtros de etiquetas
-                    const filtered = filterProjects();
-                    renderLive(filtered);
-                    setupPagination(filtered.length);
-                    updateAllButtonStates();
-                } else {
-                    // Refresco completo: reconstruye todo, incluyendo las etiquetas
-                    buildAndRenderTags(allProjects);
-                    filterAndRender();
-                }
+                // Siempre reconstruimos todo para la preview, es la forma más robusta
+                buildAndRenderTags(allProjects);
+                filterAndRender();
             }
         });
     </script>
