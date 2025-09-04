@@ -11,7 +11,6 @@ header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 .no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 .filter-controls { max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1.5rem; }
-/* --- REGLA CORREGIDA --- */
 .about-me-button { display: block; width: -moz-fit-content; width: fit-content; margin: 1.5rem auto 2.5rem auto; padding: 12px 24px; text-decoration: none; background-color: var(--surface-color); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 25px; font-weight: 500; transition: all 0.2s ease; }
 .about-me-button:hover { background-color: var(--primary-color); color: var(--dark-bg); }
 .top-controls { display: flex; gap: 1rem; align-items: flex-end; }
@@ -22,24 +21,23 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 .view-btn svg { width: 24px; height: 24px; fill: var(--light-text); transition: fill 0.2s; }
 .view-btn.active, .view-btn:hover svg { fill: var(--text-color); }
 
-/* --- ESTILOS PARA EL SISTEMA DE FILTROS CON CHECKBOX (VERTICAL) --- */
 .tag-filter-container {
     margin-top: 1.5rem;
     border: 1px solid var(--border-color);
     padding: 1rem;
     border-radius: 12px;
-    max-height: 400px; /* Altura máxima antes de que aparezca el scroll */
-    overflow-y: auto; /* Activa el scroll vertical si es necesario */
-    scrollbar-width: none; /* Oculta la barra de scroll en Firefox */
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: none;
 }
 .tag-filter-container::-webkit-scrollbar {
-    display: none; /* Oculta la barra de scroll en Chrome/Safari */
+    display: none;
 }
 .tag-item {
     display: flex;
     align-items: center;
     padding: 4px 0;
-    flex-wrap: wrap; /* Permite que los hijos salten a la línea de abajo */
+    flex-wrap: wrap;
 }
 .tag-item.expandable > .tag-label, .tag-item.expandable > .arrow {
     cursor: pointer;
@@ -108,7 +106,7 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
-    width: 100%; /* Ocupa todo el ancho para colocarse debajo */
+    width: 100%;
 }
 .tag-children-container.visible {
     max-height: 1000px;
@@ -117,11 +115,10 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
     padding-bottom: 1rem;
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
-    flex-wrap: nowrap; /* Evitamos que el botón "Todos" se rompa */
+    flex-wrap: nowrap;
 }
 .tag-button { flex-shrink: 0; width: 100%; text-align: center; padding: 8px 16px; font-family: inherit; font-size: 0.9rem; font-weight: 500; background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
 .tag-button:hover, .tag-button.active { background-color: var(--primary-color); color: var(--dark-bg); font-weight: 700; border-color: var(--primary-color); }
-/* --- FIN DE ESTILOS DE FILTROS --- */
 
 #portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; perspective: 1000px; }
 #portfolio-grid.view-list { display: block; }
@@ -201,8 +198,6 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
 .close-easter-egg-button { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--light-text); font-size: 2rem; cursor: pointer; line-height: 1; }
 .close-easter-egg-button:hover { color: white; }
 
-/* --- ESTILOS PARA IMÁGENES EN MARKDOWN --- */
-/* Regla general para todas las imágenes en el contenido. */
 #about-content-container img,
 .project-description img {
     max-width: 100%;
@@ -211,19 +206,109 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
     margin-right: 8px;
     display: inline-block;
 }
-
-/* Regla específica para ICONOS (alt="Icono...") */
 #about-content-container img[alt*="Icono"],
 .project-description img[alt*="Icono"] {
     width: 32px;
     height: 32px;
     object-fit: contain;
 }
-
-/* REGLA NUEVA para BOTONES DE DESCARGA (alt="Descarga...") */
 #about-content-container img[alt*="Descarga"],
 .project-description img[alt*="Descarga"] {
-    max-height: 64px; /* Un tamaño más grande para botones, pero sin pasarse */
-    width: auto; /* Mantenemos la proporción */
+    max-height: 64px;
+    width: auto;
 }
 
+/* --- ESTILOS PARA EASTER EGG BOYKISSER --- */
+.bk-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none; /* Se activa con .visible */
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    overflow: hidden;
+}
+.bk-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+.bk-char {
+    position: absolute;
+    bottom: 0;
+    left: -100%; /* Empieza fuera, a la izquierda */
+    max-height: 85vh; /* Tamaño del personaje */
+    max-width: 90vw;
+    transition: left 1s cubic-bezier(0.25, 1, 0.5, 1); /* Animación suave de entrada */
+}
+.bk-overlay.visible .bk-char {
+    left: 50%; /* Se mueve al centro */
+    transform: translateX(-60%); /* Ajuste fino para que no quede perfectamente centrado */
+}
+.bk-bubble {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-10%, -50%) scale(0.5); /* Posición relativa al centro */
+    background: white;
+    color: #111827;
+    padding: 1.5rem 2rem;
+    border-radius: 25px;
+    max-width: 400px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 1s; /* Aparece con retraso y efecto "pop" */
+}
+.bk-overlay.visible .bk-bubble {
+    opacity: 1;
+    transform: translate(-10%, -50%) scale(1);
+}
+.bk-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50px;
+    width: 0;
+    height: 0;
+    border: 20px solid transparent;
+    border-top-color: white;
+    border-bottom: 0;
+    border-left: 0;
+    transform: rotate(20deg);
+}
+#boykisser-text::after {
+    content: '█';
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+    from, to { color: transparent; }
+    50% { color: #111827; }
+}
+.bk-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    display: none; /* Oculto por defecto */
+    transition: transform 0.2s, background-color 0.2s;
+}
+.bk-close-btn:hover {
+    transform: scale(1.1);
+    background-color: rgba(239, 68, 68, 0.8);
+}
