@@ -6,7 +6,7 @@ body {
 }
 .panel-body { overflow: hidden; }
 header { background-color: var(--dark-bg); text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border-color); }
-header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; cursor: pointer; display: inline-block; }
+header h1 { margin: 0; font-size: 3.5rem; font-weight: 700; color: white; letter-spacing: -2px; display: inline-block; }
 header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5rem; }
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 .no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
@@ -226,3 +226,4 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5rem 0; 
     max-height: 64px; /* Un tamaño más grande para botones, pero sin pasarse */
     width: auto; /* Mantenemos la proporción */
 }
+
