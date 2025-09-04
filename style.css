@@ -124,7 +124,6 @@ main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; wi
 #portfolio-grid.view-list { display: block; }
 .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transform-style: preserve-3d; opacity: 0; transform: translateY(30px) scale(0.95); transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 .card.is-visible { opacity: 1; transform: translateY(0) scale(1); }
-/* --- ÚNICO CAMBIO: CLASE AÑADIDA PARA LA ANIMACIÓN DE SALIDA --- */
 .card.card-hiding {
     opacity: 0;
     transform: scale(0.95);
@@ -171,6 +170,24 @@ legend { padding: 0 0.5rem; color: var(--primary-color); font-weight: 700; }
 label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--light-text); }
 input, textarea { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; width: 100%; padding: 12px; margin-bottom: 1rem; box-sizing: border-box; font-size: 1rem; }
 input.error { border-color: var(--danger-color); }
+.upload-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--duplicate-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: filter 0.2s;
+}
+.upload-button:hover {
+    filter: brightness(1.2);
+}
 textarea#resumen { height: 80px; }
 textarea#contenido_completo, textarea#contenido_sobre_mi { height: 200px; border-top-left-radius: 0; border-top-right-radius: 0; margin-bottom: 0.5rem; }
 .markdown-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; background-color: var(--surface-color); padding: 0.5rem; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; }
