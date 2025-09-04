@@ -81,37 +81,41 @@
             });
         }, { threshold: 0.1 });
 
+        // FUNCIÓN DE RENDERIZADO CON ANIMACIÓN (PARA FILTROS Y PAGINACIÓN)
         function renderCards(proyectos) {
             const animationDuration = 300; // Debe coincidir con la transición en CSS
             const existingCards = grid.querySelectorAll('.card');
 
-            // 1. Iniciar animación de salida para las tarjetas existentes
             existingCards.forEach(card => card.classList.add('card-hiding'));
 
-            // 2. Después de la animación, limpiar el grid y renderizar las nuevas tarjetas
             setTimeout(() => {
-                grid.innerHTML = '';
-                if (!proyectos || proyectos.length === 0) {
-                    grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
-                    return;
-                }
-                
-                const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-                
-                paginatedProjects.forEach((proyecto) => {
-                    const card = document.createElement('a');
-                    card.className = 'card';
-                    card.href = `proyecto.html?id=${proyecto.id}`;
-                    card.addEventListener('mousemove', e => {
-                        const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
-                        e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                    });
-                    card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
-                    card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
-                    grid.appendChild(card);
-                    cardObserver.observe(card);
-                });
+                renderLive(proyectos); // Llama a la función de renderizado sin animación interna
             }, animationDuration);
+        }
+
+        // FUNCIÓN DE RENDERIZADO SIN ANIMACIÓN (PARA VISTA PREVIA EN VIVO)
+        function renderLive(proyectos) {
+            grid.innerHTML = '';
+            if (!proyectos || proyectos.length === 0) {
+                grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
+                return;
+            }
+            
+            const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
+            
+            paginatedProjects.forEach((proyecto) => {
+                const card = document.createElement('a');
+                card.className = 'card';
+                card.href = `proyecto.html?id=${proyecto.id}`;
+                card.addEventListener('mousemove', e => {
+                    const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
+                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
+                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
+                grid.appendChild(card);
+                cardObserver.observe(card);
+            });
         }
 
         function setupPagination(totalProjects) {
@@ -164,7 +168,7 @@
             const allBtnContainer = document.createElement('div');
             allBtnContainer.className = 'tag-item';
             const allBtn = document.createElement('button');
-            allBtn.className = 'tag-button'; // 'active' se manejará dinámicamente
+            allBtn.className = 'tag-button';
             allBtn.innerText = `Todos (${proyectos.length})`;
             allBtn.onclick = () => {
                 activeTags.clear();
@@ -266,7 +270,7 @@
                     });
                 });
             }
-            renderCards(filtered);
+            renderCards(filtered); // Esta función ya tiene la animación
             setupPagination(filtered.length);
             updateAllButtonStates();
             updateURLParameters();
@@ -295,19 +299,42 @@
         }
 
         // --- INICIALIZACIÓN ---
-        applyStateFromURL(); // Leer la URL al cargar
+        applyStateFromURL();
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
             window.proyectos=allProjects;
             buildAndRenderTags(allProjects);
-            filterAndRender(); // Renderizar con el estado de la URL
+            filterAndRender();
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
         
         // --- EVENT LISTENERS ---
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
-        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; buildAndRenderTags(allProjects); filterAndRender(); } });
+        
+        // --- LISTENER DE PREVIEW CORREGIDO ---
+        window.addEventListener('message', e => {
+            if (e.data.type === 'previewUpdate') {
+                const isLiveUpdate = e.data.isLive !== false; // Será true a menos que se especifique lo contrario
+                allProjects = e.data.payload;
+                
+                // Si es un refresco completo (ej. al cargar), reconstruimos todo
+                if (!isLiveUpdate) {
+                    buildAndRenderTags(allProjects);
+                }
+                
+                // Para la PREVIEW EN VIVO, usamos renderLive para una actualización instantánea
+                // Para los filtros de usuario, se seguirá usando filterAndRender que llama a renderCards con animación
+                const searchTerm = searchBox.value.toLowerCase();
+                let filtered = allProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+                
+                // Hacemos un renderizado instantáneo para la preview
+                renderLive(filtered);
+                setupPagination(filtered.length);
+                updateAllButtonStates();
+            }
+        });
+
         window.addEventListener('popstate', () => {
             applyStateFromURL();
             filterAndRender();
@@ -317,8 +344,6 @@
     <script>
         (function() {
             // --- LÓGICA DE EASTER EGGS Y CÓDIGOS SECRETOS ---
-
-            // --- SISTEMA DE ACCESO SECRETO (ACTUALIZADO) ---
             let userInput = "";
             const subtitleElement = document.getElementById('subtitle');
             
@@ -364,7 +389,6 @@
                 });
             }
 
-            // --- EASTER EGG #1: TÍTULO 5 CLICS ---
             const titleElement = document.querySelector('#main-header h1');
             const videoOverlay = document.getElementById('easter-egg-overlay');
             const videoContainer = document.getElementById('video-container');
@@ -387,7 +411,6 @@
                 videoContainer.innerHTML = '';
             });
 
-            // --- EASTER EGG #2: BOYKISSER (LÓGICA CORREGIDA) ---
             const bkOverlay = document.getElementById('boykisser-overlay');
             const bkChar = document.getElementById('boykisser-char');
             const bkAudio = document.getElementById('boykisser-audio');
@@ -397,31 +420,22 @@
             let startTypingTimeout;
 
             function showBoykisserEasterEgg() {
-                // 1. Reiniciar estado antes de empezar
                 bkTextElement.innerHTML = '';
                 bkCloseBtn.style.display = 'none';
-                bkChar.style.transition = 'none'; // Desactivar transición para el reseteo
-                bkChar.style.left = '-100%'; // Posición inicial fuera de pantalla
+                bkChar.style.transition = 'none';
+                bkChar.style.left = '-100%';
                 bkAudio.currentTime = 0;
                 clearInterval(typewriterInterval);
                 clearTimeout(startTypingTimeout);
-
-                // 2. Mostrar el overlay (fondo oscuro y borroso)
                 bkOverlay.classList.add('visible');
-
-                // 3. Forzar al navegador a que aplique el reseteo antes de animar
                 setTimeout(() => {
-                    // Aumentar la duración de la transición para que se deslice más lentamente
                     bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)'; 
-                    // Ajustar la posición final para que no esté tan a la derecha
-                    bkChar.style.left = '35%'; // Esto se ajustará con el transform en CSS
+                    bkChar.style.left = '35%';
                     bkAudio.play();
                 }, 20); 
 
                 const text = "you like kissing boys, don't you?";
                 let i = 0;
-                
-                // 4. Programar el inicio del tipeo para que coincida con el audio y la animación del personaje
                 startTypingTimeout = setTimeout(() => {
                     typewriterInterval = setInterval(() => {
                         if (i < text.length) {
@@ -447,7 +461,6 @@
                 bkAudio.pause();
                 bkAudio.currentTime = 0;
             });
-
         })();
     </script>
 </body>
