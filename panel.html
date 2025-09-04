@@ -266,34 +266,21 @@
             const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}
         }
         
-        // --- FUNCIÓN DE VISTA PREVIA CORREGIDA Y DEFINITIVA ---
         function updatePreview(forceFullRefresh = false) {
             if (!previewFrame.contentWindow) return;
-
             try {
-                // Determina si es una actualización en vivo (mientras se escribe) o un refresco completo
-                const isLiveTyping = !forceFullRefresh;
-
                 if (previewMode === 'list') {
                     const projectFromForm = getProjectFromForm();
                     let projectsForPreview = [...currentProjects];
-
-                    if (isLiveTyping && editingIndex > -1) {
-                        // Si estamos editando, actualiza el proyecto en la lista de previsualización
-                        projectsForPreview[editingIndex] = projectFromForm;
-                    } 
-                    else if (isLiveTyping && editingIndex === -1 && (projectFromForm.titulo || projectFromForm.resumen)) {
-                        // Si estamos creando uno nuevo, lo añadimos temporalmente a la lista
+                    if (editingIndex > -1) {
+                        if (!forceFullRefresh) projectsForPreview[editingIndex] = projectFromForm;
+                    } else if (!forceFullRefresh && (projectFromForm.titulo || projectFromForm.resumen)) {
                         projectsForPreview.push(projectFromForm);
                     }
-                    
-                    // Envía la lista de proyectos y la señal 'isLive'
-                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview, isLive: isLiveTyping }, '*');
-
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview }, '*');
                 } else if (previewMode === 'detail') {
                     const projectForDetailPreview = getProjectFromForm();
                     previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: projectForDetailPreview }, '*');
-
                 } else if (previewMode === 'about') {
                     const aboutContent = document.getElementById('contenido_sobre_mi').value;
                     previewFrame.contentWindow.postMessage({ type: 'aboutPreviewUpdate', payload: aboutContent }, '*');
