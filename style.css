@@ -471,3 +471,67 @@ summary::marker {
     height: 100%;
     border: 0;
 }
+/* --- INICIO: ESTILOS RESPONSIVE PARA MÓVILES --- */
+@media (max-width: 768px) {
+
+    /* --- Ajustes Generales --- */
+    body {
+        line-height: 1.6;
+    }
+    main {
+        padding: 2rem 1rem;
+    }
+    header {
+        padding: 2.5rem 1rem;
+    }
+    header h1 {
+        font-size: 2.5rem;
+    }
+    header .subtitle {
+        font-size: 1.1rem;
+    }
+
+    /* --- Página Principal y de Etiquetas (index.html, tags.html) --- */
+    .top-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+    #portfolio-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    /* --- Páginas de Detalle (proyecto.html, sobre-mi.html) --- */
+    .project-detail-container {
+        padding: 2rem 1.5rem;
+        margin: 1.5rem auto;
+    }
+    .project-title {
+        font-size: 2.5rem;
+    }
+    .back-link {
+        margin: 1.5rem 0 0 1.5rem;
+    }
+
+    /* --- Panel de Control (panel.html) --- */
+    .panel-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .editor-pane, .preview-pane {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .editor-pane {
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+        padding: 1.5rem;
+    }
+    .preview-pane {
+        height: 100vh; /* Ocupa la altura de la pantalla para la preview */
+    }
+
+}
+/* --- FIN: ESTILOS RESPONSIVE --- */
