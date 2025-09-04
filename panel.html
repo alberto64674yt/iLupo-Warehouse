@@ -222,11 +222,23 @@
                         markdownText = `\n[spoiler:${spoilerTitle}]\n${selectedText || 'Contenido oculto...'}\n[/spoiler]\n`;
                     }
                     break;
-                case 'tabs':
-                    markdownText = `\n[tabs]\n[tab:Pestaña 1]\nContenido de la primera pestaña...\n[tab:Pestaña 2]\nContenido de la segunda pestaña...\n[/tabs]\n`;
-                    break;
                 
-                // --- INICIO: LÓGICA DE TABLA ACTUALIZADA ---
+                // --- INICIO: LÓGICA DE PESTAÑAS ACTUALIZADA ---
+                case 'tabs':
+                    const numTabs = parseInt(prompt("¿Cuántas pestañas quieres crear?", "3"));
+                    if (numTabs > 0) {
+                        let tabsContent = '\n[tabs]\n';
+                        for (let i = 1; i <= numTabs; i++) {
+                            tabsContent += `[tab:Pestaña ${i}]\nContenido de la pestaña ${i}...\n`;
+                        }
+                        tabsContent += '[/tabs]\n';
+                        markdownText = tabsContent;
+                    } else {
+                        alert("El número de pestañas debe ser mayor que cero.");
+                    }
+                    break;
+                // --- FIN: LÓGICA DE PESTAÑAS ACTUALIZADA ---
+                
                 case 'table':
                     const dims = prompt("Introduce las dimensiones (Columnas x Filas):\n\n- Columnas: de izquierda a derecha\n- Filas: de arriba a abajo", "3x4");
                     if (dims) {
@@ -257,7 +269,6 @@
                         }
                     }
                     break;
-                // --- FIN: LÓGICA DE TABLA ACTUALIZADA ---
 
                 case 'bold': preText = '**'; postText = '**'; break;
                 case 'italic': preText = '*'; postText = '*'; break;
