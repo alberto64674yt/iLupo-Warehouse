@@ -69,10 +69,6 @@
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
         const tagContainer = document.getElementById('tag-filter-container');
-        
-        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
-        // Detectamos si la página está dentro del iframe del panel
-        const isPreview = (window.self !== window.top);
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -85,33 +81,33 @@
             });
         }, { threshold: 0.1 });
 
-        // Se restaura la función de renderizado simple y robusta
         function renderCards(proyectos) {
             grid.innerHTML = '';
             if (!proyectos || proyectos.length === 0) {
                 grid.innerHTML = '<p class="empty-message">No se han encontrado proyectos que coincidan con todos los filtros.</p>';
                 return;
             }
-            
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
-            
             paginatedProjects.forEach((proyecto) => {
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
-                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
+                card.addEventListener('mousemove', e => {
+                    const rect = e.currentTarget.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top, centerX = rect.width / 2, centerY = rect.height / 2, rotateX = (y - centerY) / 15, rotateY = (centerX - x) / 15;
+                    e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
+                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
-
+                
+                const isPreview = (window.self !== window.top);
                 if (isPreview) {
-                    // Si estamos en la vista previa, hacemos la tarjeta visible al instante.
                     card.classList.add('is-visible');
                 } else {
-                    // Si estamos en la web pública, usamos el observer para el efecto de scroll.
                     cardObserver.observe(card);
                 }
             });
         }
-        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
 
         function setupPagination(totalProjects) {
             paginationContainer.innerHTML = '';
@@ -152,7 +148,9 @@
                     const currentPath = pathPrefix ? `${pathPrefix} > ${key}` : key;
                     currentNode.path = currentPath;
                     currentNode.count = allProjects.filter(p => (p.tags || []).some(tag => tag.startsWith(currentPath))).length;
-                    if (Object.keys(currentNode.children).length > 0) processTree(currentNode.children, currentPath);
+                    if (Object.keys(currentNode.children).length > 0) {
+                        processTree(currentNode.children, currentPath);
+                    }
                 });
             }
             processTree(tagTree);
@@ -161,173 +159,258 @@
             const allBtnContainer = document.createElement('div');
             allBtnContainer.className = 'tag-item';
             const allBtn = document.createElement('button');
-            allBtn.className = 'tag-button';
+            allBtn.className = 'tag-button active';
             allBtn.innerText = `Todos (${proyectos.length})`;
-            allBtn.onclick = () => { currentPage = 1; activeTags.clear(); filterAndRender(); };
+            allBtn.onclick = () => {
+                activeTags.clear();
+                document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = false);
+                updateAllButtonStates();
+                filterAndRender();
+            };
             allBtnContainer.appendChild(allBtn);
             tagContainer.appendChild(allBtnContainer);
+
             renderTagTree(tagTree, tagContainer, 0);
         }
 
         function renderTagTree(tree, container, level) {
-            Object.keys(tree).sort().forEach(key => {
-                const node = tree[key], nodeName = node.path.split(' > ').pop(), hasChildren = Object.keys(node.children).length > 0;
+            const sortedKeys = Object.keys(tree).sort();
+
+            sortedKeys.forEach(key => {
+                const node = tree[key];
+                const nodeName = node.path.split(' > ').pop();
+                const hasChildren = Object.keys(node.children).length > 0;
+                const inputId = `cb-${node.path.replace(/\s|>/g, '-')}`;
+
                 const itemWrapper = document.createElement('div');
                 itemWrapper.className = 'tag-item';
                 itemWrapper.style.marginLeft = `${level * 20}px`;
+                
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.id = `cb-${node.path.replace(/\s|>/g, '-')}`;
+                checkbox.id = inputId;
                 checkbox.className = 'tag-checkbox';
-                checkbox.dataset.tagPath = node.path;
+                checkbox.checked = activeTags.has(node.path);
+                
                 const label = document.createElement('label');
                 label.className = 'tag-label';
-                label.htmlFor = checkbox.id;
+                label.htmlFor = inputId;
                 label.innerHTML = `${nodeName} <span class="tag-count">(${node.count})</span>`;
+
+                let arrow = null;
                 if (hasChildren) {
-                    const arrow = document.createElement('span');
+                    arrow = document.createElement('span');
                     arrow.className = 'arrow';
                     itemWrapper.appendChild(arrow);
                 }
+
                 itemWrapper.appendChild(checkbox);
                 itemWrapper.appendChild(label);
+                
                 container.appendChild(itemWrapper);
+
                 if (hasChildren) {
                     const childrenContainer = document.createElement('div');
                     childrenContainer.className = 'tag-children-container';
                     itemWrapper.appendChild(childrenContainer);
-                    const toggleFunc = e => { e.stopPropagation(); itemWrapper.classList.toggle('expanded'); childrenContainer.classList.toggle('visible'); };
+
+                    const toggleFunc = (e) => {
+                        e.stopPropagation();
+                        itemWrapper.classList.toggle('expanded');
+                        childrenContainer.classList.toggle('visible');
+                    };
+
                     label.addEventListener('click', toggleFunc);
-                    if (itemWrapper.querySelector('.arrow')) itemWrapper.querySelector('.arrow').addEventListener('click', toggleFunc);
+                    arrow.addEventListener('click', toggleFunc);
+                    
                     renderTagTree(node.children, childrenContainer, level + 1);
                 }
+
                 checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) activeTags.add(node.path); else activeTags.delete(node.path);
-                    currentPage = 1;
+                    if (checkbox.checked) {
+                        activeTags.add(node.path);
+                    } else {
+                        activeTags.delete(node.path);
+                    }
+                    updateAllButtonStates();
                     filterAndRender();
                 });
             });
         }
 
         function updateAllButtonStates() {
-            document.querySelector('.tag-button').classList.toggle('active', activeTags.size === 0);
-            document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = activeTags.has(cb.dataset.tagPath));
+            const hasActiveTags = activeTags.size > 0;
+            document.querySelector('.tag-button').classList.toggle('active', !hasActiveTags);
         }
 
         function filterAndRender() {
             const searchTerm = searchBox.value.toLowerCase();
             let filtered = allProjects;
-            if (searchTerm) filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+            }
             if (activeTags.size > 0) {
                 const activeTagsArr = [...activeTags];
-                filtered = filtered.filter(p => activeTagsArr.every(atp => (p.tags || []).some(pt => pt.startsWith(atp))));
+                filtered = filtered.filter(p => {
+                    return activeTagsArr.every(activeTagPath => {
+                        return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
+                    });
+                });
             }
             renderCards(filtered);
             setupPagination(filtered.length);
-            updateAllButtonStates();
-            updateURLParameters();
-        }
-        
-        function updateURLParameters() {
-            const params = new URLSearchParams();
-            if (searchBox.value) params.set('buscar', searchBox.value);
-            if (activeTags.size > 0) params.set('etiquetas', [...activeTags].join(','));
-            if (currentPage > 1) params.set('pagina', currentPage);
-            const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
-            history.pushState({ path: newUrl }, '', newUrl);
         }
 
-        function applyStateFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            searchBox.value = params.get('buscar') || '';
-            currentPage = parseInt(params.get('pagina')) || 1;
-            activeTags.clear();
-            const tagsParam = params.get('etiquetas');
-            if (tagsParam) tagsParam.split(',').forEach(tag => activeTags.add(tag));
-        }
-
-        // --- INICIALIZACIÓN ---
-        applyStateFromURL();
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
+            window.proyectos=allProjects;
             buildAndRenderTags(allProjects);
             filterAndRender();
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
-        
-        // --- EVENT LISTENERS ---
+
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
+        const gridBtn = document.getElementById('grid-view-btn');
+        const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
         listBtn.addEventListener('click', () => { grid.classList.add('view-list'); listBtn.classList.add('active'); gridBtn.classList.remove('active'); });
-        
-        window.addEventListener('popstate', () => { applyStateFromURL(); filterAndRender(); });
-
-        // LISTENER DE PREVIEW SIMPLIFICADO Y CORREGIDO
-        window.addEventListener('message', e => {
-            if (e.data.type === 'previewUpdate') {
-                allProjects = e.data.payload;
-                // Siempre reconstruimos todo para la preview, es la forma más robusta y ahora rápida
-                buildAndRenderTags(allProjects);
-                filterAndRender();
-            }
-        });
+        window.addEventListener('message', e => { if (e.data.type === 'previewUpdate') { allProjects = e.data.payload; buildAndRenderTags(allProjects); filterAndRender(); } });
     </script>
     
     <script>
         (function() {
+            // --- LÓGICA DE EASTER EGGS Y CÓDIGOS SECRETOS ---
+
+            // --- SISTEMA DE ACCESO SECRETO (ACTUALIZADO) ---
             let userInput = "";
             const subtitleElement = document.getElementById('subtitle');
-            const secretActions = {"admin": () => {alert('Acceso correcto. Redirigiendo...');window.location.href = 'panel.html';},"boykisser": () => {showBoykisserEasterEgg();}};
+            
+            const secretActions = {
+                "admin": () => {
+                    alert('Acceso correcto. Redirigiendo...');
+                    window.location.href = 'panel.html';
+                },
+                "boykisser": () => {
+                    showBoykisserEasterEgg();
+                }
+            };
+
             if (subtitleElement) {
                 const text = subtitleElement.innerText;
                 subtitleElement.innerHTML = '';
-                text.split('').forEach(char => {const span = document.createElement('span');span.textContent = char;subtitleElement.appendChild(span);});
-                document.addEventListener('click', e => {
+                text.split('').forEach(char => {
+                    const charSpan = document.createElement('span');
+                    charSpan.textContent = char;
+                    subtitleElement.appendChild(charSpan);
+                });
+
+                document.addEventListener('click', function(e) {
                     if (e.target.parentElement === subtitleElement) {
-                        userInput += e.target.textContent.toLowerCase();
-                        let match = false;
+                        const letter = e.target.textContent.toLowerCase();
+                        userInput += letter;
+
+                        let matchFound = false;
                         for (const word in secretActions) {
                             if (word.startsWith(userInput)) {
-                                match = true;
-                                if (userInput === word) { secretActions[word](); userInput = ""; break; }
+                                matchFound = true;
+                                if (userInput === word) {
+                                    secretActions[word]();
+                                    userInput = "";
+                                    break;
+                                }
                             }
                         }
-                        if (!match) userInput = "";
+                        if (!matchFound) {
+                            userInput = "";
+                        }
                     }
                 });
             }
-            const titleElement = document.querySelector('#main-header h1'), videoOverlay = document.getElementById('easter-egg-overlay'), videoContainer = document.getElementById('video-container'), closeVideoBtn = document.getElementById('close-easter-egg');
-            let clickCount = 0, timer;
-            titleElement.addEventListener('click', () => {
-                clickCount++; clearTimeout(timer); timer = setTimeout(() => { clickCount = 0; }, 1000);
+
+            // --- EASTER EGG #1: TÍTULO 5 CLICS ---
+            const titleElement = document.querySelector('#main-header h1');
+            const videoOverlay = document.getElementById('easter-egg-overlay');
+            const videoContainer = document.getElementById('video-container');
+            const closeVideoBtn = document.getElementById('close-easter-egg');
+            let clickCount = 0; let timer;
+
+            titleElement.addEventListener('click', function() {
+                clickCount++;
+                clearTimeout(timer);
+                timer = setTimeout(() => { clickCount = 0; }, 1000);
                 if (clickCount === 5) {
-                    clickCount = 0; alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
+                    clickCount = 0;
+                    alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
                     videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
                     videoOverlay.style.display = 'flex';
                 }
             });
-            closeVideoBtn.addEventListener('click', () => {videoOverlay.style.display = 'none'; videoContainer.innerHTML = '';});
-            const bkOverlay = document.getElementById('boykisser-overlay'), bkChar = document.getElementById('boykisser-char'), bkAudio = document.getElementById('boykisser-audio'), bkTextElement = document.getElementById('boykisser-text'), bkCloseBtn = document.getElementById('boykisser-close');
-            let typewriterInterval, startTypingTimeout;
+            closeVideoBtn.addEventListener('click', function() {
+                videoOverlay.style.display = 'none';
+                videoContainer.innerHTML = '';
+            });
+
+            // --- EASTER EGG #2: BOYKISSER (LÓGICA CORREGIDA) ---
+            const bkOverlay = document.getElementById('boykisser-overlay');
+            const bkChar = document.getElementById('boykisser-char');
+            const bkAudio = document.getElementById('boykisser-audio');
+            const bkTextElement = document.getElementById('boykisser-text');
+            const bkCloseBtn = document.getElementById('boykisser-close');
+            let typewriterInterval;
+            let startTypingTimeout;
+
             function showBoykisserEasterEgg() {
-                bkTextElement.innerHTML = ''; bkCloseBtn.style.display = 'none'; bkChar.style.transition = 'none'; bkChar.style.left = '-100%'; bkAudio.currentTime = 0; clearInterval(typewriterInterval); clearTimeout(startTypingTimeout);
+                // 1. Reiniciar estado antes de empezar
+                bkTextElement.innerHTML = '';
+                bkCloseBtn.style.display = 'none';
+                bkChar.style.transition = 'none'; // Desactivar transición para el reseteo
+                bkChar.style.left = '-100%'; // Posición inicial fuera de pantalla
+                bkAudio.currentTime = 0;
+                clearInterval(typewriterInterval);
+                clearTimeout(startTypingTimeout);
+
+                // 2. Mostrar el overlay (fondo oscuro y borroso)
                 bkOverlay.classList.add('visible');
+
+                // 3. Forzar al navegador a que aplique el reseteo antes de animar
                 setTimeout(() => {
+                    // Aumentar la duración de la transición para que se deslice más lentamente
                     bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)'; 
-                    bkChar.style.left = '35%'; bkAudio.play();
+                    // Ajustar la posición final para que no esté tan a la derecha
+                    bkChar.style.left = '35%'; // Esto se ajustará con el transform en CSS
+                    bkAudio.play();
                 }, 20); 
-                const text = "you like kissing boys, don't you?"; let i = 0;
+
+                const text = "you like kissing boys, don't you?";
+                let i = 0;
+                
+                // 4. Programar el inicio del tipeo para que coincida con el audio y la animación del personaje
                 startTypingTimeout = setTimeout(() => {
                     typewriterInterval = setInterval(() => {
-                        if (i < text.length) { bkTextElement.innerHTML += text.charAt(i); i++; } 
-                        else { clearInterval(typewriterInterval); }
+                        if (i < text.length) {
+                            bkTextElement.innerHTML += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(typewriterInterval);
+                        }
                     }, 65);
                 }, 1400);
             }
-            bkAudio.onended = () => {clearInterval(typewriterInterval); bkTextElement.innerHTML = "you like kissing boys, don't you?"; bkCloseBtn.style.display = 'block';};
-            bkCloseBtn.addEventListener('click', () => {
-                bkOverlay.classList.remove('visible'); clearInterval(typewriterInterval); clearTimeout(startTypingTimeout);
-                bkAudio.pause(); bkAudio.currentTime = 0;
+
+            bkAudio.onended = function() {
+                clearInterval(typewriterInterval);
+                bkTextElement.innerHTML = "you like kissing boys, don't you?";
+                bkCloseBtn.style.display = 'block';
+            };
+            
+            bkCloseBtn.addEventListener('click', function() {
+                bkOverlay.classList.remove('visible');
+                clearInterval(typewriterInterval);
+                clearTimeout(startTypingTimeout);
+                bkAudio.pause();
+                bkAudio.currentTime = 0;
             });
+
         })();
     </script>
 </body>
