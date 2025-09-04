@@ -51,6 +51,14 @@
         </div>
     </div>
 
+    <div id="boykisser-overlay" class="bk-overlay">
+        <audio id="boykisser-audio" src="https://files.catbox.moe/yqlere.mp3" preload="auto"></audio>
+        <img src="https://i.imgur.com/3WbZsMt.png" alt="Boykisser" id="boykisser-char" class="bk-char">
+        <div id="boykisser-bubble" class="bk-bubble">
+            <p id="boykisser-text"></p>
+        </div>
+        <button id="boykisser-close" class="bk-close-btn">&times;</button>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         let allProjects = [];
@@ -206,7 +214,6 @@
                         childrenContainer.classList.toggle('visible');
                     };
 
-                    // El clic para expandir es más preciso ahora
                     label.addEventListener('click', toggleFunc);
                     arrow.addEventListener('click', toggleFunc);
                     
@@ -266,13 +273,24 @@
     
     <script>
         (function() {
-            // --- NUEVO SISTEMA DE ACCESO SECRETO ---
-            const secretWord = "admin";
+            // --- LÓGICA DE EASTER EGGS Y CÓDIGOS SECRETOS ---
+
+            // --- SISTEMA DE ACCESO SECRETO (ACTUALIZADO) ---
             let userInput = "";
             const subtitleElement = document.getElementById('subtitle');
+            
+            // Definimos las palabras secretas y sus acciones
+            const secretActions = {
+                "admin": () => {
+                    alert('Acceso correcto. Redirigiendo...');
+                    window.location.href = 'panel.html';
+                },
+                "boykisser": () => {
+                    showBoykisserEasterEgg();
+                }
+            };
 
             if (subtitleElement) {
-                // 1. Hacer cada letra un span individual para detectar clics
                 const text = subtitleElement.innerText;
                 subtitleElement.innerHTML = '';
                 text.split('').forEach(char => {
@@ -281,36 +299,36 @@
                     subtitleElement.appendChild(charSpan);
                 });
 
-                // 2. Escuchar clics en todo el documento
                 document.addEventListener('click', function(e) {
-                    // Solo nos interesa si se ha hecho clic en una de nuestras letras
                     if (e.target.parentElement === subtitleElement) {
                         const letter = e.target.textContent.toLowerCase();
                         userInput += letter;
 
-                        // 3. Comprobar si la secuencia es correcta
-                        if (secretWord.startsWith(userInput)) {
-                            // Si la secuencia coincide con la palabra secreta, ¡éxito!
-                            if (userInput === secretWord) {
-                                alert('Acceso correcto. Redirigiendo...');
-                                window.location.href = 'panel.html';
-                                userInput = ""; // Reiniciar por si acaso
+                        let matchFound = false;
+                        for (const word in secretActions) {
+                            if (word.startsWith(userInput)) {
+                                matchFound = true;
+                                if (userInput === word) {
+                                    secretActions[word]();
+                                    userInput = "";
+                                    break;
+                                }
                             }
-                            // Si no, la secuencia es correcta hasta ahora, esperamos la siguiente letra.
-                        } else {
-                            // 4. Si la secuencia es incorrecta, reiniciar
+                        }
+                        if (!matchFound) {
                             userInput = "";
                         }
                     }
                 });
             }
 
-            // --- SISTEMA EASTER EGG (SIN CAMBIOS) ---
+            // --- EASTER EGG #1: TÍTULO 5 CLICS ---
             const titleElement = document.querySelector('#main-header h1');
-            const overlay = document.getElementById('easter-egg-overlay');
+            const videoOverlay = document.getElementById('easter-egg-overlay');
             const videoContainer = document.getElementById('video-container');
-            const closeButton = document.getElementById('close-easter-egg');
+            const closeVideoBtn = document.getElementById('close-easter-egg');
             let clickCount = 0; let timer;
+
             titleElement.addEventListener('click', function() {
                 clickCount++;
                 clearTimeout(timer);
@@ -319,15 +337,57 @@
                     clickCount = 0;
                     alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
                     videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-                    overlay.style.display = 'flex';
+                    videoOverlay.style.display = 'flex';
                 }
             });
-            closeButton.addEventListener('click', function() {
-                overlay.style.display = 'none';
+            closeVideoBtn.addEventListener('click', function() {
+                videoOverlay.style.display = 'none';
                 videoContainer.innerHTML = '';
             });
+
+            // --- EASTER EGG #2: BOYKISSER ---
+            const bkOverlay = document.getElementById('boykisser-overlay');
+            const bkAudio = document.getElementById('boykisser-audio');
+            const bkTextElement = document.getElementById('boykisser-text');
+            const bkCloseBtn = document.getElementById('boykisser-close');
+            let typewriterInterval;
+
+            function showBoykisserEasterEgg() {
+                bkOverlay.classList.add('visible');
+                bkAudio.play();
+
+                const text = "you like kissing boys, don't you?";
+                let i = 0;
+                bkTextElement.innerHTML = '';
+                bkCloseBtn.style.display = 'none';
+
+                // Iniciar el efecto de máquina de escribir tras una breve pausa para la risa inicial
+                setTimeout(() => {
+                    typewriterInterval = setInterval(() => {
+                        if (i < text.length) {
+                            bkTextElement.innerHTML += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(typewriterInterval);
+                        }
+                    }, 70); // Velocidad de tipeo
+                }, 1400); // Retraso de 1.4 segundos antes de que empiece el texto
+            }
+
+            bkAudio.onended = function() {
+                clearInterval(typewriterInterval); // Asegurarse de que el tipeo ha terminado
+                bkTextElement.innerHTML = "you like kissing boys, don't you?"; // Mostrar texto completo por si acaso
+                bkCloseBtn.style.display = 'block'; // Mostrar el botón de cierre
+            };
+            
+            bkCloseBtn.addEventListener('click', function() {
+                bkOverlay.classList.remove('visible');
+                clearInterval(typewriterInterval);
+                bkAudio.pause();
+                bkAudio.currentTime = 0;
+            });
+
         })();
     </script>
 </body>
 </html>
-
