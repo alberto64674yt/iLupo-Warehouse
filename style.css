@@ -568,8 +568,10 @@ summary::marker {
     padding: 1rem;
     text-align: center;
 }
-/* --- Corrección para el área clicable del Easter Egg del Título --- */
+/* --- Corrección DEFINITIVA para el área clicable del Easter Egg del Título --- */
 #main-header h1 span {
     display: inline-block;
-    line-height: 0.8; /* Reduce la altura invisible de cada letra */
+    line-height: 0.6;      /* Reducido aún más para 'aplastar' el espacio vertical */
+    vertical-align: top;   /* Asegura que no haya espacio extra por debajo de la línea base */
 }
+
