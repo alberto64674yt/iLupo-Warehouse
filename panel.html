@@ -65,7 +65,14 @@
                 </fieldset>
 
                 <div class="manage-container">
-                    <h2>Proyectos Existentes (Arrastra para ordenar)</h2>
+                    <h2>Proyectos Existentes</h2>
+                    <div class="search-manage-container">
+                        <label for="manage-search-box">Buscar proyecto para mover o editar...</label>
+                        <input type="text" id="manage-search-box" placeholder="Escribe para buscar...">
+                    </div>
+                    <div id="search-results-list"></div>
+                    <hr style="margin: 1.5rem 0;">
+                    <h3 style="margin-top:0;">Lista Completa (Arrastra para ordenar)</h3>
                     <div id="manage-list"></div>
                 </div>
                 <hr>
@@ -120,6 +127,10 @@
         let editingIndex = -1; let previewMode = 'list';
         const previewFrame = document.getElementById('preview-frame');
         const manageList = document.getElementById('manage-list');
+        // --- INICIO: NUEVOS ELEMENTOS DEL DOM ---
+        const searchResultsList = document.getElementById('search-results-list');
+        const manageSearchBox = document.getElementById('manage-search-box');
+        // --- FIN: NUEVOS ELEMENTOS DEL DOM ---
 
         function validateId() {
             const idInput = document.getElementById('id');
@@ -222,8 +233,6 @@
                         markdownText = `\n[spoiler:${spoilerTitle}]\n${selectedText || 'Contenido oculto...'}\n[/spoiler]\n`;
                     }
                     break;
-                
-                // --- INICIO: LÓGICA DE PESTAÑAS ACTUALIZADA ---
                 case 'tabs':
                     const numTabs = parseInt(prompt("¿Cuántas pestañas quieres crear?", "3"));
                     if (numTabs > 0) {
@@ -237,8 +246,6 @@
                         alert("El número de pestañas debe ser mayor que cero.");
                     }
                     break;
-                // --- FIN: LÓGICA DE PESTAÑAS ACTUALIZADA ---
-                
                 case 'table':
                     const dims = prompt("Introduce las dimensiones (Columnas x Filas):\n\n- Columnas: de izquierda a derecha\n- Filas: de arriba a abajo", "3x4");
                     if (dims) {
@@ -246,7 +253,6 @@
                         if (parts.length === 2) {
                             const cols = parseInt(parts[0]);
                             const rows = parseInt(parts[1]);
-
                             if (cols > 0 && rows > 0) {
                                 let header = '|', divider = '|', tableRows = '';
                                 for(let i = 0; i < cols; i++) {
@@ -261,15 +267,10 @@
                                     tableRows += row + '\n';
                                 }
                                 markdownText = `\n${header}\n${divider}\n${tableRows}`;
-                            } else {
-                                alert("Las dimensiones deben ser números mayores que cero.");
-                            }
-                        } else {
-                            alert("Formato incorrecto. Usa el formato 'Columnas x Filas', por ejemplo: 4x5.");
-                        }
+                            } else { alert("Las dimensiones deben ser números mayores que cero."); }
+                        } else { alert("Formato incorrecto. Usa el formato 'Columnas x Filas', por ejemplo: 4x5.");}
                     }
                     break;
-
                 case 'bold': preText = '**'; postText = '**'; break;
                 case 'italic': preText = '*'; postText = '*'; break;
                 case 'strike': preText = '~~'; postText = '~~'; break;
@@ -281,7 +282,7 @@
                     break;
                 case 'image': 
                     const imgUrl = prompt('URL de la imagen:', 'https://');
-                    if (imgUrl) { markdownText = `![${selectedText || 'alt text'}](${imgUrl})`; }
+                    if (imgUrl) markdownText = `![${selectedText || 'alt text'}](${imgUrl})`;
                     break;
                 case 'download-image':
                     const d_imgUrl = prompt('URL de la IMAGEN:', 'https://');
@@ -305,18 +306,94 @@
                 updatePreview();
             }
         }
-
+        
+        // --- INICIO: LÓGICA DE GESTIÓN DE PROYECTOS (MODIFICADA) ---
         function loadInitialData(){
-            fetch('proyectos.json').then(r=>r.json()).then(d=>{currentProjects=d.items||[];renderManageList();Sortable.create(manageList,{animation:150,handle:'.drag-handle',onEnd:()=>{const n=[...manageList.querySelectorAll('.manage-item')].map(t=>t.dataset.id).reverse();currentProjects.sort((t,a)=>n.indexOf(t.id)-n.indexOf(a.id));renderManageList();updatePreview(true)}})});
+            fetch('proyectos.json').then(r=>r.json()).then(d=>{
+                currentProjects=d.items||[];
+                renderManageList();
+                
+                // Configurar la lista de resultados de búsqueda (fuente de clones)
+                Sortable.create(searchResultsList, {
+                    group: {
+                        name: 'projects',
+                        pull: 'clone', // Permite clonar elementos hacia afuera
+                        put: false    // No permite que nada se suelte aquí
+                    },
+                    animation: 150,
+                    sort: false // No se puede reordenar la lista de resultados
+                });
+
+                // Configurar la lista principal de proyectos (destino)
+                Sortable.create(manageList, {
+                    group: 'projects', // Pertenece al mismo grupo
+                    animation: 150,
+                    handle: '.drag-handle',
+                    onEnd: function() { // Se activa al reordenar DENTRO de la lista principal
+                        saveOrder();
+                    },
+                    onAdd: function(evt) { // Se activa al soltar un elemento de OTRA lista
+                        const originalItem = manageList.querySelector(`.manage-item[data-id="${evt.item.dataset.id}"]`);
+                        if (originalItem) {
+                            originalItem.remove(); // Elimina el elemento original que ya existía
+                        }
+                        saveOrder();
+                    }
+                });
+
+            });
             fetch('info.json').then(r=>r.json()).then(d=>{aboutMeContent=d;document.getElementById('contenido_sobre_mi').value=aboutMeContent.contenido||''}).catch(e=>console.log("info.json no encontrado."));
             previewFrame.onload=()=>updatePreview(true);
         }
+
+        function saveOrder() {
+            const newOrderIds = [...manageList.querySelectorAll('.manage-item')].map(t => t.dataset.id).reverse();
+            currentProjects.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
+            renderManageList(); // Re-renderizar para asegurar consistencia
+            updatePreview(true);
+        }
         
-        function renderManageList(){
+        function createManageItem(project) {
+            const item = document.createElement('div');
+            item.className = 'manage-item';
+            item.dataset.id = project.id;
+            item.innerHTML = `
+                <span class="drag-handle">::</span>
+                <span class="manage-item-title">${project.titulo}</span>
+                <div class="manage-buttons">
+                    <button class="duplicate-button" onclick="duplicateProjectById('${project.id}')">Duplicar</button>
+                    <button class="edit-button" onclick="editProjectById('${project.id}')">Editar</button>
+                    <button class="delete-button" onclick="deleteProjectById('${project.id}')">Borrar</button>
+                </div>`;
+            return item;
+        }
+
+        function renderManageList() {
             manageList.innerHTML = '';
             if (currentProjects.length === 0) return manageList.innerHTML = '<p>No hay proyectos.</p>';
-            [...currentProjects].reverse().forEach(p=>{const t=document.createElement('div');t.className='manage-item';t.dataset.id=p.id;t.innerHTML=`<span class="drag-handle">::</span><span class="manage-item-title">${p.titulo}</span><div class="manage-buttons"><button class="duplicate-button" onclick="duplicateProjectById('${p.id}')">Duplicar</button><button class="edit-button" onclick="editProjectById('${p.id}')">Editar</button><button class="delete-button" onclick="deleteProjectById('${p.id}')">Borrar</button></div>`;manageList.appendChild(t)})
+            [...currentProjects].reverse().forEach(p => {
+                manageList.appendChild(createManageItem(p));
+            });
         }
+
+        function renderSearchResults() {
+            const searchTerm = manageSearchBox.value.toLowerCase();
+            searchResultsList.innerHTML = '';
+            if (!searchTerm) return;
+
+            const filteredProjects = currentProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+
+            if (filteredProjects.length === 0) {
+                searchResultsList.innerHTML = '<p class="empty-search-message">No se encontraron proyectos.</p>';
+                return;
+            }
+            filteredProjects.reverse().forEach(p => {
+                searchResultsList.appendChild(createManageItem(p));
+            });
+        }
+        
+        manageSearchBox.addEventListener('input', renderSearchResults);
+        // --- FIN: LÓGICA DE GESTIÓN DE PROYECTOS (MODIFICADA) ---
         
         function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
         
@@ -340,15 +417,17 @@
         function updatePreview(forceFullRefresh = false) {
             if (!previewFrame.contentWindow) return;
             try {
+                const isLiveTyping = !forceFullRefresh;
                 if (previewMode === 'list') {
                     const projectFromForm = getProjectFromForm();
                     let projectsForPreview = [...currentProjects];
-                    if (editingIndex > -1) {
-                        if (!forceFullRefresh) projectsForPreview[editingIndex] = projectFromForm;
-                    } else if (!forceFullRefresh && (projectFromForm.titulo || projectFromForm.resumen)) {
+                    if (isLiveTyping && editingIndex > -1) {
+                        projectsForPreview[editingIndex] = projectFromForm;
+                    } 
+                    else if (isLiveTyping && editingIndex === -1 && (projectFromForm.titulo || projectFromForm.resumen)) {
                         projectsForPreview.push(projectFromForm);
                     }
-                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview }, '*');
+                    previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview, isLive: isLiveTyping }, '*');
                 } else if (previewMode === 'detail') {
                     const projectForDetailPreview = getProjectFromForm();
                     previewFrame.contentWindow.postMessage({ type: 'detailPreviewUpdate', payload: projectForDetailPreview }, '*');
