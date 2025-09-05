@@ -25,6 +25,21 @@
         "Software > Windows",
         "Motores de Juego > Game Maker"
       ]
+    },
+    {
+      "titulo": "iLupo Crosshair Editor",
+      "id": "ilupo-crosshair-editor",
+      "resumen": "Editor y overlay de miras personalizadas para juegos, con formas, colores y atajos configurables.",
+      "contenido_completo": "### Capturas:\n\n![Captura principal del programa](https://i.ibb.co/hFDPt5xn/1.png)\n\n**iLupo Crosshair Editor** es un programa creado en **Python** (convertido a `.exe` con PyInstaller) que te permite mostrar una **mira flotante y personalizable** en tu pantalla, ideal para juegos que no incluyen una mira propia o para aumentar la dificultad de los que sí la tienen.  \n\nSe ejecuta como un **overlay siempre en primer plano**, por lo que la mira permanecerá visible encima de cualquier ventana o juego (excepto en pantalla completa exclusiva).  \n\n### Características Principales:\n\n* 🎨 **Formas y estilos**: incluye una gran variedad de miras (punto, cruz, círculo, T, holográfica, chevron, anillo, punteada, etc.).  \n* 🌈 **Colores personalizables**: selecciona color principal y color de borde con un selector visual.  \n* 📏 **Ajustes avanzados**: escala, grosor, separación, rotación, punto central, espaciado de puntos, inversión de forma T, y más.  \n* ⌨️ **Atajos configurables**: activa o desactiva la mira (`F6`) y abre/cierra el menú de opciones (`F7`) con teclas editables.  \n* 💾 **Perfiles de usuario**: guarda y carga configuraciones personalizadas para cambiar rápidamente entre estilos.  \n* 🖥️ **Multi-monitor**: selecciona en qué monitor se mostrará la mira.  \n* 🌍 **Soporte multi-idioma**: interfaz en **español** e **inglés**.  \n* 🆙 **Versión actual**: `1.1.4` (En El Momento De Crear La Publicacion).  \n\nA continuación puedes ver el programa en acción:\n\n(Video Proximamente...)\n\n---\n\n### Descarga:\n\n[![Descargar iLupo Crosshair Editor](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/eq0xaqoe3agcjjm/iLupo_Crosshair_Editor.rar/file)\n",
+      "imagen": "https://i.ibb.co/HfY8VfyK/crosshair.gif",
+      "enlace": "",
+      "tags": [
+        "Software > Utilidades",
+        "Software > Windows",
+        "Gaming > Overlays",
+        "Gaming > Herramientas",
+        "Programación > Python"
+      ]
     }
   ]
 }
