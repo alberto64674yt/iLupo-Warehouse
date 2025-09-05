@@ -60,6 +60,7 @@
         <button id="boykisser-close" class="bk-close-btn">&times;</button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr/lunr.min.js"></script>
     <script>
         let allProjects = [];
         let activeTags = new Set();
@@ -69,6 +70,7 @@
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
         const tagContainer = document.getElementById('tag-filter-container');
+		let searchIndex; // Variable para guardar el índice de búsqueda
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -80,6 +82,20 @@
                 }
             });
         }, { threshold: 0.1 });
+		
+		function buildSearchIndex(proyectos) {
+            searchIndex = lunr(function () {
+                this.ref('id'); // Usamos el ID para identificar cada proyecto
+                this.field('titulo', { boost: 10 }); // El título tiene 10 veces más importancia
+                this.field('resumen', { boost: 5 });  // El resumen tiene 5 veces más importancia
+                this.field('contenido_completo');    // El contenido completo tiene importancia normal
+                this.field('tags');                  // También buscamos en las etiquetas
+
+                proyectos.forEach(function (p) {
+                    this.add(p);
+                }, this);
+            });
+        }
 
         function renderCards(proyectos) {
             grid.innerHTML = '';
@@ -247,12 +263,21 @@
         }
 
         function filterAndRender() {
-            const searchTerm = searchBox.value.toLowerCase();
-            let filtered = allProjects;
+            const searchTerm = searchBox.value.toLowerCase().trim();
+            let filtered = [];
 
             if (searchTerm) {
-                filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+                // Si hay un término de búsqueda, usamos el índice de Lunr.js
+                const searchResults = searchIndex.search(searchTerm + '*'); // El '*' permite buscar mientras escribes
+                // Mapeamos los resultados (que solo tienen el ID) a los objetos de proyecto completos
+                filtered = searchResults.map(result => {
+                    return allProjects.find(p => p.id === result.ref);
+                });
+            } else {
+                // Si no hay búsqueda, usamos la lista completa de proyectos
+                filtered = allProjects;
             }
+
             if (activeTags.size > 0) {
                 const activeTagsArr = [...activeTags];
                 filtered = filtered.filter(p => {
@@ -261,12 +286,16 @@
                     });
                 });
             }
+
             renderCards(filtered);
             setupPagination(filtered.length);
+            updateAllButtonStates();
+            updateURLParameters();
         }
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
+			buildSearchIndex(allProjects);
             window.proyectos=allProjects;
             buildAndRenderTags(allProjects);
             filterAndRender();
