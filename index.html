@@ -92,7 +92,15 @@
                 this.field('tags');                  // También buscamos en las etiquetas
 
                 proyectos.forEach(function (p) {
-                    this.add(p);
+                    // CORRECCIÓN: Nos aseguramos de que las etiquetas se procesen correctamente
+                    const docToAdd = {
+                        id: p.id,
+                        titulo: p.titulo,
+                        resumen: p.resumen,
+                        contenido_completo: p.contenido_completo,
+                        tags: (p.tags || []).join(' ') // Convertimos el array de etiquetas en un texto simple
+                    };
+                    this.add(docToAdd);
                 }, this);
             });
         }
