@@ -5,3 +5,5 @@ Allow: /
 
 # No permitir que los buscadores indexen el panel de control
 Disallow: /panel.html
+
+Sitemap: https://ilupowarehouse.netlify.app/sitemap.xml
