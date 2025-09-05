@@ -381,28 +381,43 @@
                 });
             }
 
-            // --- EASTER EGG #1: TÍTULO 5 CLICS ---
-            const titleElement = document.querySelector('#main-header h1');
-            const videoOverlay = document.getElementById('easter-egg-overlay');
-            const videoContainer = document.getElementById('video-container');
-            const closeVideoBtn = document.getElementById('close-easter-egg');
-            let clickCount = 0; let timer;
+            // --- EASTER EGG #1: TÍTULO 5 CLICS (VERSIÓN CORREGIDA)---
+const titleElement = document.querySelector('#main-header h1');
+const videoOverlay = document.getElementById('easter-egg-overlay');
+const videoContainer = document.getElementById('video-container');
+const closeVideoBtn = document.getElementById('close-easter-egg');
+let clickCount = 0; let timer;
 
-            titleElement.addEventListener('click', function() {
-                clickCount++;
-                clearTimeout(timer);
-                timer = setTimeout(() => { clickCount = 0; }, 1000);
-                if (clickCount === 5) {
-                    clickCount = 0;
-                    alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
-                    videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-                    videoOverlay.style.display = 'flex';
-                }
-            });
-            closeVideoBtn.addEventListener('click', function() {
-                videoOverlay.style.display = 'none';
-                videoContainer.innerHTML = '';
-            });
+// Envolvemos cada letra del título en un <span>, como en el subtítulo
+const titleText = titleElement.innerText;
+titleElement.innerHTML = '';
+titleText.split('').forEach(char => {
+    const charSpan = document.createElement('span');
+    charSpan.textContent = char;
+    titleElement.appendChild(charSpan);
+});
+
+// Asignamos el listener a todo el documento y comprobamos el origen del clic
+document.addEventListener('click', function(e) {
+    // Solo contamos el clic si se hace en una de las letras (un <span>) dentro del <h1>
+    if (e.target.parentElement === titleElement) {
+        clickCount++;
+        clearTimeout(timer);
+        timer = setTimeout(() => { clickCount = 0; }, 1000);
+        
+        if (clickCount === 5) {
+            clickCount = 0;
+            alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
+            videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+            videoOverlay.style.display = 'flex';
+        }
+    }
+});
+
+closeVideoBtn.addEventListener('click', function() {
+    videoOverlay.style.display = 'none';
+    videoContainer.innerHTML = '';
+});
 
             // --- EASTER EGG #2: BOYKISSER (LÓGICA CORREGIDA) ---
             const bkOverlay = document.getElementById('boykisser-overlay');
@@ -482,6 +497,7 @@
 
 </body>
 </html>
+
 
 
 
