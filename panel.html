@@ -127,6 +127,7 @@
 
     <script>
         const IMGBB_API_KEY = 'b8a4f499248761bcdc6789718a1eb1d2';
+		let sitemapNeedsUpdate = false;
         
         let currentProjects = []; let aboutMeContent = { contenido: '' };
         let editingIndex = -1; let previewMode = 'list';
@@ -412,7 +413,7 @@
         }
         
         function deleteProjectById(i){
-            const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);renderManageList();updatePreview(true);}
+            const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);sitemapNeedsUpdate = true;renderManageList();updatePreview(true);}
         }
         
         function getProjectFromForm(){
@@ -483,13 +484,12 @@
         function submitProject(){
             const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){return alert('Faltan campos obligatorios.')}
             if(currentProjects.some((project,index)=>index!==editingIndex&&project.id===p.id)){return alert('El ID del proyecto ya está en uso.')}
-            if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.')}else{currentProjects.push(p);alert('Proyecto añadido.')}
+            if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.')}else{currentProjects.push(p);sitemapNeedsUpdate = true;alert('Proyecto añadido.')}
             cancelEdit();renderManageList();updatePreview(true)
         }
         
-        function saveProjects(){
-            const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href)
-        }
+        function saveProjects(){if(sitemapNeedsUpdate){if(confirm('Has añadido o borrado un proyecto. ¿Quieres descargar también el sitemap.xml actualizado?')){generateSitemap();}sitemapNeedsUpdate=false;}const f=JSON.stringify({items:currentProjects},null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='proyectos.json';a.click();URL.revokeObjectURL(a.href);}
+		function generateSitemap(){const today=new Date().toISOString().split('T')[0];const domain='https://ilupowarehouse.netlify.app';let xmlContent=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;xmlContent+=`  <url><loc>${domain}/</loc><lastmod>${today}</lastmod><priority>1.00</priority></url>\n`;xmlContent+=`  <url><loc>${domain}/sobre-mi.html</loc><lastmod>${today}</lastmod><priority>0.80</priority></url>\n`;currentProjects.forEach(project=>{xmlContent+=`  <url><loc>${domain}/proyecto.html?id=${project.id}</loc><lastmod>${today}</lastmod><priority>0.90</priority></url>\n`});xmlContent+='</urlset>';const blob=new Blob([xmlContent],{type:'application/xml'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sitemap.xml';a.click();URL.revokeObjectURL(a.href);}
 
         function saveAboutMe(){
             const c={contenido:document.getElementById('contenido_sobre_mi').value};const f=JSON.stringify(c,null,2);const b=new Blob([f],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='info.json';a.click();URL.revokeObjectURL(a.href)
