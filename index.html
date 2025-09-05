@@ -18,7 +18,7 @@
 </head>
 <body>
     <header id="main-header" class="no-select">
-		<img src="/favicon/favicon.svg" alt="Logo de iLupo Warehouse" style="display: block; margin: 0 auto 1.5rem auto; width: 128px; height: 128px; -webkit-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none;">
+		<img id="header-logo" src="/favicon/favicon.svg" alt="Logo de iLupo Warehouse" style="display: block; margin: 0 auto 1.5rem auto; width: 128px; height: 128px; -webkit-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none;">
         <h1>iLupo Warehouse</h1>
         <p class="subtitle" id="subtitle">
             "Con gran fluidez, mi pequeño workflow exhibe hoy la hazaña de zanjar viejos bugs."
@@ -50,7 +50,9 @@
         <p>© 2025 iLupo Warehouse | Administrado por alberto64674yt</p>
     </footer>
 
-    <div id="easter-egg-overlay" class="easter-egg-overlay">
+	<audio id="wolf-howl-audio" src="https://files.catbox.moe/a490qy.mp3" preload="auto"></audio>
+    
+	<div id="easter-egg-overlay" class="easter-egg-overlay">
         <div class="easter-egg-content">
             <div id="video-container" class="video-container-easter-egg"></div>
             <p class="easter-egg-quote">"A veces es mejor dejar ciertas cosas sin descubrir"</p>
@@ -482,6 +484,33 @@ closeVideoBtn.addEventListener('click', function() {
 
         })();
     </script>
+
+	<script>
+    // --- EASTER EGG #3: LOGO 5 CLICS (AULLIDO DE LOBO) ---
+    (function() {
+        const logoElement = document.getElementById('header-logo');
+        const wolfHowlAudio = document.getElementById('wolf-howl-audio');
+
+        if (logoElement && wolfHowlAudio) {
+            let logoClickCount = 0;
+            let logoTimer;
+
+            logoElement.addEventListener('click', function() {
+                logoClickCount++;
+                clearTimeout(logoTimer);
+                logoTimer = setTimeout(() => { logoClickCount = 0; }, 1000);
+
+                if (logoClickCount === 5) {
+                    if (wolfHowlAudio.paused) {
+                        wolfHowlAudio.currentTime = 0;
+                        wolfHowlAudio.play();
+                    }
+                    logoClickCount = 0;
+                }
+            });
+        }
+    })();
+</script>
 	
 	<script>
   if ('serviceWorker' in navigator) {
@@ -497,6 +526,7 @@ closeVideoBtn.addEventListener('click', function() {
 
 </body>
 </html>
+
 
 
 
