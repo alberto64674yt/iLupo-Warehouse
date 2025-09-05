@@ -1,0 +1,7 @@
+# Contenido completo para robots.txt
+
+User-agent: *
+Allow: /
+
+# No permitir que los buscadores indexen el panel de control
+Disallow: /panel.html
