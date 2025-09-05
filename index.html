@@ -60,6 +60,7 @@
         <button id="boykisser-close" class="bk-close-btn">&times;</button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lunr/lunr.min.js"></script>
     <script>
         let allProjects = [];
         let activeTags = new Set();
@@ -69,6 +70,7 @@
         const grid = document.getElementById('portfolio-grid');
         const paginationContainer = document.getElementById('pagination-container');
         const tagContainer = document.getElementById('tag-filter-container');
+		let searchIndex; // Variable para guardar el índice de búsqueda
 
         marked.setOptions({ gfm: true, breaks: true });
 
@@ -80,6 +82,29 @@
                 }
             });
         }, { threshold: 0.1 });
+		
+		function buildSearchIndex(proyectos) {
+            searchIndex = lunr(function () {
+                this.ref('id');
+                this.field('titulo', { boost: 10 });
+                this.field('resumen', { boost: 5 });
+                this.field('contenido_completo');
+                this.field('tags');
+
+                proyectos.forEach(function (p) {
+                    // CORRECCIÓN DEFINITIVA: Asegurarse de que TODOS los campos son strings
+                    // para evitar errores con la librería de búsqueda.
+                    const docToAdd = {
+                        id: p.id || '',
+                        titulo: p.titulo || '',
+                        resumen: p.resumen || '',
+                        contenido_completo: p.contenido_completo || '',
+                        tags: (p.tags || []).join(' ')
+                    };
+                    this.add(docToAdd);
+                }, this);
+            });
+        }
 
         function renderCards(proyectos) {
             grid.innerHTML = '';
@@ -247,26 +272,44 @@
         }
 
         function filterAndRender() {
-            const searchTerm = searchBox.value.toLowerCase();
-            let filtered = allProjects;
+            const searchTerm = searchBox.value.toLowerCase().trim();
+            let projectsToShow = allProjects; // Por defecto, mostramos todo.
 
+            // Si hay un término de búsqueda, filtramos los resultados.
             if (searchTerm) {
-                filtered = filtered.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+                // Usamos el índice de Lunr.js si existe.
+                if (searchIndex) {
+                    const searchResults = searchIndex.search(searchTerm + '*');
+                    // Mapeamos los IDs de los resultados a los objetos de proyecto completos.
+                    projectsToShow = searchResults.map(result => {
+                        return allProjects.find(p => p.id === result.ref);
+                    });
+                } else {
+                    // Fallback por si el índice no se ha creado (nunca debería pasar).
+                    projectsToShow = [];
+                }
             }
+
+            // Si hay etiquetas activas, filtramos sobre los resultados actuales.
             if (activeTags.size > 0) {
                 const activeTagsArr = [...activeTags];
-                filtered = filtered.filter(p => {
+                projectsToShow = projectsToShow.filter(p => {
                     return activeTagsArr.every(activeTagPath => {
                         return (p.tags || []).some(projectTag => projectTag.startsWith(activeTagPath));
                     });
                 });
             }
-            renderCards(filtered);
-            setupPagination(filtered.length);
+
+            renderCards(projectsToShow);
+            setupPagination(projectsToShow.length);
+            updateAllButtonStates();
+            // La actualización de la URL la quitamos temporalmente para asegurar estabilidad.
+            // updateURLParameters(); 
         }
 
         fetch('proyectos.json').then(r=>r.json()).then(data=>{
             allProjects=data.items||[];
+			buildSearchIndex(allProjects);
             window.proyectos=allProjects;
             buildAndRenderTags(allProjects);
             filterAndRender();
