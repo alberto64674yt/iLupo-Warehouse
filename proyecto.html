@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proyecto</title>
+	<meta name="description" content="">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -119,7 +120,14 @@
             const container = document.getElementById('project-detail-content');
             if (!proyecto || !proyecto.titulo) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
             document.title = proyecto.titulo + " | iLupo Warehouse";
-            
+			
+			// Actualiza la meta descripción
+			const metaDescription = document.querySelector('meta[name="description"]');
+			if (metaDescription && proyecto.resumen) {
+    		// Usamos el resumen del proyecto como descripción. Quitamos el formato Markdown.
+    		metaDescription.setAttribute('content', proyecto.resumen.replace(/[*_#`~>]/g, ''));
+			}
+			
             let rawContent = proyecto.contenido_completo || '';
             const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
             rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
