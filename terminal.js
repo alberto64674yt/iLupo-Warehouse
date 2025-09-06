@@ -1,4 +1,4 @@
-// Contenido completo, con correcciones de resize y enlaces v5.1 para terminal.js
+// Contenido completo, basado en tu archivo, con la lógica de 'exit' corregida v5.3
 
 (function() {
     const Terminal = {
@@ -39,7 +39,7 @@
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 5.1 - Estable]');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 5.3 - Lógica Corregida]');
                     this.print('Escribe "help" para ver los comandos. Usa TAB para autocompletar.');
                 })
                 .catch(() => this.print('Error al cargar proyectos.json.'));
@@ -252,7 +252,7 @@
                 Terminal.print('**theme [color]**: Cambia el color del texto (verde, ambar, azul, blanco).');
                 Terminal.print('**exec [easter_egg]**: Ejecuta un Easter egg (ej: "exec wolf_howl").');
                 Terminal.print('**clear**: Limpia la pantalla.');
-                Terminal.print('**exit**: Cierra el terminal o sale del Modo Root.');
+                Terminal.print('**exit**: Cierra el terminal.');
             },
             su: function() {
                 Terminal.isRootMode = !Terminal.isRootMode;
@@ -265,7 +265,6 @@
                     Terminal.print('<span style="color: var(--danger-color);">Acceso root concedido.</span> El comando "open" ahora mostrará el contenido aquí.');
                 } else {
                     Terminal.dom.container.style.height = Terminal.basicModeHeight;
-                    Terminal.dom.container.style.maxHeight = Terminal.basicModeHeight;
                     Terminal.dom.prompt.classList.remove('root-mode');
                     Terminal.print('Saliendo de modo root.');
                 }
@@ -286,11 +285,7 @@
                 Terminal.print(`Error: no se encontró el destino "${target}".`);
             },
             exit: function() {
-                if (Terminal.isRootMode) {
-                    Terminal.commands.su();
-                } else {
-                    Terminal.toggle();
-                }
+                Terminal.toggle();
             },
             cdf: function(args) {
                 const newPath = args[0] || '/';
