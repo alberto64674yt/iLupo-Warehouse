@@ -10,7 +10,6 @@
         commandHistory: [],
         historyIndex: -1,
         lastAutocomplete: { input: '', matches: [] },
-        figletLoaded: false,
         
         restrictedFiles: ['terminal.js', 'terminal.css', 'style.css', 'sw.js', 'sitemap.xml', 'panel.html'],
         allowedPages: ['index.html', 'sobre-mi.html', 'tags.html', 'proyectos.json', 'info.json', 'robots.txt'],
@@ -217,14 +216,10 @@
             this.dom.output.scrollTop = this.dom.output.scrollHeight;
         },
 
-        print: function(message, isRaw = false) {
-        const line = document.createElement(isRaw ? 'pre' : 'div');
-        line.innerHTML = isRaw ? message.replace(/</g, "&lt;").replace(/>/g, "&gt;") : message.replace(/ /g, '&nbsp;');
-        if (isRaw) {
-        line.style.fontFamily = "'Courier New', Courier, monospace";
-        line.style.whiteSpace = "pre-wrap";
-        }
-        this.dom.output.appendChild(line);
+        print: function(message) {
+            const line = document.createElement('div');
+            line.innerHTML = message.replace(/ /g, '&nbsp;');
+            this.dom.output.appendChild(line);
         },
 
         navigateHistory: function(direction) {
@@ -239,39 +234,6 @@
         },
         
         commands: {
-            banner: function(args) {
-    const text = args.join(' ');
-    if (!text) return Terminal.print('Error: especifica un texto para el banner.');
-
-    const renderBanner = () => {
-        figlet.text(text, { font: 'Standard', horizontalLayout: 'default', verticalLayout: 'default' }, 
-        function(err, data) {
-            if (err) {
-                Terminal.print('Error al generar el arte ASCII: ' + JSON.stringify(err));
-                return;
-            }
-            Terminal.print(data, true);
-            Terminal.dom.output.scrollTop = Terminal.dom.output.scrollHeight;
-        });
-    };
-
-    if (Terminal.figletLoaded) {
-        renderBanner();
-    } else {
-        Terminal.print('Descargando librería Figlet por primera vez...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/figlet/lib/figlet.js';
-        document.body.appendChild(script);
-        script.onload = () => {
-            Terminal.figletLoaded = true;
-            Terminal.print('Librería cargada. Generando banner...');
-            renderBanner();
-        };
-        script.onerror = () => {
-            Terminal.print('Error: no se pudo descargar la librería Figlet.');
-        }
-    }
-},
             help: function() {
                 Terminal.print('--- Comandos de Contenido ---');
                 Terminal.print('**ls**: Muestra los IDs de todos los proyectos disponibles.');
@@ -476,4 +438,3 @@
     };
     window.Terminal = Terminal;
 })();
-
