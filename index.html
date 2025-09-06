@@ -344,7 +344,7 @@
         let userInput = "";
         const subtitleElement = document.getElementById('subtitle');
         const secretActions = {
-            "admin": () => { window.location.href = 'panel.html'; },
+            "admin": () => { alert('Acceso correcto. Redirigiendo...'); window.location.href = 'panel.html'; },
             "boykisser": () => { window.easterEggFunctions.boykisser(); },
             "terminal": () => { cargarTerminal(); } // Puedes cambiar "cmd" por "terminal" si lo prefieres
         };
@@ -522,3 +522,4 @@
 
 </body>
 </html>
+
