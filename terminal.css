@@ -1,4 +1,4 @@
-/* Contenido completo y definitivo para terminal.css v5.0 */
+/* Contenido completo y definitivo para terminal.css v5.1 */
 
 /* --- Estructura Principal del Terminal --- */
 #terminal-container {
@@ -74,7 +74,7 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #39ff14; /* Color del texto que escribe el usuario */
+    color: #39ff14;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
     width: 100%;
@@ -84,7 +84,7 @@
 /* --- Animación del Cursor --- */
 #terminal-input-line::after {
     content: '█';
-    color: inherit; /* Hereda el color del texto del input */
+    color: inherit;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
     animation: blink 1s step-end infinite;
@@ -100,8 +100,8 @@
 /* --- Modo Root y Avanzado (Pantalla Completa) --- */
 body.terminal-mode-full #terminal-container {
     top: 0;
-    height: 100vh;
-    max-height: 100vh;
+    height: 100vh !important;
+    max-height: 100vh !important;
     border-top: none;
 }
 
@@ -110,6 +110,10 @@ body.terminal-mode-full .filter-controls,
 body.terminal-mode-full main,
 body.terminal-mode-full footer {
     display: none !important;
+}
+
+body.terminal-mode-full #terminal-resizer {
+    display: none;
 }
 
 #terminal-prompt.root-mode {
@@ -124,7 +128,7 @@ body.terminal-mode-full footer {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
-    display: none; /* Cambiado para que no interfiera */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 10000;
