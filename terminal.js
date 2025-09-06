@@ -1,9 +1,10 @@
-// Contenido completo, con Modo Root y definitivo v5.0 para terminal.js
+// Contenido completo, con correcciones de resize y enlaces v5.1 para terminal.js
 
 (function() {
     const Terminal = {
         isOpen: false,
         isRootMode: false,
+        basicModeHeight: '400px',
         dom: {},
         projectData: [],
         commandHistory: [],
@@ -38,8 +39,8 @@
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 5.0 - Root Enabled]');
-                    this.print('Escribe "help" para ver los comandos.');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 5.1 - Estable]');
+                    this.print('Escribe "help" para ver los comandos. Usa TAB para autocompletar.');
                 })
                 .catch(() => this.print('Error al cargar proyectos.json.'));
 
@@ -72,6 +73,7 @@
             const container = this.dom.container;
             let startY, startHeight;
             const doDrag = (e) => {
+                if (Terminal.isRootMode) return;
                 let newHeight = startHeight - (e.clientY - startY);
                 if (newHeight < 50) newHeight = 50;
                 if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20;
@@ -79,6 +81,9 @@
                 container.style.maxHeight = 'none';
             };
             const stopDrag = () => {
+                if (!Terminal.isRootMode) {
+                    Terminal.basicModeHeight = container.style.height;
+                }
                 window.removeEventListener('mousemove', doDrag);
                 window.removeEventListener('mouseup', stopDrag);
             };
@@ -144,7 +149,6 @@
             const currentWord = parts[parts.length - 1];
             const command = parts[0];
             let dictionary = [];
-
             if (parts.length === 1) {
                 dictionary = Object.keys(this.commands);
             } else {
@@ -170,11 +174,8 @@
                         break;
                 }
             }
-
             const matches = dictionary.filter(item => item.startsWith(currentWord));
-
             if (matches.length === 0) return;
-
             if (matches.length === 1) {
                 parts[parts.length - 1] = matches[0];
                 this.dom.input.value = parts.join(' ') + ' ';
@@ -183,19 +184,16 @@
                     this.print(`${this.dom.prompt.innerHTML}${inputValue}`);
                     this.print(matches.join('&nbsp;&nbsp;&nbsp;'));
                 }
-                
                 let commonPrefix = matches[0];
                 for (let i = 1; i < matches.length; i++) {
                     while (matches[i].slice(0, commonPrefix.length) !== commonPrefix) {
                         commonPrefix = commonPrefix.slice(0, -1);
                     }
                 }
-
                 if (commonPrefix.length > currentWord.length) {
                     parts[parts.length - 1] = commonPrefix;
                     this.dom.input.value = parts.join(' ');
                 }
-                
                 this.lastAutocomplete = { input: this.dom.input.value, matches: matches };
             }
         },
@@ -246,7 +244,7 @@
                 Terminal.print('**lsf**: Lista los archivos del directorio virtual actual.');
                 Terminal.print('**cdf [dir]**: Cambia de directorio virtual.');
                 Terminal.print('**pwd**: Muestra el directorio virtual actual.');
-                Terminal.print('**view [archivo]**: Muestra una imagen (ej: "view favicon/favicon.svg").');
+                Terminal.print('**view [archivo]**: Muestra una imagen del dir. virtual (ej: "view favicon/favicon.svg").');
                 Terminal.print('--- Comandos de Sistema ---');
                 Terminal.print('**su**: Entra o sale del "Modo Root" (pantalla completa).');
                 Terminal.print('**whoami**: Muestra el usuario actual.');
@@ -259,32 +257,32 @@
             su: function() {
                 Terminal.isRootMode = !Terminal.isRootMode;
                 document.body.classList.toggle('terminal-mode-full', Terminal.isRootMode);
-                
                 if (Terminal.isRootMode) {
+                    Terminal.basicModeHeight = Terminal.dom.container.style.height || '400px';
+                    Terminal.dom.container.style.height = '100vh';
+                    Terminal.dom.container.style.maxHeight = '100vh';
                     Terminal.dom.prompt.classList.add('root-mode');
-                    Terminal.updatePrompt();
                     Terminal.print('<span style="color: var(--danger-color);">Acceso root concedido.</span> El comando "open" ahora mostrará el contenido aquí.');
                 } else {
+                    Terminal.dom.container.style.height = Terminal.basicModeHeight;
+                    Terminal.dom.container.style.maxHeight = Terminal.basicModeHeight;
                     Terminal.dom.prompt.classList.remove('root-mode');
-                    Terminal.updatePrompt();
                     Terminal.print('Saliendo de modo root.');
                 }
+                Terminal.updatePrompt();
             },
             open: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica un destino.');
                 const target = args[0];
-
                 if (Terminal.isRootMode) {
                     if (Terminal.projectData.find(p => p.id === target) || ['info.json', 'proyectos.json'].includes(target)) {
                          return Terminal.commands.read(args);
                     }
                 }
-                
                 if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`<span style="color: var(--danger-color);">**ACCESO DENEGADO a ${target}**</span>`); }
                 if (Terminal.allowedPages.includes(target)) { window.open(target, '_blank'); return; }
                 const project = Terminal.projectData.find(p => p.id === target);
                 if (project) { window.open(`proyecto.html?id=${target}`, '_blank'); return; }
-                
                 Terminal.print(`Error: no se encontró el destino "${target}".`);
             },
             exit: function() {
@@ -386,17 +384,19 @@
         },
 
         updatePrompt: function() {
+            const pathIndicator = this.currentPath === '/' ? '' : this.currentPath;
             if (this.isRootMode) {
-                this.dom.prompt.innerHTML = `root@warehouse:~${this.currentPath === '/' ? '' : this.currentPath}#&nbsp;`;
+                this.dom.prompt.innerHTML = `root@warehouse:~${pathIndicator}#&nbsp;`;
             } else {
-                this.dom.prompt.innerHTML = `ilupo@warehouse:~${this.currentPath === '/' ? '' : this.currentPath}$&nbsp;`;
+                this.dom.prompt.innerHTML = `ilupo@warehouse:~${pathIndicator}$&nbsp;`;
             }
         },
 
         stripMarkdown: function(text) {
             let cleanText = text || '';
-            cleanText = cleanText.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
-            cleanText = cleanText.replace(/!\[[^\]]*\]\([^\)]+\)/g, '[IMAGEN]');
+            cleanText = cleanText.replace(/\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g, (match, img, dl) => `[IMAGEN DE DESCARGA] (Enlace: ${dl})`);
+            cleanText = cleanText.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, (match, alt, src) => ` (${src})`);
+            cleanText = cleanText.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, (match, linkText, url) => `${linkText} (${url})`);
             cleanText = cleanText.replace(/\[(nota|aviso|info|spoiler:[^\]]+|tabs|tab:[^\]]+)\]/g, '').replace(/\[\/(nota|aviso|info|spoiler|tabs|tab)\]/g, '');
             cleanText = cleanText.replace(/(\*\*|__)(.*?)\1/g, '$2');
             cleanText = cleanText.replace(/([*_~`])/g, '');
