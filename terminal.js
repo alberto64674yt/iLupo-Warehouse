@@ -1,4 +1,4 @@
-// Contenido completo, corregido y definitivo para terminal.js
+// Contenido completo, corregido y definitivo v2.3 para terminal.js
 
 (function() {
     const Terminal = {
@@ -7,17 +7,21 @@
         commandHistory: [],
         historyIndex: -1,
         
+        // CORRECCIÓN: Se reestructura para tener un nodo raíz con tipo 'dir'
         fileSystem: {
-            'proyectos.json': { type: 'file', content: 'Lista de todos los proyectos.' },
-            'info.json': { type: 'file', content: 'Información sobre el autor.' },
-            'index.html': { type: 'file', content: 'Página principal.' },
-            'favicon': {
-                type: 'dir',
-                content: {
-                    'favicon.ico': { type: 'file' },
-                    'favicon.svg': { type: 'file' },
-                    'apple-touch-icon.png': { type: 'file' },
-                    'logo.svg': { type: 'file' }
+            type: 'dir',
+            content: {
+                'proyectos.json': { type: 'file', content: 'Lista de todos los proyectos.' },
+                'info.json': { type: 'file', content: 'Información sobre el autor.' },
+                'index.html': { type: 'file', content: 'Página principal.' },
+                'favicon': {
+                    type: 'dir',
+                    content: {
+                        'favicon.ico': { type: 'file' },
+                        'favicon.svg': { type: 'file' },
+                        'apple-touch-icon.png': { type: 'file' },
+                        'logo.svg': { type: 'file' }
+                    }
                 }
             }
         },
@@ -27,7 +31,7 @@
             this.createUI();
             this.attachEventListeners();
             this.initResizer();
-            this.print('Bienvenido a iLupo Warehouse Shell [Versión 2.2 - Estable]');
+            this.print('Bienvenido a iLupo Warehouse Shell [Versión 2.3 - Estable]');
             this.print('Escribe "help" para ver la lista de comandos disponibles.');
             this.toggle();
         },
@@ -81,7 +85,6 @@
             this.isOpen = !this.isOpen;
             this.dom.container.classList.toggle('visible', this.isOpen);
             if (this.isOpen) {
-                // CORRECCIÓN: Evita el scroll de la página al abrir el terminal
                 this.dom.input.focus({ preventScroll: true });
             }
         },
@@ -117,7 +120,6 @@
             } else {
                 this.print(`Error: comando no encontrado "${command}".`);
             }
-            // CORRECCIÓN: Auto-scroll del contenido del terminal
             this.dom.output.scrollTop = this.dom.output.scrollHeight;
         },
 
@@ -138,7 +140,6 @@
             this.dom.input.value = this.commandHistory[this.historyIndex] || '';
         },
         
-        // CORRECCIÓN: Se usa "Terminal." en lugar de "this." para evitar problemas de contexto.
         commands: {
             help: function() {
                 Terminal.print('--- Comandos Disponibles ---');
@@ -204,13 +205,14 @@
         },
 
         getNodeFromPath: function(path) {
-            if (path === '/') return this.fileSystem;
             const parts = path.split('/').filter(p => p);
             let currentNode = this.fileSystem;
             for (const part of parts) {
-                if (currentNode && currentNode.type === 'dir' && currentNode.content[part]) {
+                if (currentNode && currentNode.type === 'dir' && currentNode.content && currentNode.content[part]) {
                     currentNode = currentNode.content[part];
-                } else { return null; }
+                } else {
+                    return null;
+                }
             }
             return currentNode;
         },
@@ -219,8 +221,11 @@
             if (path.startsWith('/')) return path;
             const currentParts = this.currentPath.split('/').filter(p => p);
             path.split('/').forEach(part => {
-                if (part === '..') { currentParts.pop(); }
-                else if (part !== '.' && part !== '') { currentParts.push(part); }
+                if (part === '..') {
+                    currentParts.pop();
+                } else if (part !== '.' && part !== '') {
+                    currentParts.push(part);
+                }
             });
             return '/' + currentParts.join('/');
         }
