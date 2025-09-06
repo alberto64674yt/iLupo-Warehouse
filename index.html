@@ -334,181 +334,177 @@
     </script>
     
     <script>
-        (function() {
-            // --- LÓGICA DE EASTER EGGS Y CÓDIGOS SECRETOS ---
+    (function() {
+        // --- LÓGICA DE EASTER EGGS, CÓDIGOS SECRETOS Y TERMINAL ---
 
-            // --- SISTEMA DE ACCESO SECRETO (ACTUALIZADO) ---
-            let userInput = "";
-            const subtitleElement = document.getElementById('subtitle');
-            
-            const secretActions = {
-                "admin": () => {
-                    alert('Acceso correcto. Redirigiendo...');
-                    window.location.href = 'panel.html';
-                },
-                "boykisser": () => {
-                    showBoykisserEasterEgg();
-                }
-            };
+        // Objeto global para que el terminal pueda llamar a estas funciones
+        window.easterEggFunctions = {};
 
-            if (subtitleElement) {
-                const text = subtitleElement.innerText;
-                subtitleElement.innerHTML = '';
-                text.split('').forEach(char => {
-                    const charSpan = document.createElement('span');
-                    charSpan.textContent = char;
-                    subtitleElement.appendChild(charSpan);
-                });
+        // --- SISTEMA DE ACCESO SECRETO (PALABRAS CLAVE) ---
+        let userInput = "";
+        const subtitleElement = document.getElementById('subtitle');
+        const secretActions = {
+            "admin": () => { window.location.href = 'panel.html'; },
+            "boykisser": () => { window.easterEggFunctions.boykisser(); },
+            "terminal": () => { cargarTerminal(); } // Puedes cambiar "cmd" por "terminal" si lo prefieres
+        };
 
-                document.addEventListener('click', function(e) {
-                    if (e.target.parentElement === subtitleElement) {
-                        const letter = e.target.textContent.toLowerCase();
-                        userInput += letter;
-
-                        let matchFound = false;
-                        for (const word in secretActions) {
-                            if (word.startsWith(userInput)) {
-                                matchFound = true;
-                                if (userInput === word) {
-                                    secretActions[word]();
-                                    userInput = "";
-                                    break;
-                                }
+        if (subtitleElement) {
+            const text = subtitleElement.innerText;
+            subtitleElement.innerHTML = '';
+            text.split('').forEach(char => {
+                const charSpan = document.createElement('span');
+                charSpan.textContent = char;
+                subtitleElement.appendChild(charSpan);
+            });
+            document.addEventListener('click', function(e) {
+                if (e.target.parentElement === subtitleElement) {
+                    const letter = e.target.textContent.toLowerCase();
+                    userInput += letter;
+                    let matchFound = false;
+                    for (const word in secretActions) {
+                        if (word.startsWith(userInput)) {
+                            matchFound = true;
+                            if (userInput === word) {
+                                secretActions[word]();
+                                userInput = "";
+                                break;
                             }
                         }
-                        if (!matchFound) {
-                            userInput = "";
-                        }
                     }
-                });
+                    if (!matchFound) userInput = "";
+                }
+            });
+        }
+
+        // --- FUNCIÓN DE CARGA DINÁMICA DEL TERMINAL ---
+        let terminalCargado = false;
+        function cargarTerminal() {
+            if (terminalCargado) {
+                if (window.Terminal) window.Terminal.toggle();
+                return;
             }
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'terminal.css';
+            document.head.appendChild(link);
+            const script = document.createElement('script');
+            script.src = 'terminal.js';
+            document.body.appendChild(script);
+            script.onload = () => {
+                if (window.Terminal && typeof window.Terminal.init === 'function') {
+                    window.Terminal.init();
+                    terminalCargado = true;
+                }
+            };
+        }
 
-            // --- EASTER EGG #1: TÍTULO 5 CLICS (VERSIÓN CORREGIDA)---
-const titleElement = document.querySelector('#main-header h1');
-const videoOverlay = document.getElementById('easter-egg-overlay');
-const videoContainer = document.getElementById('video-container');
-const closeVideoBtn = document.getElementById('close-easter-egg');
-let clickCount = 0; let timer;
+        // --- EASTER EGG #1: TÍTULO 5 CLICS ---
+        const titleElement = document.querySelector('#main-header h1');
+        const videoOverlay = document.getElementById('easter-egg-overlay');
+        const videoContainer = document.getElementById('video-container');
+        const closeVideoBtn = document.getElementById('close-easter-egg');
+        let clickCount = 0; let timer;
 
-// Envolvemos cada letra del título en un <span>, como en el subtítulo
-const titleText = titleElement.innerText;
-titleElement.innerHTML = '';
-titleText.split('').forEach(char => {
-    const charSpan = document.createElement('span');
-    charSpan.textContent = char;
-    titleElement.appendChild(charSpan);
-});
-
-// Asignamos el listener a todo el documento y comprobamos el origen del clic
-document.addEventListener('click', function(e) {
-    // Solo contamos el clic si se hace en una de las letras (un <span>) dentro del <h1>
-    if (e.target.parentElement === titleElement) {
-        clickCount++;
-        clearTimeout(timer);
-        timer = setTimeout(() => { clickCount = 0; }, 1000);
-        
-        if (clickCount === 5) {
-            clickCount = 0;
+        window.easterEggFunctions.matrix_video = function() { // Expuesto para el terminal
             alert("Has Encontrado algo que no deberías poder estar viéndo, tanto tiempo libre tienes para toquetear toda la pagina y descubrir esto? bueno aqui tienes tu hallazgo:");
             videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/bN1shALfJqg?autoplay=1&loop=1&controls=0&playlist=bN1shALfJqg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             videoOverlay.style.display = 'flex';
-        }
-    }
-});
-
-closeVideoBtn.addEventListener('click', function() {
-    videoOverlay.style.display = 'none';
-    videoContainer.innerHTML = '';
-});
-
-            // --- EASTER EGG #2: BOYKISSER (LÓGICA CORREGIDA) ---
-            const bkOverlay = document.getElementById('boykisser-overlay');
-            const bkChar = document.getElementById('boykisser-char');
-            const bkAudio = document.getElementById('boykisser-audio');
-            const bkTextElement = document.getElementById('boykisser-text');
-            const bkCloseBtn = document.getElementById('boykisser-close');
-            let typewriterInterval;
-            let startTypingTimeout;
-
-            function showBoykisserEasterEgg() {
-                // 1. Reiniciar estado antes de empezar
-                bkTextElement.innerHTML = '';
-                bkCloseBtn.style.display = 'none';
-                bkChar.style.transition = 'none'; // Desactivar transición para el reseteo
-                bkChar.style.left = '-100%'; // Posición inicial fuera de pantalla
-                bkAudio.currentTime = 0;
-                clearInterval(typewriterInterval);
-                clearTimeout(startTypingTimeout);
-
-                // 2. Mostrar el overlay (fondo oscuro y borroso)
-                bkOverlay.classList.add('visible');
-
-                // 3. Forzar al navegador a que aplique el reseteo antes de animar
-                setTimeout(() => {
-                    // Aumentar la duración de la transición para que se deslice más lentamente
-                    bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)'; 
-                    // Ajustar la posición final para que no esté tan a la derecha
-                    bkChar.style.left = '35%'; // Esto se ajustará con el transform en CSS
-                    bkAudio.play();
-                }, 20); 
-
-                const text = "you like kissing boys, don't you?";
-                let i = 0;
-                
-                // 4. Programar el inicio del tipeo para que coincida con el audio y la animación del personaje
-                startTypingTimeout = setTimeout(() => {
-                    typewriterInterval = setInterval(() => {
-                        if (i < text.length) {
-                            bkTextElement.innerHTML += text.charAt(i);
-                            i++;
-                        } else {
-                            clearInterval(typewriterInterval);
-                        }
-                    }, 65);
-                }, 1400);
+        };
+        const titleText = titleElement.innerText;
+        titleElement.innerHTML = '';
+        titleText.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.textContent = char;
+            titleElement.appendChild(charSpan);
+        });
+        document.addEventListener('click', function(e) {
+            if (e.target.parentElement === titleElement) {
+                clickCount++;
+                clearTimeout(timer);
+                timer = setTimeout(() => { clickCount = 0; }, 1000);
+                if (clickCount === 5) {
+                    clickCount = 0;
+                    window.easterEggFunctions.matrix_video();
+                }
             }
+        });
+        closeVideoBtn.addEventListener('click', function() {
+            videoOverlay.style.display = 'none';
+            videoContainer.innerHTML = '';
+        });
 
-            bkAudio.onended = function() {
-                clearInterval(typewriterInterval);
-                bkTextElement.innerHTML = "you like kissing boys, don't you?";
-                bkCloseBtn.style.display = 'block';
-            };
-            
-            bkCloseBtn.addEventListener('click', function() {
-                bkOverlay.classList.remove('visible');
-                clearInterval(typewriterInterval);
-                clearTimeout(startTypingTimeout);
-                bkAudio.pause();
-                bkAudio.currentTime = 0;
-            });
+        // --- EASTER EGG #2: BOYKISSER ---
+        const bkOverlay = document.getElementById('boykisser-overlay');
+        const bkChar = document.getElementById('boykisser-char');
+        const bkAudio = document.getElementById('boykisser-audio');
+        const bkTextElement = document.getElementById('boykisser-text');
+        const bkCloseBtn = document.getElementById('boykisser-close');
+        let typewriterInterval, startTypingTimeout;
+        
+        window.easterEggFunctions.boykisser = function() { // Expuesto para el terminal
+            bkTextElement.innerHTML = '';
+            bkCloseBtn.style.display = 'none';
+            bkChar.style.transition = 'none';
+            bkChar.style.left = '-100%';
+            bkAudio.currentTime = 0;
+            clearInterval(typewriterInterval);
+            clearTimeout(startTypingTimeout);
+            bkOverlay.classList.add('visible');
+            setTimeout(() => {
+                bkChar.style.transition = 'left 2s cubic-bezier(0.25, 1, 0.5, 1)';
+                bkChar.style.left = '35%';
+                bkAudio.play();
+            }, 20);
+            const text = "you like kissing boys, don't you?";
+            let i = 0;
+            startTypingTimeout = setTimeout(() => {
+                typewriterInterval = setInterval(() => {
+                    if (i < text.length) {
+                        bkTextElement.innerHTML += text.charAt(i); i++;
+                    } else { clearInterval(typewriterInterval); }
+                }, 65);
+            }, 1400);
+        };
 
-        })();
-    </script>
-
-	<script>
-    // --- EASTER EGG #3: LOGO 5 CLICS (AULLIDO DE LOBO) ---
-    (function() {
+        bkAudio.onended = function() {
+            clearInterval(typewriterInterval);
+            bkTextElement.innerHTML = "you like kissing boys, don't you?";
+            bkCloseBtn.style.display = 'block';
+        };
+        bkCloseBtn.addEventListener('click', function() {
+            bkOverlay.classList.remove('visible');
+            clearInterval(typewriterInterval);
+            clearTimeout(startTypingTimeout);
+            bkAudio.pause();
+            bkAudio.currentTime = 0;
+        });
+        
+        // --- EASTER EGG #3: LOGO 5 CLICS (AULLIDO DE LOBO) ---
         const logoElement = document.getElementById('header-logo');
         const wolfHowlAudio = document.getElementById('wolf-howl-audio');
+
+        window.easterEggFunctions.wolf_howl = function() { // Expuesto para el terminal
+            if (wolfHowlAudio.paused) {
+                wolfHowlAudio.currentTime = 0;
+                wolfHowlAudio.play();
+            }
+        };
 
         if (logoElement && wolfHowlAudio) {
             let logoClickCount = 0;
             let logoTimer;
-
             logoElement.addEventListener('click', function() {
                 logoClickCount++;
                 clearTimeout(logoTimer);
                 logoTimer = setTimeout(() => { logoClickCount = 0; }, 1000);
-
                 if (logoClickCount === 5) {
-                    if (wolfHowlAudio.paused) {
-                        wolfHowlAudio.currentTime = 0;
-                        wolfHowlAudio.play();
-                    }
+                    window.easterEggFunctions.wolf_howl();
                     logoClickCount = 0;
                 }
             });
         }
+
     })();
 </script>
 	
@@ -526,14 +522,3 @@ closeVideoBtn.addEventListener('click', function() {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
