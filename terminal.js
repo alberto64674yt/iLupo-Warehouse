@@ -285,7 +285,16 @@
                 Terminal.print(`Error: no se encontró el destino "${target}".`);
             },
             exit: function() {
-                Terminal.toggle();
+            if (Terminal.isRootMode) {
+             // Si estamos en modo root, primero desactiva todo lo visual del modo root
+            Terminal.isRootMode = false;
+            document.body.classList.remove('terminal-mode-full');
+            Terminal.dom.prompt.classList.remove('root-mode');
+            Terminal.updatePrompt();
+            Terminal.dom.container.style.height = Terminal.basicModeHeight;
+            }
+            // Después (o si nunca estuvimos en modo root), SIEMPRE cierra el terminal
+            Terminal.toggle();
             },
             cdf: function(args) {
                 const newPath = args[0] || '/';
@@ -429,3 +438,4 @@
     };
     window.Terminal = Terminal;
 })();
+
