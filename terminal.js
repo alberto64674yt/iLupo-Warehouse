@@ -1,4 +1,4 @@
-// Contenido completo, pulido y definitivo v4.3 para terminal.js
+// Contenido completo, con autocompletado y definitivo v4.3 para terminal.js
 
 (function() {
     const Terminal = {
@@ -7,6 +7,7 @@
         projectData: [],
         commandHistory: [],
         historyIndex: -1,
+        lastAutocomplete: { input: '', matches: [] },
         
         restrictedFiles: ['terminal.js', 'terminal.css', 'style.css', 'sw.js', 'sitemap.xml', 'panel.html'],
         allowedPages: ['index.html', 'sobre-mi.html', 'tags.html', 'proyectos.json', 'info.json', 'robots.txt'],
@@ -36,10 +37,10 @@
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 4.3 - Estable]');
-                    this.print('Escribe "help" para ver los comandos.');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 4.3 - Autocomplete]');
+                    this.print('Escribe "help" para ver los comandos. Usa TAB para autocompletar.');
                 })
-                .catch(() => this.print('Error al cargar proyectos.json. Algunos comandos pueden no funcionar.'));
+                .catch(() => this.print('Error al cargar proyectos.json.'));
 
             this.toggle();
         },
@@ -57,17 +58,36 @@
             `;
             document.body.appendChild(container);
             this.dom = {
-                container: container, output: document.getElementById('terminal-output'),
-                input: document.getElementById('terminal-input'), prompt: document.getElementById('terminal-prompt'),
+                container: container,
+                output: document.getElementById('terminal-output'),
+                input: document.getElementById('terminal-input'),
+                prompt: document.getElementById('terminal-prompt'),
                 resizer: document.getElementById('terminal-resizer')
             };
         },
         
         initResizer: function() {
-            const resizer = this.dom.resizer; const container = this.dom.container; let startY, startHeight;
-            const doDrag = (e) => { let newHeight = startHeight - (e.clientY - startY); if (newHeight < 50) newHeight = 50; if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20; container.style.height = `${newHeight}px`; container.style.maxHeight = 'none'; };
-            const stopDrag = () => { window.removeEventListener('mousemove', doDrag); window.removeEventListener('mouseup', stopDrag); };
-            resizer.addEventListener('mousedown', (e) => { e.preventDefault(); startY = e.clientY; startHeight = container.offsetHeight; window.addEventListener('mousemove', doDrag); window.addEventListener('mouseup', stopDrag); });
+            const resizer = this.dom.resizer;
+            const container = this.dom.container;
+            let startY, startHeight;
+            const doDrag = (e) => {
+                let newHeight = startHeight - (e.clientY - startY);
+                if (newHeight < 50) newHeight = 50;
+                if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20;
+                container.style.height = `${newHeight}px`;
+                container.style.maxHeight = 'none';
+            };
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                startY = e.clientY;
+                startHeight = container.offsetHeight;
+                window.addEventListener('mousemove', doDrag);
+                window.addEventListener('mouseup', stopDrag);
+            });
         },
 
         initLightbox: function() {
@@ -76,9 +96,12 @@
             lightbox.id = 'terminal-lightbox';
             lightbox.style.display = 'none';
             lightbox.innerHTML = `<img id="terminal-lightbox-img" src="">`;
-            lightbox.addEventListener('click', () => { lightbox.style.display = 'none'; });
+            lightbox.addEventListener('click', () => {
+                lightbox.style.display = 'none';
+            });
             document.body.appendChild(lightbox);
-            this.dom.lightbox = lightbox; this.dom.lightboxImg = document.getElementById('terminal-lightbox-img');
+            this.dom.lightbox = lightbox;
+            this.dom.lightboxImg = document.getElementById('terminal-lightbox-img');
         },
 
         showLightbox: function(src) {
@@ -89,18 +112,102 @@
         toggle: function() {
             this.isOpen = !this.isOpen;
             this.dom.container.classList.toggle('visible', this.isOpen);
-            if (this.isOpen) { this.dom.input.focus({ preventScroll: true }); }
+            if (this.isOpen) {
+                this.dom.input.focus({ preventScroll: true });
+            }
         },
         
         attachEventListeners: function() {
-            this.dom.input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.processCommand(e.target.value); e.target.value = ''; } else if (e.key === 'ArrowUp') { e.preventDefault(); this.navigateHistory('up'); } else if (e.key === 'ArrowDown') { e.preventDefault(); this.navigateHistory('down'); } });
+            this.dom.input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.processCommand(e.target.value);
+                    e.target.value = '';
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.navigateHistory('up');
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.navigateHistory('down');
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    this.handleAutocomplete();
+                }
+            });
             this.dom.container.addEventListener('click', () => this.dom.input.focus());
         },
 
+        handleAutocomplete: function() {
+            const inputValue = this.dom.input.value;
+            const parts = inputValue.split(' ');
+            const currentWord = parts[parts.length - 1];
+            const command = parts[0];
+            let dictionary = [];
+
+            if (parts.length === 1) {
+                dictionary = Object.keys(this.commands);
+            } else {
+                switch(command) {
+                    case 'open':
+                    case 'read':
+                    case 'cat':
+                        dictionary = this.projectData.map(p => p.id);
+                        break;
+                    case 'cdf':
+                    case 'lsf':
+                    case 'view':
+                        const node = this.getNodeFromPath(this.currentPath);
+                        if (node && node.type === 'dir') {
+                            dictionary = Object.keys(node.content);
+                        }
+                        break;
+                    case 'exec':
+                        dictionary = Object.keys(window.easterEggFunctions || {});
+                        break;
+                    case 'theme':
+                        dictionary = ['verde', 'ambar', 'azul', 'blanco'];
+                        break;
+                }
+            }
+
+            const matches = dictionary.filter(item => item.startsWith(currentWord));
+
+            if (matches.length === 0) return;
+
+            if (matches.length === 1) {
+                parts[parts.length - 1] = matches[0];
+                this.dom.input.value = parts.join(' ') + ' ';
+            } else {
+                if (this.lastAutocomplete.input === inputValue && this.lastAutocomplete.matches.length > 1) {
+                    this.print(`${this.dom.prompt.innerHTML}${inputValue}`);
+                    this.print(matches.join('&nbsp;&nbsp;&nbsp;'));
+                }
+                
+                let commonPrefix = matches[0];
+                for (let i = 1; i < matches.length; i++) {
+                    while (matches[i].slice(0, commonPrefix.length) !== commonPrefix) {
+                        commonPrefix = commonPrefix.slice(0, -1);
+                    }
+                }
+
+                if (commonPrefix.length > currentWord.length) {
+                    parts[parts.length - 1] = commonPrefix;
+                    this.dom.input.value = parts.join(' ');
+                }
+                
+                this.lastAutocomplete = { input: this.dom.input.value, matches: matches };
+            }
+        },
+
         processCommand: function(inputValue) {
-            if (!inputValue.trim()) { this.print(`${this.dom.prompt.innerHTML}`); return; }
+            this.lastAutocomplete = { input: '', matches: [] };
+            if (!inputValue.trim()) {
+                this.print(`${this.dom.prompt.innerHTML}`);
+                return;
+            }
             this.print(`${this.dom.prompt.innerHTML}${inputValue.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`);
-            this.commandHistory.unshift(inputValue); this.historyIndex = -1;
+            this.commandHistory.unshift(inputValue);
+            this.historyIndex = -1;
             const [command, ...args] = inputValue.trim().split(/\s+/);
             if (this.commands[command]) {
                 this.commands[command](args);
@@ -117,7 +224,13 @@
         },
 
         navigateHistory: function(direction) {
-            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; } else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; } else if (direction === 'down' && this.historyIndex <= 0) { this.historyIndex = -1; this.dom.input.value = ''; return; }
+            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; }
+            else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; }
+            else if (direction === 'down' && this.historyIndex <= 0) {
+                this.historyIndex = -1;
+                this.dom.input.value = '';
+                return;
+            }
             this.dom.input.value = this.commandHistory[this.historyIndex] || '';
         },
         
@@ -147,7 +260,7 @@
                 Terminal.projectData.forEach(p => Terminal.print(p.id));
             },
             read: function(args) {
-                if (!args.length) return Terminal.print('Error: especifica qué leer (ej: un ID de proyecto o "info.json").');
+                if (!args.length) return Terminal.print('Error: especifica qué leer.');
                 const target = args.join(' ');
                 if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`Error: Permisos insuficientes para leer "${target}".`); }
                 if (target === 'info.json' || target === 'proyectos.json') {
