@@ -1,4 +1,4 @@
-/* Contenido completo y definitivo para terminal.css v3.1 */
+/* Contenido completo y definitivo para terminal.css v5.0 */
 
 /* --- Estructura Principal del Terminal --- */
 #terminal-container {
@@ -53,7 +53,7 @@
     padding: 1rem;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
-    color: #39ff14; /* Verde terminal */
+    color: #39ff14; /* Verde terminal por defecto */
     word-break: break-word;
 }
 #terminal-output::-webkit-scrollbar { display: none; }
@@ -64,7 +64,7 @@
 }
 
 #terminal-prompt {
-    color: #00aaff; /* Prompt en azul */
+    color: #00aaff; /* Prompt en azul por defecto */
     font-weight: bold;
     flex-shrink: 0;
     font-family: 'Courier New', Courier, monospace;
@@ -74,7 +74,7 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #39ff14;
+    color: #39ff14; /* Color del texto que escribe el usuario */
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
     width: 100%;
@@ -84,7 +84,7 @@
 /* --- Animación del Cursor --- */
 #terminal-input-line::after {
     content: '█';
-    color: #39ff14;
+    color: inherit; /* Hereda el color del texto del input */
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
     animation: blink 1s step-end infinite;
@@ -97,18 +97,23 @@
     50% { opacity: 1; }
 }
 
-/* --- Modo Avanzado (Pantalla Completa) --- */
+/* --- Modo Root y Avanzado (Pantalla Completa) --- */
 body.terminal-mode-full #terminal-container {
     top: 0;
     height: 100vh;
     max-height: 100vh;
     border-top: none;
 }
+
 body.terminal-mode-full header,
 body.terminal-mode-full .filter-controls,
 body.terminal-mode-full main,
 body.terminal-mode-full footer {
     display: none !important;
+}
+
+#terminal-prompt.root-mode {
+    color: #ef4444; /* Rojo para el prompt de root */
 }
 
 /* --- Lightbox para el comando 'view' --- */
@@ -119,7 +124,7 @@ body.terminal-mode-full footer {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
+    display: none; /* Cambiado para que no interfiera */
     justify-content: center;
     align-items: center;
     z-index: 10000;
