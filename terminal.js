@@ -1,4 +1,4 @@
-// Contenido completo, universal y definitivo v4.2 para terminal.js
+// Contenido completo, pulido y definitivo v4.3 para terminal.js
 
 (function() {
     const Terminal = {
@@ -19,8 +19,7 @@
                     content: {
                         'favicon.ico': { type: 'file' },
                         'favicon.svg': { type: 'file' },
-                        'apple-touch-icon.png': { type: 'file' },
-                        'logo.svg': { type: 'file' }
+                        'apple-touch-icon.png': { type: 'file' }
                     }
                 }
             }
@@ -37,7 +36,7 @@
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 4.2 - Completa]');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 4.3 - Estable]');
                     this.print('Escribe "help" para ver los comandos.');
                 })
                 .catch(() => this.print('Error al cargar proyectos.json. Algunos comandos pueden no funcionar.'));
@@ -58,36 +57,17 @@
             `;
             document.body.appendChild(container);
             this.dom = {
-                container: container,
-                output: document.getElementById('terminal-output'),
-                input: document.getElementById('terminal-input'),
-                prompt: document.getElementById('terminal-prompt'),
+                container: container, output: document.getElementById('terminal-output'),
+                input: document.getElementById('terminal-input'), prompt: document.getElementById('terminal-prompt'),
                 resizer: document.getElementById('terminal-resizer')
             };
         },
         
         initResizer: function() {
-            const resizer = this.dom.resizer;
-            const container = this.dom.container;
-            let startY, startHeight;
-            const doDrag = (e) => {
-                let newHeight = startHeight - (e.clientY - startY);
-                if (newHeight < 50) newHeight = 50;
-                if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20;
-                container.style.height = `${newHeight}px`;
-                container.style.maxHeight = 'none';
-            };
-            const stopDrag = () => {
-                window.removeEventListener('mousemove', doDrag);
-                window.removeEventListener('mouseup', stopDrag);
-            };
-            resizer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                startY = e.clientY;
-                startHeight = container.offsetHeight;
-                window.addEventListener('mousemove', doDrag);
-                window.addEventListener('mouseup', stopDrag);
-            });
+            const resizer = this.dom.resizer; const container = this.dom.container; let startY, startHeight;
+            const doDrag = (e) => { let newHeight = startHeight - (e.clientY - startY); if (newHeight < 50) newHeight = 50; if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20; container.style.height = `${newHeight}px`; container.style.maxHeight = 'none'; };
+            const stopDrag = () => { window.removeEventListener('mousemove', doDrag); window.removeEventListener('mouseup', stopDrag); };
+            resizer.addEventListener('mousedown', (e) => { e.preventDefault(); startY = e.clientY; startHeight = container.offsetHeight; window.addEventListener('mousemove', doDrag); window.addEventListener('mouseup', stopDrag); });
         },
 
         initLightbox: function() {
@@ -96,12 +76,9 @@
             lightbox.id = 'terminal-lightbox';
             lightbox.style.display = 'none';
             lightbox.innerHTML = `<img id="terminal-lightbox-img" src="">`;
-            lightbox.addEventListener('click', () => {
-                lightbox.style.display = 'none';
-            });
+            lightbox.addEventListener('click', () => { lightbox.style.display = 'none'; });
             document.body.appendChild(lightbox);
-            this.dom.lightbox = lightbox;
-            this.dom.lightboxImg = document.getElementById('terminal-lightbox-img');
+            this.dom.lightbox = lightbox; this.dom.lightboxImg = document.getElementById('terminal-lightbox-img');
         },
 
         showLightbox: function(src) {
@@ -112,36 +89,18 @@
         toggle: function() {
             this.isOpen = !this.isOpen;
             this.dom.container.classList.toggle('visible', this.isOpen);
-            if (this.isOpen) {
-                this.dom.input.focus({ preventScroll: true });
-            }
+            if (this.isOpen) { this.dom.input.focus({ preventScroll: true }); }
         },
         
         attachEventListeners: function() {
-            this.dom.input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.processCommand(e.target.value);
-                    e.target.value = '';
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    this.navigateHistory('up');
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    this.navigateHistory('down');
-                }
-            });
+            this.dom.input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.processCommand(e.target.value); e.target.value = ''; } else if (e.key === 'ArrowUp') { e.preventDefault(); this.navigateHistory('up'); } else if (e.key === 'ArrowDown') { e.preventDefault(); this.navigateHistory('down'); } });
             this.dom.container.addEventListener('click', () => this.dom.input.focus());
         },
 
         processCommand: function(inputValue) {
-            if (!inputValue.trim()) {
-                this.print(`${this.dom.prompt.innerHTML}`);
-                return;
-            }
+            if (!inputValue.trim()) { this.print(`${this.dom.prompt.innerHTML}`); return; }
             this.print(`${this.dom.prompt.innerHTML}${inputValue.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`);
-            this.commandHistory.unshift(inputValue);
-            this.historyIndex = -1;
+            this.commandHistory.unshift(inputValue); this.historyIndex = -1;
             const [command, ...args] = inputValue.trim().split(/\s+/);
             if (this.commands[command]) {
                 this.commands[command](args);
@@ -158,28 +117,23 @@
         },
 
         navigateHistory: function(direction) {
-            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; }
-            else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; }
-            else if (direction === 'down' && this.historyIndex <= 0) {
-                this.historyIndex = -1;
-                this.dom.input.value = '';
-                return;
-            }
+            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; } else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; } else if (direction === 'down' && this.historyIndex <= 0) { this.historyIndex = -1; this.dom.input.value = ''; return; }
             this.dom.input.value = this.commandHistory[this.historyIndex] || '';
         },
         
         commands: {
             help: function() {
-                Terminal.print('--- Comandos de Navegación ---');
-                Terminal.print('**open [destino]**: Abre un proyecto (por ID) o una página (ej: "index.html").');
-                Terminal.print('**read [id] / cat [id]**: Muestra los detalles de un proyecto o archivo .json.');
+                Terminal.print('--- Comandos de Contenido ---');
                 Terminal.print('**ls**: Muestra los IDs de todos los proyectos disponibles.');
-                Terminal.print('--- Comandos de Sistema de Archivos (Simulado) ---');
-                Terminal.print('**lsf**: Lista los archivos del directorio actual.');
-                Terminal.print('**cdf [dir]**: Cambia de directorio.');
-                Terminal.print('**pwd**: Muestra el directorio actual.');
-                Terminal.print('**view [archivo]**: Muestra una imagen (ej: "view favicon/logo.svg").');
-                Terminal.print('--- Comandos de Sistema y Personalización ---');
+                Terminal.print('**read [id] / cat [id]**: Muestra los detalles de un proyecto o archivo .json.');
+                Terminal.print('**open [destino]**: Abre un proyecto (por ID) o una página (ej: "index.html").');
+                Terminal.print('**about**: Muestra la información de la página "Sobre Mí".');
+                Terminal.print('--- Comandos de Archivos Virtuales ---');
+                Terminal.print('**lsf**: Lista los archivos del directorio virtual actual.');
+                Terminal.print('**cdf [dir]**: Cambia de directorio virtual.');
+                Terminal.print('**pwd**: Muestra el directorio virtual actual.');
+                Terminal.print('**view [archivo]**: Muestra una imagen del dir. virtual (ej: "view favicon/favicon.svg").');
+                Terminal.print('--- Comandos de Sistema ---');
                 Terminal.print('**whoami**: Muestra el usuario actual.');
                 Terminal.print('**hostname**: Muestra el nombre del host.');
                 Terminal.print('**theme [color]**: Cambia el color del texto (verde, ambar, azul, blanco).');
@@ -195,11 +149,7 @@
             read: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica qué leer (ej: un ID de proyecto o "info.json").');
                 const target = args.join(' ');
-
-                if (Terminal.restrictedFiles.includes(target)) {
-                    return Terminal.print(`Error: Permisos insuficientes para leer "${target}".`);
-                }
-
+                if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`Error: Permisos insuficientes para leer "${target}".`); }
                 if (target === 'info.json' || target === 'proyectos.json') {
                     fetch(target).then(r => r.json()).then(data => {
                         Terminal.print(`--- Contenido de ${target} ---`);
@@ -208,7 +158,6 @@
                     }).catch(() => Terminal.print(`Error al cargar ${target}.`));
                     return;
                 }
-
                 const project = Terminal.projectData.find(p => p.id === target);
                 if (project) {
                     Terminal.print(`\n<span style="color: var(--primary-color);">--- ${project.titulo} ---</span>`);
@@ -224,19 +173,10 @@
             open: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica un destino.');
                 const target = args[0];
-
-                if (Terminal.restrictedFiles.includes(target)) {
-                    return Terminal.print(`<span style="color: var(--danger-color);">**ACCESO DENEGADO a ${target}**</span>`);
-                }
-                if (Terminal.allowedPages.includes(target)) {
-                    window.open(target, '_blank');
-                    return;
-                }
+                if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`<span style="color: var(--danger-color);">**ACCESO DENEGADO a ${target}**</span>`); }
+                if (Terminal.allowedPages.includes(target)) { window.open(target, '_blank'); return; }
                 const project = Terminal.projectData.find(p => p.id === target);
-                if (project) {
-                    window.open(`proyecto.html?id=${target}`, '_blank');
-                    return;
-                }
+                if (project) { window.open(`proyecto.html?id=${target}`, '_blank'); return; }
                 Terminal.print(`Error: no se encontró el destino "${target}".`);
             },
             whoami: function() { Terminal.print('guest'); },
@@ -249,9 +189,7 @@
                     Terminal.dom.output.style.color = validColors[color];
                     Terminal.dom.input.style.color = validColors[color];
                     Terminal.print(`Tema cambiado a ${color}.`);
-                } else {
-                    Terminal.print('Error: color no válido. Opciones: verde, ambar, azul, blanco.');
-                }
+                } else { Terminal.print('Error: color no válido. Opciones: verde, ambar, azul, blanco.'); }
             },
             lsf: function(args) {
                 const path = args[0] ? Terminal.resolvePath(args[0]) : Terminal.currentPath;
