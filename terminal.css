@@ -1,0 +1,119 @@
+/* Contenido completo para terminal.css */
+
+/* --- Estructura Principal del Terminal --- */
+#terminal-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 45vh; /* Altura de la barra de comandos (45% de la pantalla) */
+    max-height: 400px; /* Pero con un máximo de 400px */
+    background-color: rgba(10, 15, 25, 0.95);
+    border-top: 1px solid #374151;
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    
+    display: flex;
+    flex-direction: column;
+    
+    /* Oculto por defecto, con animación de entrada */
+    visibility: hidden;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+}
+
+#terminal-container.visible {
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* --- Contenido (Output, Input, Prompt) --- */
+#terminal-output {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #39ff14; /* Verde terminal */
+    word-break: break-word;
+}
+#terminal-output::-webkit-scrollbar { display: none; } /* Ocultar scrollbar */
+
+#terminal-input-line {
+    display: flex;
+    padding: 0 1rem 1rem 1rem;
+}
+
+#terminal-prompt {
+    color: #00aaff; /* Prompt en azul */
+    font-weight: bold;
+    flex-shrink: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #39ff14; /* Texto de input verde */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    width: 100%;
+    padding: 0;
+}
+
+/* --- Animación del Cursor --- */
+#terminal-input-line::after {
+    content: '█';
+    color: #39ff14;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    animation: blink 1s step-end infinite;
+}
+#terminal-input:focus + #terminal-input-line::after {
+    display: inline;
+}
+
+@keyframes blink {
+    from, to { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* --- Modo Avanzado (Pantalla Completa) --- */
+/* Cuando el body tenga esta clase, el terminal ocupará todo */
+body.terminal-mode-full #terminal-container {
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    border-top: none;
+}
+/* Y ocultamos el resto de la web */
+body.terminal-mode-full header,
+body.terminal-mode-full .filter-controls,
+body.terminal-mode-full main,
+body.terminal-mode-full footer,
+body.terminal-mode-full .bk-overlay,
+body.terminal-mode-full .easter-egg-overlay {
+    display: none !important;
+}
+
+/* --- Lightbox para el comando 'view' (pendiente de implementar en JS) --- */
+.terminal-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    cursor: pointer;
+}
+.terminal-lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border: 2px solid #374151;
+}
