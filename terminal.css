@@ -116,4 +116,26 @@ body.terminal-mode-full .easter-egg-overlay {
     max-height: 90%;
     object-fit: contain;
     border: 2px solid #374151;
+
+}
+/* --- Estilos para redimensionar el terminal --- */
+#terminal-resizer {
+    width: 100%;
+    height: 10px; /* Aumentamos el área de agarre */
+    padding-top: 4px; /* Centramos la línea visualmente */
+    cursor: ns-resize; /* Cursor de redimensionar vertical */
+    background-color: transparent;
+    position: absolute;
+    top: -4px;
+    left: 0;
+}
+
+#terminal-resizer::before {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 4px;
+    background-color: #374151; /* Color de la línea */
+    border-radius: 2px;
+    margin: 0 auto;
 }
