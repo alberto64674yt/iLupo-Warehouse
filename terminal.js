@@ -1,8 +1,9 @@
-// Contenido completo, con autocompletado y definitivo v4.3 para terminal.js
+// Contenido completo, con Modo Root y definitivo v5.0 para terminal.js
 
 (function() {
     const Terminal = {
         isOpen: false,
+        isRootMode: false,
         dom: {},
         projectData: [],
         commandHistory: [],
@@ -37,8 +38,8 @@
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 4.3 - Autocomplete]');
-                    this.print('Escribe "help" para ver los comandos. Usa TAB para autocompletar.');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 5.0 - Root Enabled]');
+                    this.print('Escribe "help" para ver los comandos.');
                 })
                 .catch(() => this.print('Error al cargar proyectos.json.'));
 
@@ -245,14 +246,64 @@
                 Terminal.print('**lsf**: Lista los archivos del directorio virtual actual.');
                 Terminal.print('**cdf [dir]**: Cambia de directorio virtual.');
                 Terminal.print('**pwd**: Muestra el directorio virtual actual.');
-                Terminal.print('**view [archivo]**: Muestra una imagen del dir. virtual (ej: "view favicon/favicon.svg").');
+                Terminal.print('**view [archivo]**: Muestra una imagen (ej: "view favicon/favicon.svg").');
                 Terminal.print('--- Comandos de Sistema ---');
+                Terminal.print('**su**: Entra o sale del "Modo Root" (pantalla completa).');
                 Terminal.print('**whoami**: Muestra el usuario actual.');
                 Terminal.print('**hostname**: Muestra el nombre del host.');
                 Terminal.print('**theme [color]**: Cambia el color del texto (verde, ambar, azul, blanco).');
                 Terminal.print('**exec [easter_egg]**: Ejecuta un Easter egg (ej: "exec wolf_howl").');
                 Terminal.print('**clear**: Limpia la pantalla.');
-                Terminal.print('**exit**: Cierra el terminal.');
+                Terminal.print('**exit**: Cierra el terminal o sale del Modo Root.');
+            },
+            su: function() {
+                Terminal.isRootMode = !Terminal.isRootMode;
+                document.body.classList.toggle('terminal-mode-full', Terminal.isRootMode);
+                
+                if (Terminal.isRootMode) {
+                    Terminal.dom.prompt.classList.add('root-mode');
+                    Terminal.updatePrompt();
+                    Terminal.print('<span style="color: var(--danger-color);">Acceso root concedido.</span> El comando "open" ahora mostrará el contenido aquí.');
+                } else {
+                    Terminal.dom.prompt.classList.remove('root-mode');
+                    Terminal.updatePrompt();
+                    Terminal.print('Saliendo de modo root.');
+                }
+            },
+            open: function(args) {
+                if (!args.length) return Terminal.print('Error: especifica un destino.');
+                const target = args[0];
+
+                if (Terminal.isRootMode) {
+                    if (Terminal.projectData.find(p => p.id === target) || ['info.json', 'proyectos.json'].includes(target)) {
+                         return Terminal.commands.read(args);
+                    }
+                }
+                
+                if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`<span style="color: var(--danger-color);">**ACCESO DENEGADO a ${target}**</span>`); }
+                if (Terminal.allowedPages.includes(target)) { window.open(target, '_blank'); return; }
+                const project = Terminal.projectData.find(p => p.id === target);
+                if (project) { window.open(`proyecto.html?id=${target}`, '_blank'); return; }
+                
+                Terminal.print(`Error: no se encontró el destino "${target}".`);
+            },
+            exit: function() {
+                if (Terminal.isRootMode) {
+                    Terminal.commands.su();
+                } else {
+                    Terminal.toggle();
+                }
+            },
+            cdf: function(args) {
+                const newPath = args[0] || '/';
+                const targetPath = Terminal.resolvePath(newPath);
+                const node = Terminal.getNodeFromPath(targetPath);
+                if (node && node.type === 'dir') {
+                    Terminal.currentPath = targetPath;
+                } else {
+                    Terminal.print(`Error: el directorio "${newPath}" no existe.`);
+                }
+                Terminal.updatePrompt();
             },
             ls: function() {
                 if (Terminal.projectData.length === 0) return Terminal.print('No hay proyectos cargados o encontrados.');
@@ -283,15 +334,6 @@
                 }
             },
             cat: function(args) { Terminal.commands.read(args); },
-            open: function(args) {
-                if (!args.length) return Terminal.print('Error: especifica un destino.');
-                const target = args[0];
-                if (Terminal.restrictedFiles.includes(target)) { return Terminal.print(`<span style="color: var(--danger-color);">**ACCESO DENEGADO a ${target}**</span>`); }
-                if (Terminal.allowedPages.includes(target)) { window.open(target, '_blank'); return; }
-                const project = Terminal.projectData.find(p => p.id === target);
-                if (project) { window.open(`proyecto.html?id=${target}`, '_blank'); return; }
-                Terminal.print(`Error: no se encontró el destino "${target}".`);
-            },
             whoami: function() { Terminal.print('guest'); },
             hostname: function() { Terminal.print('iLupo-Warehouse-Server'); },
             pwd: function() { Terminal.print(Terminal.currentPath); },
@@ -317,17 +359,6 @@
                     Terminal.print(`Error: la ruta "${path}" no existe.`);
                 }
             },
-            cdf: function(args) {
-                const newPath = args[0] || '/';
-                const targetPath = Terminal.resolvePath(newPath);
-                const node = Terminal.getNodeFromPath(targetPath);
-                if (node && node.type === 'dir') {
-                    Terminal.currentPath = targetPath;
-                } else {
-                    Terminal.print(`Error: el directorio "${newPath}" no existe.`);
-                }
-                Terminal.dom.prompt.innerHTML = `ilupo@warehouse:~${Terminal.currentPath === '/' ? '' : Terminal.currentPath}$&nbsp;`;
-            },
             view: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica la ruta de una imagen.');
                 const path = Terminal.resolvePath(args[0]);
@@ -351,8 +382,15 @@
             },
             date: function() { Terminal.print(new Date().toLocaleString('es-ES')); },
             echo: function(args) { Terminal.print(args.join(' ')); },
-            clear: function() { Terminal.dom.output.innerHTML = ''; },
-            exit: function() { Terminal.toggle(); }
+            clear: function() { Terminal.dom.output.innerHTML = ''; }
+        },
+
+        updatePrompt: function() {
+            if (this.isRootMode) {
+                this.dom.prompt.innerHTML = `root@warehouse:~${this.currentPath === '/' ? '' : this.currentPath}#&nbsp;`;
+            } else {
+                this.dom.prompt.innerHTML = `ilupo@warehouse:~${this.currentPath === '/' ? '' : this.currentPath}$&nbsp;`;
+            }
         },
 
         stripMarkdown: function(text) {
