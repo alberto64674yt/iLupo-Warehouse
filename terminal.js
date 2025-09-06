@@ -247,7 +247,7 @@
         figlet.text(text, { font: 'Standard', horizontalLayout: 'default', verticalLayout: 'default' }, 
         function(err, data) {
             if (err) {
-                Terminal.print('Error al generar el arte ASCII.');
+                Terminal.print('Error al generar el arte ASCII: ' + JSON.stringify(err));
                 return;
             }
             Terminal.print(data, true);
@@ -476,3 +476,4 @@
     };
     window.Terminal = Terminal;
 })();
+
