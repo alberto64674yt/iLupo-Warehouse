@@ -1,4 +1,4 @@
-// Contenido completo, actualizado y definitivo v3.0 para terminal.js
+// Contenido completo, corregido y definitivo v3.1 para terminal.js
 
 (function() {
     const Terminal = {
@@ -8,15 +8,16 @@
         commandHistory: [],
         historyIndex: -1,
         
-        // El sistema de archivos simulado se mantiene para comandos como 'view favicon/logo.svg'
         fileSystem: {
             type: 'dir',
             content: {
                 'favicon': {
                     type: 'dir',
                     content: {
-                        'favicon.ico': { type: 'file' }, 'favicon.svg': { type: 'file' },
-                        'apple-touch-icon.png': { type: 'file' }, 'logo.svg': { type: 'file' }
+                        'favicon.ico': { type: 'file' },
+                        'favicon.svg': { type: 'file' },
+                        'apple-touch-icon.png': { type: 'file' },
+                        'logo.svg': { type: 'file' }
                     }
                 }
             }
@@ -29,12 +30,11 @@
             this.initResizer();
             this.initLightbox();
             
-            // Carga los datos de los proyectos al iniciar
             fetch('proyectos.json')
                 .then(r => r.json())
                 .then(data => {
                     this.projectData = data.items || [];
-                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 3.0]');
+                    this.print('Bienvenido a iLupo Warehouse Shell [Versión 3.1 - Estable]');
                     this.print('Datos de proyectos cargados. Escribe "help" para ver los comandos.');
                 })
                 .catch(() => this.print('Error al cargar proyectos.json. Algunos comandos pueden no funcionar.'));
@@ -43,7 +43,6 @@
         },
 
         createUI: function() {
-            // ... (Esta función no cambia, la incluyo por completitud)
             const container = document.createElement('div');
             container.id = 'terminal-container';
             container.innerHTML = `
@@ -56,24 +55,45 @@
             `;
             document.body.appendChild(container);
             this.dom = {
-                container: container, output: document.getElementById('terminal-output'),
-                input: document.getElementById('terminal-input'), prompt: document.getElementById('terminal-prompt'),
+                container: container,
+                output: document.getElementById('terminal-output'),
+                input: document.getElementById('terminal-input'),
+                prompt: document.getElementById('terminal-prompt'),
                 resizer: document.getElementById('terminal-resizer')
             };
         },
         
         initResizer: function() {
-            // ... (Esta función no cambia)
-            const resizer = this.dom.resizer; const container = this.dom.container; let startY, startHeight;
-            const doDrag = (e) => { let newHeight = startHeight - (e.clientY - startY); if (newHeight < 50) newHeight = 50; if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20; container.style.height = `${newHeight}px`; container.style.maxHeight = 'none'; };
-            const stopDrag = () => { window.removeEventListener('mousemove', doDrag); window.removeEventListener('mouseup', stopDrag); };
-            resizer.addEventListener('mousedown', (e) => { e.preventDefault(); startY = e.clientY; startHeight = container.offsetHeight; window.addEventListener('mousemove', doDrag); window.addEventListener('mouseup', stopDrag); });
+            const resizer = this.dom.resizer;
+            const container = this.dom.container;
+            let startY, startHeight;
+
+            const doDrag = (e) => {
+                let newHeight = startHeight - (e.clientY - startY);
+                if (newHeight < 50) newHeight = 50;
+                if (newHeight > window.innerHeight - 20) newHeight = window.innerHeight - 20;
+                container.style.height = `${newHeight}px`;
+                container.style.maxHeight = 'none';
+            };
+
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                startY = e.clientY;
+                startHeight = container.offsetHeight;
+                window.addEventListener('mousemove', doDrag);
+                window.addEventListener('mouseup', stopDrag);
+            });
         },
 
-        // --- ¡NUEVO! Lógica del Visor de Imágenes (Lightbox) ---
         initLightbox: function() {
             const lightbox = document.createElement('div');
             lightbox.id = 'terminal-lightbox';
+            lightbox.className = 'terminal-lightbox';
             lightbox.style.display = 'none';
             lightbox.innerHTML = `<img id="terminal-lightbox-img" src="">`;
             lightbox.addEventListener('click', () => {
@@ -90,40 +110,64 @@
         },
 
         toggle: function() {
-            // ... (Esta función no cambia)
-            this.isOpen = !this.isOpen; this.dom.container.classList.toggle('visible', this.isOpen);
-            if (this.isOpen) { this.dom.input.focus({ preventScroll: true }); }
+            this.isOpen = !this.isOpen;
+            this.dom.container.classList.toggle('visible', this.isOpen);
+            if (this.isOpen) {
+                this.dom.input.focus({ preventScroll: true });
+            }
         },
         
         attachEventListeners: function() {
-            // ... (Esta función no cambia)
-            this.dom.input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.processCommand(e.target.value); e.target.value = ''; } else if (e.key === 'ArrowUp') { e.preventDefault(); this.navigateHistory('up'); } else if (e.key === 'ArrowDown') { e.preventDefault(); this.navigateHistory('down'); } });
+            this.dom.input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.processCommand(e.target.value);
+                    e.target.value = '';
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.navigateHistory('up');
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.navigateHistory('down');
+                }
+            });
             this.dom.container.addEventListener('click', () => this.dom.input.focus());
         },
 
         processCommand: function(inputValue) {
-            // ... (Esta función no cambia)
-            if (!inputValue.trim()) { this.print(`${this.dom.prompt.innerHTML}`); return; }
+            if (!inputValue.trim()) {
+                this.print(`${this.dom.prompt.innerHTML}`);
+                return;
+            }
             this.print(`${this.dom.prompt.innerHTML}${inputValue.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`);
-            this.commandHistory.unshift(inputValue); this.historyIndex = -1;
+            this.commandHistory.unshift(inputValue);
+            this.historyIndex = -1;
             const [command, ...args] = inputValue.trim().split(/\s+/);
-            if (this.commands[command]) { this.commands[command](args); }
-            else { this.print(`Error: comando no encontrado "${command}".`); }
+            if (this.commands[command]) {
+                this.commands[command](args);
+            } else {
+                this.print(`Error: comando no encontrado "${command}".`);
+            }
             this.dom.output.scrollTop = this.dom.output.scrollHeight;
         },
 
         print: function(message) {
-            // ... (Esta función no cambia)
-            const line = document.createElement('div'); line.innerHTML = message.replace(/ /g, '&nbsp;'); this.dom.output.appendChild(line);
+            const line = document.createElement('div');
+            line.innerHTML = message.replace(/ /g, '&nbsp;');
+            this.dom.output.appendChild(line);
         },
 
         navigateHistory: function(direction) {
-            // ... (Esta función no cambia)
-            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; } else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; } else if (direction === 'down' && this.historyIndex <= 0) { this.historyIndex = -1; this.dom.input.value = ''; return; }
+            if (direction === 'up' && this.historyIndex < this.commandHistory.length - 1) { this.historyIndex++; }
+            else if (direction === 'down' && this.historyIndex > 0) { this.historyIndex--; }
+            else if (direction === 'down' && this.historyIndex <= 0) {
+                this.historyIndex = -1;
+                this.dom.input.value = '';
+                return;
+            }
             this.dom.input.value = this.commandHistory[this.historyIndex] || '';
         },
         
-        // --- ¡ACTUALIZADO! Objeto de Comandos ---
         commands: {
             help: function() {
                 Terminal.print('--- Comandos de Navegación de Contenido ---');
@@ -141,57 +185,122 @@
                 Terminal.print('**exit**: Cierra el terminal.');
             },
             ls: function() {
-                if (Terminal.projectData.length === 0) return Terminal.print('No hay proyectos cargados.');
+                if (Terminal.projectData.length === 0) return Terminal.print('No hay proyectos cargados o encontrados.');
                 Terminal.print('--- Proyectos Disponibles (IDs) ---');
                 Terminal.projectData.forEach(p => Terminal.print(p.id));
             },
             read: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica el ID de un proyecto.');
-                const project = Terminal.projectData.find(p => p.id === args[0]);
-                if (!project) return Terminal.print(`Error: no se encontró el proyecto con ID "${args[0]}".`);
-                Terminal.print(`\n--- ${project.titulo} ---`);
+                const projectId = args.join(' ');
+                const project = Terminal.projectData.find(p => p.id === projectId);
+                if (!project) return Terminal.print(`Error: no se encontró el proyecto con ID "${projectId}".`);
+                Terminal.print(`\n<span style="color: var(--primary-color);">--- ${project.titulo} ---</span>`);
                 Terminal.print(`**Resumen:** ${Terminal.stripMarkdown(project.resumen)}`);
-                Terminal.print(`**Contenido:**\n${Terminal.stripMarkdown(project.contenido_completo).replace(/\n/g, '<br>')}`);
+                Terminal.print(`**Contenido:**`);
+                Terminal.print(Terminal.stripMarkdown(project.contenido_completo).replace(/\n/g, '<br>'));
                 Terminal.print('--------------------');
             },
             open: function(args) {
-                if (!args.length) return Terminal.print('Error: especifica el ID de un proyecto.');
-                if (args[0] === 'panel.html') return Terminal.print('**ACCESO DENEGADO**');
-                const project = Terminal.projectData.find(p => p.id === args[0]);
-                if (!project) return Terminal.print(`Error: no se encontró el proyecto con ID "${args[0]}".`);
-                window.open(`proyecto.html?id=${args[0]}`, '_blank');
+                if (!args.length) return Terminal.print('Error: especifica el ID de un proyecto o URL.');
+                const target = args[0];
+                if (target === 'panel.html') return Terminal.print('<span style="color: var(--danger-color);">**ACCESO DENEGADO**</span>');
+                
+                const project = Terminal.projectData.find(p => p.id === target);
+                if (!project) return Terminal.print(`Error: no se encontró el proyecto con ID "${target}".`);
+                
+                window.open(`proyecto.html?id=${target}`, '_blank');
             },
-            about: function() { /* ... (no cambia) ... */ },
-            lsf: function(args) { Terminal.commands.ls(args); }, // ls-file es un alias para ls
-            cdf: function(args) { Terminal.commands.cd(args); }, // cd-file es un alias para cd
+            about: function() {
+                fetch('info.json').then(r => r.json()).then(data => Terminal.print(Terminal.stripMarkdown(data.contenido).replace(/\n/g, '<br>'))).catch(() => Terminal.print('Error al cargar info.json.'));
+            },
+            lsf: function(args) {
+                const path = args[0] ? Terminal.resolvePath(args[0]) : Terminal.currentPath;
+                const node = Terminal.getNodeFromPath(path);
+                if (node && node.type === 'dir') {
+                    Object.keys(node.content).forEach(key => {
+                        Terminal.print(node.content[key].type === 'dir' ? `&lt;DIR&gt; ${key}` : `      ${key}`);
+                    });
+                } else if (node && node.type === 'file') {
+                    Terminal.print(`Error: "${path}" es un archivo, no un directorio.`);
+                } else {
+                    Terminal.print(`Error: la ruta "${path}" no existe.`);
+                }
+            },
+            cdf: function(args) {
+                const newPath = args[0] || '/';
+                const targetPath = Terminal.resolvePath(newPath);
+                const node = Terminal.getNodeFromPath(targetPath);
+                if (node && node.type === 'dir') {
+                    Terminal.currentPath = targetPath;
+                } else {
+                    Terminal.print(`Error: el directorio "${newPath}" no existe.`);
+                }
+                Terminal.dom.prompt.innerHTML = `ilupo@warehouse:~${Terminal.currentPath === '/' ? '' : Terminal.currentPath}$&nbsp;`;
+            },
             view: function(args) {
                 if (!args.length) return Terminal.print('Error: especifica la ruta de una imagen.');
                 const path = Terminal.resolvePath(args[0]);
                 const node = Terminal.getNodeFromPath(path);
                 if (node && node.type === 'file') {
-                    // Asumimos que la ruta es correcta y coincide con el servidor
                     Terminal.showLightbox(path);
                 } else {
                     Terminal.print(`Error: el archivo de imagen "${args[0]}" no existe en el sistema simulado.`);
                 }
             },
-            exec: function(args) { /* ... (no cambia) ... */ },
-            clear: function() { /* ... (no cambia) ... */ },
-            exit: function() { /* ... (no cambia) ... */ }
+            exec: function(args) {
+                if (!args.length) return Terminal.print('Error: especifica qué Easter egg ejecutar (ej: wolf_howl).');
+                const eggName = args[0];
+                if (window.easterEggFunctions && typeof window.easterEggFunctions[eggName] === 'function') {
+                    Terminal.print(`Ejecutando ${eggName}...`);
+                    window.easterEggFunctions[eggName]();
+                } else {
+                    Terminal.print(`Error: Easter egg "${eggName}" no encontrado.`);
+                }
+            },
+            date: function() { Terminal.print(new Date().toLocaleString('es-ES')); },
+            echo: function(args) { Terminal.print(args.join(' ')); },
+            clear: function() { Terminal.dom.output.innerHTML = ''; },
+            exit: function() { Terminal.toggle(); }
         },
 
-        // Función para limpiar Markdown a texto plano
         stripMarkdown: function(text) {
             let cleanText = text || '';
-            cleanText = cleanText.replace(/###\s/g, '\n').replace(/##\s/g, '\n'); // Encabezados
-            cleanText = cleanText.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); // Enlaces
-            cleanText = cleanText.replace(/!\[[^\]]*\]\([^\)]+\)/g, '[IMAGEN]'); // Imágenes
-            cleanText = cleanText.replace(/[*_~`]/g, ''); // Formato
-            return cleanText;
+            cleanText = cleanText.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+            cleanText = cleanText.replace(/!\[[^\]]*\]\([^\)]+\)/g, '[IMAGEN]');
+            cleanText = clean-text.replace(/\[(nota|aviso|info|spoiler:[^\]]+|tabs|tab:[^\]]+)\]/g, '').replace(/\[\/(nota|aviso|info|spoiler|tabs|tab)\]/g, '');
+            cleanText = cleanText.replace(/(\*\*|__)(.*?)\1/g, '$2');
+            cleanText = cleanText.replace(/([*_~`])/g, '');
+            cleanText = cleanText.replace(/^(#+\s*)/gm, '');
+            cleanText = cleanText.replace(/^>\s*/gm, '');
+            cleanText = cleanText.replace(/^-\s*/gm, '* ');
+            cleanText = cleanText.replace(/^\d+\.\s*/gm, (match) => `${match.trim()} `);
+            return cleanText.trim();
         },
 
-        getNodeFromPath: function(path) { /* ... (no cambia) ... */ },
-        resolvePath: function(path) { /* ... (no cambia) ... */ }
+        getNodeFromPath: function(path) {
+            const parts = path.split('/').filter(p => p);
+            let currentNode = this.fileSystem;
+            for (const part of parts) {
+                if (currentNode && currentNode.type === 'dir' && currentNode.content && currentNode.content[part]) {
+                    currentNode = currentNode.content[part];
+                } else { return null; }
+            }
+            return currentNode;
+        },
+
+        resolvePath: function(path) {
+            if (path === '..') {
+                const parts = this.currentPath.split('/').filter(p => p);
+                parts.pop();
+                return '/' + parts.join('/');
+            }
+            if (path.startsWith('/')) return path;
+            const currentParts = this.currentPath.split('/').filter(p => p);
+            path.split('/').forEach(part => {
+                if (part !== '.' && part !== '') currentParts.push(part);
+            });
+            return '/' + currentParts.join('/');
+        }
     };
     window.Terminal = Terminal;
 })();
