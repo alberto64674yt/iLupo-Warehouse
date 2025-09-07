@@ -79,8 +79,7 @@
     <div id="daily-summary-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 id="summary-title">Resumen del Día X</h3>
-            <div id="summary-content">
-                </div>
+            <div id="summary-content"></div>
             <button class="close-modal-button">Continuar</button>
         </div>
     </div>
@@ -133,9 +132,42 @@
         </div>
     </div>
     
-    <div id="new-project-modal" class="modal-overlay hidden"> </div>
-    <div id="debug-minigame-overlay" class="modal-overlay hidden"> </div>
-    <div id="video-seo-minigame-overlay" class="modal-overlay hidden"> </div>
+    <div id="new-project-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Iniciar Nuevo Proyecto</h3>
+            <div id="project-creation-options"></div>
+            <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
+            <div>
+                <button id="confirm-new-project-button">Empezar Desarrollo</button>
+                <button class="close-modal-button">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="debug-minigame-overlay" class="modal-overlay hidden">
+        <div class="minigame-container">
+            <h3><i class="fas fa-bug"></i> ¡A Depurar!</h3>
+            <div class="minigame-hud">
+                <span>Bugs restantes: <span id="debug-bugs-left">0</span></span>
+                <span>Tiempo: <span id="debug-timer">0s</span></span>
+            </div>
+            <div id="debug-play-area"></div>
+            <button id="start-debug-button">Empezar a Depurar</button>
+        </div>
+    </div>
+    
+    <div id="video-seo-minigame-overlay" class="modal-overlay hidden">
+        <div class="minigame-container">
+            <h3><i class="fas fa-chart-line"></i> Optimización SEO</h3>
+            <p>Selecciona las <strong>5 etiquetas correctas</strong> antes de que se acabe el tiempo.</p>
+            <div class="minigame-hud">
+                <span>Puntuación: <span id="seo-score">0 / 5</span></span>
+                <span>Tiempo: <span id="seo-timer">15s</span></span>
+            </div>
+            <div id="seo-tags-container"></div>
+             <button id="finish-seo-button" class="hidden">Finalizar Vídeo</button>
+        </div>
+    </div>
 
     <a href="../index.html" class="back-to-portfolio-link">← Volver al Portfolio</a>
     <div id="notification-container"></div>
