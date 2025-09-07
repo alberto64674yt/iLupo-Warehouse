@@ -1,10 +1,6 @@
 // =================================================================================
-//  DATA.JS - v4.0 - Rebalance de Energía, Economía y Tienda.
+//  DATA.JS - v4.2 - Balance Final y Corrección de Ítem
 // =================================================================================
-
-// -----------------------------------------------------------------------------
-//  1. ESTADO INICIAL Y VARIABLES GLOBALES
-// -----------------------------------------------------------------------------
 
 const initialGameState = {
     money: 500,
@@ -23,7 +19,7 @@ const initialGameState = {
     shopUpgrades: [],
     maxProjectsPerDay: 1,
     hardwareTimeReduction: 0,
-    rentCost: 150, // Aumentado para que sea una amenaza inicial
+    rentCost: 150,
     lastRentDay: 1,
     appMonetization: 1,
     postMonetization: 1,
@@ -34,16 +30,10 @@ const initialGameState = {
     }
 };
 
-// Se declaran aquí para ser accesibles globalmente por los demás scripts
 let gameState = {};
 let gameTickInterval = null;
 let minigameInterval = null;
 let selectedProjectType = null;
-
-
-// -----------------------------------------------------------------------------
-//  2. REFERENCIAS AL DOM
-// -----------------------------------------------------------------------------
 
 const dom = {
     mainMenu: document.getElementById('main-menu'),
@@ -89,29 +79,25 @@ const dom = {
     importFileInput: document.getElementById('import-file-input'),
 };
 
-// -----------------------------------------------------------------------------
-//  3. DATOS DEL JUEGO (PROYECTOS, TIENDA, TENDENCIAS, EVENTOS)
-// -----------------------------------------------------------------------------
-
 const gameData = {
     projectTypes: {
         'Utilidad': {
             icon: 'fa-wrench',
             baseCost: 50,
             baseTime: 120,
-            baseIncome: 4 // Nerfeado de 10
+            baseIncome: 4
         },
         'Juego Arcade': {
             icon: 'fa-gamepad',
             baseCost: 100,
             baseTime: 180,
-            baseIncome: 8 // Nerfeado de 20
+            baseIncome: 8
         },
         'Mod': {
             icon: 'fa-puzzle-piece',
             baseCost: 25,
             baseTime: 90,
-            baseIncome: 2 // Nerfeado de 5
+            baseIncome: 2
         }
     },
     shopItems: {
@@ -147,7 +133,7 @@ const gameData = {
             id: 'ps1',
             name: 'Monetizar Apps',
             desc: 'Tus proyectos generan un 25% más de ingresos.',
-            cost: 800, // Aumentado
+            cost: 800,
             effect: {
                 type: 'appMonetization',
                 value: 1.25
@@ -156,7 +142,7 @@ const gameData = {
             id: 'ps2',
             name: 'Monetizar Posts',
             desc: 'Tus vídeos/posts generan un 25% más de seguidores.',
-            cost: 800, // Aumentado
+            cost: 800,
             effect: {
                 type: 'postMonetization',
                 value: 1.25
@@ -165,20 +151,22 @@ const gameData = {
             id: 'ps3',
             name: 'Curso Productividad I',
             desc: 'Permite gestionar 2 proyectos/día y aumenta la Energía Máxima a 200.',
-            cost: 4000, // Aumentado significativamente
+            cost: 4000,
             effect: {
                 type: 'maxProjectsPerDay',
                 value: 1,
                 energy: 200
             }
         }, {
-            id: 'ps4',
-            name: 'Silla Ergonómica',
-            desc: '+25 Energía Máxima. Útil si quieres reintentar minijuegos.',
-            cost: 1000, // Aumentado
+            id: 'ps5',
+            name: 'Curso Productividad II',
+            desc: 'Permite gestionar 3 proyectos/día y aumenta la Energía Máxima a 300.',
+            cost: 8000,
+            requires: 'ps3',
             effect: {
-                type: 'maxEnergy',
-                value: 25
+                type: 'maxProjectsPerDay',
+                value: 1,
+                energy: 300
             }
         }, ]
     },
@@ -245,7 +233,6 @@ const gameData = {
             }
         }]
     },
-    // Nuevas constantes de balance
     energyCosts: {
         debug: 50,
         video: 40,
