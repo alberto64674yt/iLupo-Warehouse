@@ -1,4 +1,4 @@
-// Contenido 100% completo, con menú principal y correcciones v1.1 para juego.js
+// Contenido 100% completo, con correcciones de botones y menú v1.2 para juego.js
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -16,33 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameState = {};
 
     const dom = {
-        // Contenedores principales
         mainMenu: document.getElementById('main-menu'),
         gameContainer: document.getElementById('game-container'),
-        // Botones del menú principal
         newGameBtn: document.getElementById('new-game-button'),
         continueBtn: document.getElementById('continue-button'),
         helpBtn: document.getElementById('help-button'),
-        // Elementos de la UI del juego
         money: document.getElementById('money-display'),
         followers: document.getElementById('followers-display'),
         energy: document.getElementById('energy-display'),
         date: document.getElementById('date-text'),
         nextDayBtn: document.getElementById('next-day-button'),
-        mainView: document.getElementById('main-view'),
-        devPanel: document.getElementById('dev-panel'),
-        shopPanel: document.getElementById('shop-panel'),
-        newsPanel: document.getElementById('news-content'),
         navButtons: document.querySelectorAll('.nav-button'),
         newProjectBtn: document.getElementById('new-project-button'),
         projectListContainer: document.getElementById('project-list-container'),
-        // Modales
         helpModal: document.getElementById('help-modal'),
         newProjectModal: document.getElementById('new-project-modal'),
         confirmNewProjectBtn: document.getElementById('confirm-new-project-button'),
         newProjectNameInput: document.getElementById('new-project-name-input'),
         projectCreationOptions: document.getElementById('project-creation-options'),
-        // Guardado
         exportSaveBtn: document.getElementById('export-save-button'),
         importSaveBtn: document.getElementById('import-save-button'),
         importFileInput: document.getElementById('import-file-input')
@@ -70,23 +61,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
 
     function initializeApp() {
+        attachAllEventListeners(); // Llamada única para todos los listeners
         if (localStorage.getItem('iLupoDevTycoonSave')) {
             dom.continueBtn.disabled = false;
         } else {
             dom.continueBtn.disabled = true;
         }
-        attachMenuEventListeners();
     }
 
     function startGame(saveData = null) {
         gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
-        
         dom.mainMenu.classList.add('hidden');
         dom.gameContainer.classList.remove('hidden');
-        
         generateNewTrend();
         updateUI();
-        attachGameEventListeners();
     }
 
     function updateUI() {
@@ -103,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         generateNewTrend();
         updateUI();
         saveGame();
-        console.log("Nuevo día. Partida guardada.");
     }
 
     function generateNewTrend() {
@@ -114,11 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rand <= cumulativeProb) {
                 const bonus = Math.floor(Math.random() * (trendTier.bonusRange[1] - trendTier.bonusRange[0] + 1)) + trendTier.bonusRange[0];
                 const categoryName = Object.keys(gameData.projectTypes)[Math.floor(Math.random() * Object.keys(gameData.projectTypes).length)];
-                gameState.currentTrend = {
-                    name: trendTier.messages[0].replace('{category}', categoryName),
-                    bonus: bonus,
-                    category: categoryName
-                };
+                gameState.currentTrend = { name: trendTier.messages[0].replace('{category}', categoryName), bonus: bonus, category: categoryName };
                 return;
             }
         }
@@ -132,14 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const encodedSave = btoa(JSON.stringify(gameState));
             localStorage.setItem('iLupoDevTycoonSave', encodedSave);
+            console.log("Partida guardada.");
         } catch (e) {
             console.error("Error al guardar la partida:", e);
         }
     }
 
-    function loadGame() {
-        return localStorage.getItem('iLupoDevTycoonSave');
-    }
+    function loadGame() { return localStorage.getItem('iLupoDevTycoonSave'); }
 
     function exportSave() {
         const saveData = loadGame();
@@ -155,9 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function importSave() {
-        dom.importFileInput.click();
-    }
+    function importSave() { dom.importFileInput.click(); }
     
     function handleFileImport(event) {
         const file = event.target.files[0];
@@ -165,9 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    // Validar que el contenido parece una partida guardada
                     const content = e.target.result;
-                    JSON.parse(atob(content)); // Si esto no falla, el formato es correcto
+                    JSON.parse(atob(content));
                     localStorage.setItem('iLupoDevTycoonSave', content);
                     alert("Partida importada con éxito. El juego se reiniciará.");
                     window.location.reload();
@@ -183,67 +162,53 @@ document.addEventListener('DOMContentLoaded', () => {
     //  4. MANEJO DE EVENTOS Y LÓGICA DE LA UI
     // -----------------------------------------------------------------------------
     
-    function attachMenuEventListeners() {
+    function attachAllEventListeners() {
+        // --- LISTENERS DEL MENÚ PRINCIPAL ---
         dom.newGameBtn.addEventListener('click', () => {
-            if (loadGame()) {
-                if (confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) {
-                    localStorage.removeItem('iLupoDevTycoonSave');
-                    startGame();
-                }
-            } else {
-                startGame();
+            if (loadGame() && !confirm("¿Seguro? Se borrará tu progreso actual.")) {
+                return;
             }
+            localStorage.removeItem('iLupoDevTycoonSave');
+            startGame();
         });
-
         dom.continueBtn.addEventListener('click', () => {
             const saveData = loadGame();
-            if (saveData) {
-                startGame(saveData);
-            }
+            if (saveData) startGame(saveData);
         });
-        
         dom.helpBtn.addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
         dom.exportSaveBtn.addEventListener('click', exportSave);
         dom.importSaveBtn.addEventListener('click', importSave);
         dom.importFileInput.addEventListener('change', handleFileImport);
         
-        // Cerrar modales
+        // --- LISTENERS DEL JUEGO ---
+        dom.nextDayBtn.addEventListener('click', nextDay);
+        dom.navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetViewId = button.dataset.view;
+                document.querySelectorAll('.view-panel').forEach(panel => panel.classList.toggle('active', panel.id === targetViewId));
+                dom.navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === targetViewId));
+            });
+        });
+        dom.newProjectBtn.addEventListener('click', openNewProjectModal);
+        
+        // --- LISTENERS DE MODALES ---
+        dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
         document.querySelectorAll('.close-modal-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 btn.closest('.modal-overlay').classList.add('hidden');
             });
         });
     }
-
-    function attachGameEventListeners() {
-        dom.nextDayBtn.addEventListener('click', nextDay);
-        
-        dom.navButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const targetViewId = button.dataset.view;
-                document.querySelectorAll('.view-panel').forEach(panel => {
-                    panel.classList.toggle('active', panel.id === targetViewId);
-                });
-                dom.navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === targetViewId);});
-            });
-        });
-        
-        dom.newProjectBtn.addEventListener('click', openNewProjectModal);
-        dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
-    }
     
     function openNewProjectModal() {
         selectedProjectType = null;
         dom.newProjectNameInput.value = '';
-        
         let optionsHtml = '<h4>Elige un tipo de proyecto:</h4>';
         Object.keys(gameData.projectTypes).forEach(type => {
             optionsHtml += `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type}</button>`;
         });
         dom.projectCreationOptions.innerHTML = optionsHtml;
-        
         dom.newProjectModal.classList.remove('hidden');
-        
         document.querySelectorAll('.project-type-choice').forEach(button => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('.project-type-choice').forEach(btn => btn.classList.remove('active'));
@@ -263,12 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Debes darle un nombre a tu proyecto.");
             return;
         }
-        
-        // Aquí iría la lógica para crear el objeto del proyecto y añadirlo a gameState.activeProjects
         console.log(`Creando proyecto: "${name}" del tipo "${selectedProjectType}"`);
-        
         dom.newProjectModal.classList.add('hidden');
-        // A continuación, se abriría el minijuego de debug, etc.
     }
 
     // -----------------------------------------------------------------------------
