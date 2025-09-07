@@ -1,6 +1,10 @@
 // =================================================================================
-//  DATA.JS - v4.2 - Balance Final y Corrección de Ítem
+//  DATA.JS - v5.0 - Añadidos datos de Habilidades y Cursos
 // =================================================================================
+
+// -----------------------------------------------------------------------------
+//  1. ESTADO INICIAL Y VARIABLES GLOBALES
+// -----------------------------------------------------------------------------
 
 const initialGameState = {
     money: 500,
@@ -9,12 +13,14 @@ const initialGameState = {
     maxEnergy: 100,
     day: 1,
     skills: {
-        programming: 5,
-        design: 5,
-        marketing: 5
+        programming: { level: 1, xp: 0 },
+        design: { level: 1, xp: 0 },
+        marketing: { level: 1, xp: 0 }
     },
     activeProject: null,
+    activeCourse: null, // Para saber si hay un curso en progreso
     completedProjects: [],
+    completedCourses: [], // Para saber qué cursos hemos completado
     completedProjectsToday: [],
     shopUpgrades: [],
     maxProjectsPerDay: 1,
@@ -35,6 +41,11 @@ let gameTickInterval = null;
 let minigameInterval = null;
 let selectedProjectType = null;
 
+
+// -----------------------------------------------------------------------------
+//  2. REFERENCIAS AL DOM
+// -----------------------------------------------------------------------------
+
 const dom = {
     mainMenu: document.getElementById('main-menu'),
     gameContainer: document.getElementById('game-container'),
@@ -48,9 +59,12 @@ const dom = {
     nextDayBtn: document.getElementById('next-day-button'),
     navButtons: document.querySelectorAll('.nav-button'),
     activeProjectSlot: document.getElementById('active-project-slot'),
+    skillsPanel: document.getElementById('skills-panel'),
     completedProjectsList: document.getElementById('completed-projects-list'),
     shopHardware: document.getElementById('shop-hardware'),
     shopPersonal: document.getElementById('shop-personal'),
+    coursesContainer: document.getElementById('courses-container'),
+    activeCourseContainer: document.getElementById('active-course-container'),
     newsContent: document.getElementById('news-content'),
     notificationContainer: document.getElementById('notification-container'),
     newProjectModal: document.getElementById('new-project-modal'),
@@ -79,7 +93,31 @@ const dom = {
     importFileInput: document.getElementById('import-file-input'),
 };
 
+// -----------------------------------------------------------------------------
+//  3. DATOS DEL JUEGO
+// -----------------------------------------------------------------------------
+
 const gameData = {
+    skillData: {
+        xpCurve: [0, 100, 250, 500, 1000, 1750, 2500, 5000] 
+    },
+    courses: {
+        programming: [
+            { id: 'prog1', name: 'Programación I: Fundamentos', desc: 'Conceptos básicos de la programación.', cost: 200, duration: 1, xp: 50 },
+            { id: 'prog2', name: 'Programación II: Algoritmia', desc: 'Optimiza tu código y resuelve problemas complejos.', cost: 600, duration: 2, xp: 120, requires: 'prog1' },
+            { id: 'prog3', name: 'Programación III: Arquitectura', desc: 'Diseña software robusto y escalable.', cost: 1500, duration: 3, xp: 250, requires: 'prog2' },
+        ],
+        design: [
+            { id: 'design1', name: 'Diseño I: Teoría del Color', desc: 'Aprende a combinar colores de forma efectiva.', cost: 200, duration: 1, xp: 50 },
+            { id: 'design2', name: 'Diseño II: Experiencia de Usuario', desc: 'Crea interfaces intuitivas y atractivas.', cost: 600, duration: 2, xp: 120, requires: 'design1' },
+            { id: 'design3', name: 'Diseño III: Animación', desc: 'Dota de vida a tus creaciones con movimiento.', cost: 1500, duration: 3, xp: 250, requires: 'design2' },
+        ],
+        marketing: [
+            { id: 'mkt1', name: 'Marketing I: Redes Sociales', desc: 'Promociona tus proyectos en las principales plataformas.', cost: 350, duration: 1, xp: 50 },
+            { id: 'mkt2', name: 'Marketing II: SEO y Contenido', desc: 'Atrae público de forma orgánica a tus webs.', cost: 800, duration: 2, xp: 120, requires: 'mkt1' },
+            { id: 'mkt3', name: 'Marketing III: Campañas Virales', desc: 'Aprende las claves para que tu contenido explote.', cost: 2000, duration: 3, xp: 250, requires: 'mkt2' },
+        ]
+    },
     projectTypes: {
         'Utilidad': {
             icon: 'fa-wrench',
