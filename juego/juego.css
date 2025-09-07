@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v5.0 - Estilos para el Sistema de Habilidades */
+/* Contenido 100% completo y funcional, v5.1 - Corrección de estilos del Modal de Ayuda */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -157,3 +157,16 @@ button.close-modal-button { background-color: var(--primary-color); color: var(-
 .back-to-portfolio-link:hover { background-color: var(--primary-color); color: var(--dark-bg); box-shadow: 0 0 10px var(--primary-color-trans); }
 #save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .hidden { display: none !important; }
+
+/* --- INICIO DE LA CORRECCIÓN: Modal de Ayuda --- */
+.help-container { text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 1rem; }
+.help-section { margin-bottom: 2rem; }
+.help-section h4 { color: var(--primary-color); display: flex; align-items: center; gap: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+.help-section p { line-height: 1.6; }
+.help-section ol, .help-section ul { padding-left: 1.5rem; line-height: 1.7; }
+.help-section ul { list-style: none; padding-left: 0; }
+.help-section ul li { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+.help-section ul li span { flex-shrink: 0; width: 220px; font-weight: bold; display: flex; align-items: center; }
+.help-section ul li span i { font-size: 1.2rem; margin-right: 0.8rem; width: 25px; text-align: center; }
+.help-section ul li div { flex-grow: 1; }
+/* --- FIN DE LA CORRECCIÓN --- */
