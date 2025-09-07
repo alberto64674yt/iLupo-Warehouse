@@ -1,4 +1,4 @@
-/* Contenido 100% completo, v1.4 - Estilos para el Núcleo Jugable */
+/* Contenido 100% completo, v2.0 - Estilos para la Mega Update */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -30,80 +30,20 @@ body {
     padding: 2rem;
 }
 
-#main-menu h1 {
-    font-size: 3.5rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
+#main-menu h1 { font-size: 3.5rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+#main-menu .game-subtitle { font-size: 1.25rem; color: var(--light-text); margin-bottom: 3rem; }
+.menu-buttons { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; }
+.menu-buttons button { padding: 1rem; font-family: inherit; font-size: 1.2rem; font-weight: bold; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; }
+.menu-buttons button#new-game-button { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
+.menu-buttons button#continue-button { background-color: var(--success-color); color: white; border-color: var(--success-color); }
+.menu-buttons button#help-button { background-color: var(--edit-color); color: white; border-color: var(--edit-color); }
+.menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; }
 
-#main-menu .game-subtitle {
-    font-size: 1.25rem;
-    color: var(--light-text);
-    margin-bottom: 3rem;
-}
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    max-width: 300px;
-}
-
-.menu-buttons button {
-    padding: 1rem;
-    font-family: inherit;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.menu-buttons button#new-game-button {
-    background-color: var(--primary-color);
-    color: var(--dark-bg);
-    border-color: var(--primary-color);
-}
-
-.menu-buttons button#continue-button {
-    background-color: var(--success-color);
-    color: white;
-    border-color: var(--success-color);
-}
-
-.menu-buttons button#help-button {
-    background-color: var(--edit-color);
-    color: white;
-    border-color: var(--edit-color);
-}
-
-.menu-buttons button:disabled {
-    background-color: var(--surface-color);
-    color: var(--light-text);
-    border-color: var(--border-color);
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* --- Contenedor del Juego (Oculto al inicio) --- */
-#game-container {
-    display: flex;
-    flex-direction: column;
-}
+/* --- Contenedor del Juego --- */
+#game-container { display: flex; flex-direction: column; }
 
 /* --- Barra Superior de Recursos --- */
-#game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: var(--surface-color);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
+#game-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
 .resource-display { display: flex; gap: 2rem; font-size: 1.2rem; font-weight: 500; }
 .resource-item i { color: var(--primary-color); margin-right: 0.5rem; }
 .date-display { display: flex; align-items: center; gap: 1rem; }
@@ -117,54 +57,67 @@ body {
 .view-panel.active { display: flex; }
 .view-panel h2 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
 
-/* --- Estilos de las Tarjetas de Proyecto --- */
-.no-projects-message { text-align: center; color: var(--light-text); padding: 2rem; font-style: italic; }
-#project-list-container { display: flex; flex-direction: column; gap: 1.5rem; }
-
-.project-card {
-    background-color: var(--dark-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.2rem;
+/* --- Panel de Desarrollo (Rediseñado) --- */
+#active-project-slot .no-active-project {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    height: 100%;
 }
-
+#new-project-button-main { padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold; background-color: var(--primary-color); color: var(--dark-bg); border: none; border-radius: 8px; cursor: pointer; }
+.active-project-card { display: flex; flex-direction: column; gap: 1rem; background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; }
 .project-card-header { display: flex; justify-content: space-between; align-items: center; }
-.project-title { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
+.project-title { font-size: 1.3rem; font-weight: bold; }
 .project-title i { margin-right: 0.8rem; color: var(--primary-color); }
-
-.project-stage {
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: capitalize;
-}
-.project-stage.dev { background-color: var(--primary-color); color: var(--dark-bg); }
+.project-stage { padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold; text-transform: capitalize; }
+.project-stage.development { background-color: var(--primary-color); color: var(--dark-bg); }
+.project-stage.debugging { background-color: var(--danger-color); color: white; }
 .project-stage.video { background-color: var(--edit-color); color: white; }
 .project-stage.post { background-color: var(--success-color); color: white; }
-
-.project-card-body { display: flex; flex-direction: column; gap: 0.8rem; }
-
-.progress-bar-container { width: 100%; height: 24px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; position: relative; overflow: hidden; }
-.progress-bar { height: 100%; background-color: var(--primary-color); border-radius: 3px; transition: width 0.3s ease-in-out; }
-.progress-bar-container span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 0.9rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
-
-.project-stat { font-size: 1rem; color: var(--light-text); }
-.project-stat .stat-value { font-weight: bold; }
-.project-stat .stat-value.error { color: var(--danger-color); }
-.project-stat .stat-value.info { color: var(--edit-color); }
-.project-stat .stat-value.success { color: var(--success-color); }
-
-.project-card-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
-.action-button { padding: 0.6rem 1.2rem; font-family: inherit; font-size: 0.9rem; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
-.action-button:hover { transform: scale(1.05); filter: brightness(1.1); }
-.action-button.develop-button { background-color: var(--primary-color); color: var(--dark-bg); }
+.project-stat-row { display: flex; justify-content: space-between; font-size: 1rem; color: var(--light-text); }
+.progress-bar-container { width: 100%; height: 28px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 4px; position: relative; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-color), #8e44ad); transition: width 0.1s linear; }
+.progress-bar-container span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
+.project-card-body .action-button { width: 100%; padding: 1rem; font-size: 1.1rem; }
+.action-button { padding: 0.6rem 1.2rem; font-family: inherit; font-size: 0.9rem; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.action-button:hover { transform: scale(1.02); filter: brightness(1.1); }
 .action-button.debug-button { background-color: var(--danger-color); color: white; }
 .action-button.video-button { background-color: var(--edit-color); color: white; }
 .action-button.publish-button { background-color: var(--success-color); color: white; }
+#completed-projects-container h3 { margin-top: 2rem; }
+#completed-projects-list { list-style: none; padding-left: 0; color: var(--light-text); }
+#completed-projects-list li i { margin-right: 0.5rem; color: var(--primary-color); }
+
+/* --- Estilos de la Tienda --- */
+.shop-category { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+.shop-item { background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; }
+.item-name { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
+.item-desc { color: var(--light-text); flex-grow: 1; }
+.item-buy { display: flex; justify-content: space-between; align-items: center; }
+.item-cost { font-weight: bold; font-size: 1.1rem; }
+.buy-button { background-color: var(--success-color); color: white; font-weight: bold; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+.shop-item.owned { background-color: var(--surface-color); border-color: var(--success-color); }
+.shop-item.owned .buy-button { background-color: #555; cursor: not-allowed; }
+
+/* --- Estilos de los Minijuegos --- */
+.minigame-container { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; text-align: center; }
+.minigame-container h3 { margin-top: 0; color: var(--primary-color); font-size: 1.8rem; }
+.minigame-hud { display: flex; justify-content: space-around; background-color: var(--surface-color); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 1.2rem; font-weight: bold; }
+/* Minijuego de Depuración */
+#debug-play-area { width: 100%; height: 300px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; position: relative; overflow: hidden; }
+.bug { position: absolute; color: var(--danger-color); font-size: 2rem; cursor: pointer; transition: transform 0.2s ease; animation: wiggle 1s infinite; }
+.bug:hover { transform: scale(1.2); }
+@keyframes wiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+/* Minijuego de SEO */
+#seo-tags-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0; }
+.seo-tag { padding: 0.8rem 1.2rem; background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--light-text); font-family: inherit; font-size: 1rem; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+.seo-tag:hover:not(:disabled) { background-color: var(--primary-color); color: var(--dark-bg); }
+.seo-tag.correct { background-color: var(--success-color); color: white; }
+.seo-tag.incorrect { background-color: var(--danger-color); color: white; }
+.seo-tag:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* --- Panel de Noticias (Lateral) --- */
 #news-panel { width: 300px; flex-shrink: 0; background-color: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); }
@@ -178,54 +131,26 @@ body {
 .nav-button.active, .nav-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); transform: translateY(-2px); }
 .nav-button i { margin-right: 0.5rem; }
 
-/* --- Estilos para Ventanas Modales --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; transition: opacity 0.3s ease, visibility 0.3s; }
-.modal-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; }
-.modal-content h3 { margin-top: 0; color: var(--primary-color); font-size: 1.8rem; }
-.modal-content input[type="text"] { width: 100%; padding: 12px; margin: 1rem 0; box-sizing: border-box; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: inherit; font-size: 1.1rem; }
-.modal-content button { padding: 0.8rem 1.5rem; margin: 0.5rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
-
-#project-creation-options { margin: 1.5rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-.project-type-choice { background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); }
-.project-type-choice.active { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
-.project-type-choice span { font-size: 0.9rem; opacity: 0.8; }
-button#confirm-new-project-button { background-color: var(--success-color); color: white; }
-button.close-modal-button { background-color: var(--danger-color); color: white; }
-
-#help-modal .modal-content { text-align: left; position: relative; }
-#help-modal ul { list-style: none; padding: 0; }
-#help-modal li { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-#help-modal li i { color: var(--primary-color); font-size: 1.5rem; width: 30px; text-align: center; }
-
 /* --- Estilos para Notificaciones Flotantes --- */
-#notification-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; pointer-events: none; }
+#notification-container { position: fixed; bottom: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; pointer-events: none; }
 .notification {
-    background-color: var(--surface-color);
-    color: var(--text-color);
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    font-weight: 500;
-    opacity: 0;
-    animation: slideInFadeOut 3s ease forwards;
+    background-color: var(--surface-color); color: var(--text-color); padding: 0.8rem 1.2rem; border-radius: 6px;
+    border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: 500; opacity: 0;
+    animation: slideInFadeOutBottom 3s ease forwards;
 }
 .notification.success { background-color: var(--success-color); color: white; border-color: var(--success-color); }
 .notification.error { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 .notification.info { background-color: var(--edit-color); color: white; border-color: var(--edit-color); }
-
-@keyframes slideInFadeOut {
+@keyframes slideInFadeOutBottom {
     0% { transform: translateX(100%); opacity: 0; }
     15% { transform: translateX(0); opacity: 1; }
     85% { transform: translateX(0); opacity: 1; }
     100% { transform: translateX(100%); opacity: 0; }
 }
 
-/* --- Menú de Guardado y Enlace de Volver --- */
+/* --- Modales, Guardado y otros --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay.hidden { display: none !important; }
+.modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; }
 #save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
-#save-menu button { background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--light-text); width: 40px; height: 40px; border-radius: 50%; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
-#save-menu button:hover { background-color: var(--primary-color); color: var(--dark-bg); }
-.back-to-portfolio-link { position: fixed; top: 1.2rem; left: 1.2rem; z-index: 2000; color: var(--light-text); text-decoration: none; background-color: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); transition: all 0.2s; }
-.back-to-portfolio-link:hover { background-color: var(--primary-color); color: var(--dark-bg); }
-.hidden { display: none !important; }
+.back-to-portfolio-link { position: fixed; top: 1.2rem; left: 1.2rem; z-index: 2000; }
