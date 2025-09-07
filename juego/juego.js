@@ -7,20 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
 
     let gameState = {
-        money: 1000,
-        followers: 100,
-        energy: 10,
-        maxEnergy: 10,
-        day: 1,
-        skills: {
-            programming: 10,
-            design: 10,
-            marketing: 10
-        },
-        activeProjects: [],
-        shopUpgrades: {},
-        currentTrend: { name: 'Ninguna', bonus: 0, category: '' }
-    };
+    money: 500,        // Menos dinero inicial para que las primeras decisiones importen más.
+    followers: 0,      // Empezamos desde cero, como en la vida real.
+    energy: 10,
+    maxEnergy: 10,
+    day: 1,
+    skills: {
+        programming: 5,  // Habilidades iniciales más bajas para que se note la progresión.
+        design: 5,
+        marketing: 5
+    },
+    activeProjects: [],
+    shopUpgrades: {},
+    currentTrend: { name: 'Ninguna', bonus: 0, category: '' }
+};
 
     const dom = {
         money: document.getElementById('money-display'),
