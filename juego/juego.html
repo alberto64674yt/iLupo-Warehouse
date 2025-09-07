@@ -47,11 +47,10 @@
         <main id="main-view">
             <section id="dev-panel" class="view-panel active">
                 <h2>Oficina de Desarrollo</h2>
-                <div id="active-project-slot">
-                    </div>
+                <div id="active-project-slot"></div>
                 <div id="completed-projects-container">
-                    <h3>Proyectos Completados Hoy</h3>
-                    <ul id="completed-projects-list"></ul>
+                    <h3>Proyectos que generan ingresos</h3>
+                    <div id="completed-projects-list"></div>
                 </div>
             </section>
             
@@ -60,7 +59,7 @@
                 <div id="shop-items-container">
                     <h3><i class="fas fa-desktop"></i> Hardware</h3>
                     <div id="shop-hardware" class="shop-category"></div>
-                    <h3><i class="fas fa-coffee"></i> Personal</h3>
+                    <h3><i class="fas fa-coffee"></i> Personal y Software</h3>
                     <div id="shop-personal" class="shop-category"></div>
                 </div>
             </section>
@@ -77,46 +76,66 @@
         </nav>
     </div>
 
-    <div id="new-project-modal" class="modal-overlay hidden">
+    <div id="daily-summary-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3>Iniciar Nuevo Proyecto</h3>
-            <div id="project-creation-options"></div>
-            <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
-            <div>
-                <button id="confirm-new-project-button">Empezar Desarrollo</button>
-                <button class="close-modal-button">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="debug-minigame-overlay" class="modal-overlay hidden">
-        <div class="minigame-container">
-            <h3><i class="fas fa-bug"></i> ¡A Depurar!</h3>
-            <div class="minigame-hud">
-                <span>Bugs restantes: <span id="debug-bugs-left">0</span></span>
-                <span>Tiempo: <span id="debug-timer">0s</span></span>
-            </div>
-            <div id="debug-play-area">
+            <h3 id="summary-title">Resumen del Día X</h3>
+            <div id="summary-content">
                 </div>
-            <button id="start-debug-button">Empezar a Depurar</button>
+            <button class="close-modal-button">Continuar</button>
         </div>
     </div>
     
-    <div id="video-seo-minigame-overlay" class="modal-overlay hidden">
-        <div class="minigame-container">
-            <h3><i class="fas fa-chart-line"></i> Optimización SEO</h3>
-            <p>Selecciona las <strong>5 etiquetas correctas</strong> antes de que se acabe el tiempo.</p>
-            <div class="minigame-hud">
-                <span>Puntuación: <span id="seo-score">0 / 5</span></span>
-                <span>Tiempo: <span id="seo-timer">15s</span></span>
-            </div>
-            <div id="seo-tags-container">
-                </div>
-             <button id="finish-seo-button" class="hidden">Finalizar Vídeo</button>
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3><i class="fas fa-skull-crossbones"></i> Game Over</h3>
+            <p id="game-over-reason">Te has quedado sin dinero para pagar el alquiler.</p>
+            <button id="restart-game-button">Empezar de Nuevo</button>
         </div>
     </div>
 
-    <div id="help-modal" class="modal-overlay hidden"></div>
+    <div id="help-modal" class="modal-overlay hidden">
+        <div class="modal-content large">
+            <button class="close-modal-button" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem;">&times;</button>
+            <h3><i class="fas fa-question-circle"></i> Guía del Juego</h3>
+            <div class="help-container">
+                <div class="help-section">
+                    <h4>Concepto del Juego</h4>
+                    <p>En <strong>iLupo Dev Tycoon</strong>, tu objetivo es pasar de ser un desarrollador aficionado a un magnate de la tecnología. Desarrolla proyectos, publícalos para ganar dinero y seguidores, e invierte en mejoras para crecer cada vez más rápido.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-sync-alt"></i> El Bucle de Juego</h4>
+                    <ol>
+                        <li><strong>Inicia un Proyecto:</strong> Cuesta dinero inicial, pero es tu única forma de empezar. ¡Solo puedes trabajar en uno por día!</li>
+                        <li><strong>Desarrollo Automático:</strong> El proyecto avanzará solo en tiempo real. Durante este tiempo, pueden aparecer bugs.</li>
+                        <li><strong>Depuración (Minijuego):</strong> Una vez desarrollado, deberás eliminar los bugs en un minijuego de "aplastar bugs". ¡Tu habilidad de programación te ayudará!</li>
+                        <li><strong>Producción de Vídeo (Minijuego):</strong> A continuación, optimiza el SEO de tu vídeo promocional en un minijuego de seleccionar etiquetas. ¡Esto potenciará la calidad final!</li>
+                        <li><strong>Publicación:</strong> El último paso. Publicar consume energía pero añade el proyecto a tu catálogo.</li>
+                        <li><strong>Ingresos Pasivos:</strong> ¡Aquí está la clave! Cada proyecto completado te generará ingresos y seguidores <strong>todos los días</strong>.</li>
+                        <li><strong>Dormir:</strong> Pasa al día siguiente para cobrar tus ingresos pasivos, recuperar energía y empezar de nuevo.</li>
+                    </ol>
+                </div>
+                 <div class="help-section">
+                    <h4><i class="fas fa-server"></i> Gastos y Game Over</h4>
+                    <p>Cada 7 días, tendrás que pagar el <strong>alquiler del servidor</strong>. Es un gasto fijo que aumentará a medida que crezcas. Si no puedes pagarlo y tu saldo queda en negativo, será <strong>Game Over</strong>.</p>
+                </div>
+                <div class="help-section">
+                    <h4><i class="fas fa-star"></i> Recursos y Habilidades</h4>
+                    <ul>
+                        <li><span><i class="fas fa-coins"></i> <strong>Dinero:</strong></span> Se usa para empezar proyectos y comprar mejoras. Se gana pasivamente cada día.</li>
+                        <li><span><i class="fas fa-users"></i> <strong>Seguidores:</strong></span> Aumentan tus ingresos diarios. ¡Más gente ve tu contenido!</li>
+                        <li><span><i class="fas fa-bolt"></i> <strong>Energía:</strong></span> Se gasta en las fases críticas (depurar, vídeo, publicar). Se recupera al dormir.</li>
+                        <li><span><i class="fas fa-code"></i> <strong>Programación:</strong></span> Reduce la aparición de bugs y mejora tu rendimiento en el minijuego de depuración.</li>
+                        <li><span><i class="fas fa-palette"></i> <strong>Diseño:</strong></span> Aumenta la calidad base de tus proyectos.</li>
+                        <li><span><i class="fas fa-chart-line"></i> <strong>Marketing:</strong></span> Potencia enormemente tus ganancias de dinero y seguidores diarios.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="new-project-modal" class="modal-overlay hidden"> </div>
+    <div id="debug-minigame-overlay" class="modal-overlay hidden"> </div>
+    <div id="video-seo-minigame-overlay" class="modal-overlay hidden"> </div>
 
     <a href="../index.html" class="back-to-portfolio-link">← Volver al Portfolio</a>
     <div id="notification-container"></div>
