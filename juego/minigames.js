@@ -1,5 +1,5 @@
 // =================================================================================
-//  MINIGAMES.JS - v4.2 - Lógica de minijuegos con penalización por fallo.
+//  MINIGAMES.JS - v5.1 - Añade recompensas de XP y bonus de habilidad (Completo)
 // =================================================================================
 
 function startDebugMinigame() {
@@ -12,7 +12,9 @@ function startDebugMinigame() {
 
     const proj = gameState.activeProject;
     let bugsToSpawn = proj.bugs;
-    let timeLeft = 30;
+    const bugsOriginales = proj.bugs;
+
+    let timeLeft = 30 + (gameState.skills.programming.level * 2);
 
     dom.debugBugsLeft.textContent = bugsToSpawn;
     dom.debugTimer.textContent = `${timeLeft}s`;
@@ -59,10 +61,14 @@ function startDebugMinigame() {
         if (success) {
             showNotification('¡Todos los bugs eliminados!', 'success');
             proj.stage = 'video';
+            const xpGained = (bugsOriginales * 2) + 5;
+            addXp('programming', xpGained);
         } else {
             showNotification(`Quedaron ${bugsToSpawn} bugs. ¡Calidad penalizada!`, 'error');
             proj.quality = Math.floor(proj.quality * 0.8);
             proj.stage = 'video';
+            const xpGained = Math.floor((bugsOriginales - bugsToSpawn) * 2);
+            if (xpGained > 0) addXp('programming', xpGained);
         }
         updateUI();
     }
@@ -128,6 +134,9 @@ function startSeoMinigame() {
         minigameInterval = null;
         const qualityBonus = Math.floor(score * 5);
         gameState.activeProject.quality += qualityBonus;
+
+        const xpGained = (score * 3) + (score === goodTagsCount ? 5 : 0);
+        if (xpGained > 0) addXp('design', xpGained);
 
         if (score < 3) {
             gameState.activeProject.seoPenalty = 0.5;
