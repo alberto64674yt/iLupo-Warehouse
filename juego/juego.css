@@ -1,4 +1,4 @@
-/* Contenido 100% completo, v2.0.1 - Corrección de visibilidad de la UI */
+/* Contenido 100% completo, v2.1 - Remasterización visual y corrección de regresiones */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -30,14 +30,15 @@ body {
     padding: 2rem;
 }
 
-#main-menu h1 { font-size: 3.5rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+#main-menu h1 { font-size: 3.5rem; color: var(--primary-color); margin-bottom: 0.5rem; text-shadow: 0 0 10px var(--primary-color-trans); }
 #main-menu .game-subtitle { font-size: 1.25rem; color: var(--light-text); margin-bottom: 3rem; }
 .menu-buttons { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; }
 .menu-buttons button { padding: 1rem; font-family: inherit; font-size: 1.2rem; font-weight: bold; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; }
+.menu-buttons button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 .menu-buttons button#new-game-button { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
 .menu-buttons button#continue-button { background-color: var(--success-color); color: white; border-color: var(--success-color); }
 .menu-buttons button#help-button { background-color: var(--edit-color); color: white; border-color: var(--edit-color); }
-.menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; }
+.menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: none; }
 
 /* --- Contenedor del Juego --- */
 #game-container { display: flex; flex-direction: column; }
@@ -58,16 +59,9 @@ body {
 .view-panel h2 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
 
 /* --- Panel de Desarrollo (Rediseñado) --- */
-#active-project-slot .no-active-project {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem;
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    height: 100%;
-}
-#new-project-button-main { padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold; background-color: var(--primary-color); color: var(--dark-bg); border: none; border-radius: 8px; cursor: pointer; }
+#active-project-slot .no-active-project { display: flex; justify-content: center; align-items: center; padding: 3rem; border: 2px dashed var(--border-color); border-radius: 12px; height: 100%; }
+#new-project-button-main { padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold; background-color: var(--primary-color); color: var(--dark-bg); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+#new-project-button-main:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--primary-color-trans); }
 .active-project-card { display: flex; flex-direction: column; gap: 1rem; background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; }
 .project-card-header { display: flex; justify-content: space-between; align-items: center; }
 .project-title { font-size: 1.3rem; font-weight: bold; }
@@ -83,7 +77,7 @@ body {
 .progress-bar-container span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
 .project-card-body .action-button { width: 100%; padding: 1rem; font-size: 1.1rem; }
 .action-button { padding: 0.6rem 1.2rem; font-family: inherit; font-size: 0.9rem; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-.action-button:hover { transform: scale(1.02); filter: brightness(1.1); }
+.action-button:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 .action-button.debug-button { background-color: var(--danger-color); color: white; }
 .action-button.video-button { background-color: var(--edit-color); color: white; }
 .action-button.publish-button { background-color: var(--success-color); color: white; }
@@ -93,31 +87,34 @@ body {
 
 /* --- Estilos de la Tienda --- */
 .shop-category { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
-.shop-item { background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; }
+.shop-item { background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; transition: all 0.2s ease; }
+.shop-item:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .item-name { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
 .item-desc { color: var(--light-text); flex-grow: 1; }
 .item-buy { display: flex; justify-content: space-between; align-items: center; }
 .item-cost { font-weight: bold; font-size: 1.1rem; }
-.buy-button { background-color: var(--success-color); color: white; font-weight: bold; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
-.shop-item.owned { background-color: var(--surface-color); border-color: var(--success-color); }
+.buy-button { background-color: var(--success-color); color: white; font-weight: bold; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+.buy-button:hover { filter: brightness(1.1); }
+.shop-item.owned { background-color: var(--surface-color); border-color: var(--success-color); transform: none; box-shadow: none; }
 .shop-item.owned .buy-button { background-color: #555; cursor: not-allowed; }
 
 /* --- Estilos de los Minijuegos --- */
-.minigame-container { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; text-align: center; }
+.minigame-container { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
 .minigame-container h3 { margin-top: 0; color: var(--primary-color); font-size: 1.8rem; }
 .minigame-hud { display: flex; justify-content: space-around; background-color: var(--surface-color); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 1.2rem; font-weight: bold; }
 /* Minijuego de Depuración */
-#debug-play-area { width: 100%; height: 300px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; position: relative; overflow: hidden; }
+#debug-play-area { width: 100%; height: 300px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; }
 .bug { position: absolute; color: var(--danger-color); font-size: 2rem; cursor: pointer; transition: transform 0.2s ease; animation: wiggle 1s infinite; }
 .bug:hover { transform: scale(1.2); }
 @keyframes wiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 /* Minijuego de SEO */
 #seo-tags-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0; }
 .seo-tag { padding: 0.8rem 1.2rem; background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--light-text); font-family: inherit; font-size: 1rem; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
-.seo-tag:hover:not(:disabled) { background-color: var(--primary-color); color: var(--dark-bg); }
-.seo-tag.correct { background-color: var(--success-color); color: white; }
-.seo-tag.incorrect { background-color: var(--danger-color); color: white; }
+.seo-tag:hover:not(:disabled) { background-color: var(--primary-color); color: var(--dark-bg); transform: scale(1.05); }
+.seo-tag.correct { background-color: var(--success-color); color: white; transform: scale(1.05); }
+.seo-tag.incorrect { background-color: var(--danger-color); color: white; animation: shake 0.5s; }
 .seo-tag:disabled { opacity: 0.6; cursor: not-allowed; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
 /* --- Panel de Noticias (Lateral) --- */
 #news-panel { width: 300px; flex-shrink: 0; background-color: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); }
@@ -128,8 +125,7 @@ body {
 /* --- Barra de Navegación Inferior --- */
 #game-nav { display: flex; gap: 1rem; padding: 1rem 2rem; background-color: var(--surface-color); border-top: 1px solid var(--border-color); justify-content: center; flex-shrink: 0; }
 .nav-button { padding: 0.8rem 1.5rem; font-family: inherit; font-size: 1.1rem; font-weight: 500; background-color: var(--dark-bg); color: var(--light-text); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-.nav-button.active, .nav-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); transform: translateY(-2px); }
-.nav-button i { margin-right: 0.5rem; }
+.nav-button.active, .nav-button:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
 /* --- Estilos para Notificaciones Flotantes --- */
 #notification-container { position: fixed; bottom: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; pointer-events: none; }
@@ -141,20 +137,42 @@ body {
 .notification.success { background-color: var(--success-color); color: white; border-color: var(--success-color); }
 .notification.error { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 .notification.info { background-color: var(--edit-color); color: white; border-color: var(--edit-color); }
-@keyframes slideInFadeOutBottom {
-    0% { transform: translateX(100%); opacity: 0; }
-    15% { transform: translateX(0); opacity: 1; }
-    85% { transform: translateX(0); opacity: 1; }
-    100% { transform: translateX(100%); opacity: 0; }
-}
+@keyframes slideInFadeOutBottom { 0% { transform: translateX(100%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
 
 /* --- Modales, Guardado y otros --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; }
-#save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
-.back-to-portfolio-link { position: fixed; top: 1.2rem; left: 1.2rem; z-index: 2000; }
+/* Estilos para el Modal de Nuevo Proyecto (CORREGIDO) */
+#project-creation-options { margin: 1.5rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+.project-type-choice { background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); padding: 0.8rem 1.2rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+.project-type-choice:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
+.project-type-choice.active { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color-trans); transform: scale(1.05); }
+.project-type-choice span { font-size: 0.9rem; opacity: 0.8; }
+.modal-content button { padding: 0.8rem 1.5rem; margin: 0.5rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
+button#confirm-new-project-button { background-color: var(--success-color); color: white; }
+button.close-modal-button { background-color: var(--danger-color); color: white; }
 
-/* REGLA DE VISIBILIDAD RESTAURADA */
-.hidden {
-    display: none !important;
+/* Botón "Volver al Portfolio" (CORREGIDO) */
+.back-to-portfolio-link {
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    z-index: 2000;
+    color: var(--light-text);
+    text-decoration: none;
+    background-color: var(--surface-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
 }
+.back-to-portfolio-link:hover {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+    box-shadow: 0 0 10px var(--primary-color-trans);
+}
+
+#save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
+
+/* Regla de visibilidad */
+.hidden { display: none !important; }
