@@ -1,5 +1,5 @@
 // =================================================================================
-//  SHOP.JS - v4.0 - Lógica de compra ajustada al nuevo balance.
+//  SHOP.JS - v4.2 - Lógica de renderizado para soportar árbol de mejoras.
 // =================================================================================
 
 function renderShop() {
@@ -7,8 +7,13 @@ function renderShop() {
         const container = dom[`shop${category.charAt(0).toUpperCase() + category.slice(1)}`];
         container.innerHTML = gameData.shopItems[category].map(item => {
             const isOwned = gameState.shopUpgrades.includes(item.id);
-            // Lógica para no mostrar mejoras de proyectos/día si ya se tiene
-            if (item.effect.type === 'maxProjectsPerDay' && gameState.maxProjectsPerDay >= 2 && !isOwned) {
+
+            if (item.requires && !gameState.shopUpgrades.includes(item.requires)) {
+                return '';
+            }
+            
+            const hasTieredUpgrade = gameData.shopItems[category].some(otherItem => otherItem.requires === item.id);
+            if (isOwned && hasTieredUpgrade) {
                 return '';
             }
 
@@ -46,7 +51,6 @@ function buyUpgrade(itemId) {
     gameState.money -= item.cost;
     gameState.shopUpgrades.push(item.id);
 
-    // Aplicar efecto
     switch(item.effect.type) {
         case 'hardwareTimeReduction':
             gameState.hardwareTimeReduction += item.effect.value;
@@ -59,7 +63,6 @@ function buyUpgrade(itemId) {
             break;
         case 'maxProjectsPerDay':
             gameState.maxProjectsPerDay += item.effect.value;
-            // Aumenta la energía máxima al comprar esta mejora
             if(item.effect.energy) {
                 gameState.maxEnergy = item.effect.energy;
             }
@@ -69,7 +72,6 @@ function buyUpgrade(itemId) {
             break;
     }
 
-    // Rellena siempre la energía al comprar una mejora que la afecte
     if(item.effect.type === 'maxProjectsPerDay' || item.effect.type === 'maxEnergy') {
         gameState.energy = gameState.maxEnergy;
     }
