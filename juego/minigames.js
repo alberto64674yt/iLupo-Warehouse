@@ -1,13 +1,13 @@
 // =================================================================================
-//  MINIGAMES.JS - Lógica para los minijuegos de depuración y SEO.
+//  MINIGAMES.JS - v4.0 - Lógica de minijuegos con costes de energía actualizados.
 // =================================================================================
 
 function startDebugMinigame() {
-    if (gameState.energy < 30) {
-        showNotification('Se necesitan 30 de energía para depurar.', 'error');
+    if (gameState.energy < gameData.energyCosts.debug) {
+        showNotification(`Se necesitan ${gameData.energyCosts.debug} de energía para depurar.`, 'error');
         return;
     }
-    gameState.energy -= 30;
+    gameState.energy -= gameData.energyCosts.debug;
     updateUI();
 
     const proj = gameState.activeProject;
@@ -67,11 +67,11 @@ function startDebugMinigame() {
 }
 
 function startSeoMinigame() {
-    if (gameState.energy < 30) {
-        showNotification('Se necesitan 30 de energía para el vídeo.', 'error');
+    if (gameState.energy < gameData.energyCosts.video) {
+        showNotification(`Se necesitan ${gameData.energyCosts.video} de energía para el vídeo.`, 'error');
         return;
     }
-    gameState.energy -= 30;
+    gameState.energy -= gameData.energyCosts.video;
     updateUI();
 
     dom.videoSeoMinigameOverlay.classList.remove('hidden');
