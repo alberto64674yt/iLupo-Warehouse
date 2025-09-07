@@ -1,4 +1,4 @@
-// Contenido 100% completo, con menú principal y correcciones v1.2 para juego.js
+// Contenido 100% completo, con corrección de bugs y lógica de proyectos v1.3 para juego.js
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let gameState = {};
 
+    // Referencias a los elementos del DOM
     const dom = {
         mainMenu: document.getElementById('main-menu'),
         gameContainer: document.getElementById('game-container'),
@@ -36,14 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
         projectCreationOptions: document.getElementById('project-creation-options'),
         exportSaveBtn: document.getElementById('export-save-button'),
         importSaveBtn: document.getElementById('import-save-button'),
-        importFileInput: document.getElementById('import-file-input')
+        importFileInput: document.getElementById('import-file-input'),
+        // Referencia corregida para el panel de noticias
+        newsContent: document.getElementById('news-content')
     };
 
     const gameData = {
         projectTypes: {
-            'Utilidad': { programming: 0.7, design: 0.1, marketing: 0.2, icon: 'fa-wrench' },
-            'Juego Arcade': { programming: 0.4, design: 0.5, marketing: 0.1, icon: 'fa-gamepad' },
-            'Mod': { programming: 0.8, design: 0.1, marketing: 0.1, icon: 'fa-puzzle-piece' }
+            'Utilidad': { programming: 0.7, design: 0.1, marketing: 0.2, icon: 'fa-wrench', baseCost: 50, baseEffort: 100 },
+            'Juego Arcade': { programming: 0.4, design: 0.5, marketing: 0.1, icon: 'fa-gamepad', baseCost: 100, baseEffort: 150 },
+            'Mod': { programming: 0.8, design: 0.1, marketing: 0.1, icon: 'fa-puzzle-piece', baseCost: 25, baseEffort: 80 }
         },
         trends: [
             { quality: 'Común', bonusRange: [5, 20], probability: 0.75, messages: ["Un ligero interés en {category} este mes."] },
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
 
     function initializeApp() {
-        attachAllEventListeners(); // Llamada única para todos los listeners
+        attachAllEventListeners();
         if (localStorage.getItem('iLupoDevTycoonSave')) {
             dom.continueBtn.disabled = false;
         } else {
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
         dom.mainMenu.classList.add('hidden');
         dom.gameContainer.classList.remove('hidden');
-        generateNewTrend();
+        if (gameState.day === 1) generateNewTrend();
         updateUI();
     }
 
@@ -82,7 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.followers.innerHTML = `<i class="fas fa-users"></i> ${gameState.followers}`;
         dom.energy.innerHTML = `<i class="fas fa-bolt"></i> ${gameState.energy} / ${gameState.maxEnergy}`;
         dom.date.innerHTML = `Día ${gameState.day}`;
-        dom.newsPanel.innerHTML = `<p><strong>Tendencia del día:</strong> ${gameState.currentTrend.name} (+${gameState.currentTrend.bonus}%)</p>`;
+        // Lógica de noticias reparada: apunta al elemento correcto
+        dom.newsContent.innerHTML = `<p><strong>Tendencia del día:</strong> ${gameState.currentTrend.name} <span>(+${gameState.currentTrend.bonus}% bonus)</span></p>`;
+        
+        // Renderiza los proyectos activos
+        renderActiveProjects();
     }
     
     function nextDay() {
@@ -100,15 +107,90 @@ document.addEventListener('DOMContentLoaded', () => {
             cumulativeProb += trendTier.probability;
             if (rand <= cumulativeProb) {
                 const bonus = Math.floor(Math.random() * (trendTier.bonusRange[1] - trendTier.bonusRange[0] + 1)) + trendTier.bonusRange[0];
-                const categoryName = Object.keys(gameData.projectTypes)[Math.floor(Math.random() * Object.keys(gameData.projectTypes).length)];
-                gameState.currentTrend = { name: trendTier.messages[0].replace('{category}', categoryName), bonus: bonus, category: categoryName };
+                const categoryKeys = Object.keys(gameData.projectTypes);
+                const categoryName = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
+                const messageTemplate = trendTier.messages[0];
+                gameState.currentTrend = { name: messageTemplate.replace('{category}', categoryName), bonus: bonus, category: categoryName };
                 return;
             }
         }
     }
 
     // -----------------------------------------------------------------------------
-    //  3. SISTEMA DE GUARDADO
+    //  3. LÓGICA DE PROYECTOS
+    // -----------------------------------------------------------------------------
+
+    function confirmNewProject() {
+        const name = dom.newProjectNameInput.value.trim();
+        if (!selectedProjectType) {
+            alert("Debes elegir un tipo de proyecto.");
+            return;
+        }
+        if (!name) {
+            alert("Debes darle un nombre a tu proyecto.");
+            return;
+        }
+
+        const projectData = gameData.projectTypes[selectedProjectType];
+        if (gameState.money < projectData.baseCost) {
+            alert("No tienes suficiente dinero para empezar este proyecto.");
+            return;
+        }
+
+        gameState.money -= projectData.baseCost;
+
+        const newProject = {
+            id: Date.now(), // ID único para el proyecto
+            name: name,
+            type: selectedProjectType,
+            effortRequired: projectData.baseEffort,
+            progress: 0,
+            bugs: 0,
+            quality: 0,
+            stage: 'development' // development -> video -> post -> complete
+        };
+
+        gameState.activeProjects.push(newProject);
+        
+        console.log(`Creando proyecto: "${name}" del tipo "${selectedProjectType}"`);
+        dom.newProjectModal.classList.add('hidden');
+        updateUI(); // Actualiza la UI para mostrar el nuevo proyecto
+    }
+
+    function renderActiveProjects() {
+        if (gameState.activeProjects.length === 0) {
+            dom.projectListContainer.innerHTML = '<p class="no-projects-message">No hay proyectos en desarrollo. ¡Crea uno para empezar!</p>';
+            return;
+        }
+
+        let projectsHtml = '';
+        gameState.activeProjects.forEach(proj => {
+            const progressPercent = (proj.progress / proj.effortRequired) * 100;
+            projectsHtml += `
+                <div class="project-card" data-id="${proj.id}">
+                    <div class="project-card-header">
+                        <span class="project-title"><i class="fas ${gameData.projectTypes[proj.type].icon}"></i> ${proj.name}</span>
+                        <span class="project-stage">${proj.stage}</span>
+                    </div>
+                    <div class="project-card-body">
+                        <p>Progreso:</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+                            <span>${Math.floor(progressPercent)}%</span>
+                        </div>
+                    </div>
+                    <div class="project-card-actions">
+                        <button class="action-button develop-button">Desarrollar</button>
+                    </div>
+                </div>
+            `;
+        });
+        dom.projectListContainer.innerHTML = projectsHtml;
+    }
+
+
+    // -----------------------------------------------------------------------------
+    //  4. SISTEMA DE GUARDADO
     // -----------------------------------------------------------------------------
 
     function saveGame() {
@@ -116,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const encodedSave = btoa(JSON.stringify(gameState));
             localStorage.setItem('iLupoDevTycoonSave', encodedSave);
             console.log("Partida guardada.");
+            dom.continueBtn.disabled = false;
         } catch (e) {
             console.error("Error al guardar la partida:", e);
         }
@@ -146,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = function(e) {
                 try {
                     const content = e.target.result;
-                    JSON.parse(atob(content));
+                    JSON.parse(atob(content)); // Valida que el archivo es correcto
                     localStorage.setItem('iLupoDevTycoonSave', content);
                     alert("Partida importada con éxito. El juego se reiniciará.");
                     window.location.reload();
@@ -159,13 +242,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------------------------------------
-    //  4. MANEJO DE EVENTOS Y LÓGICA DE LA UI
+    //  5. MANEJO DE EVENTOS Y LÓGICA DE LA UI
     // -----------------------------------------------------------------------------
     
     function attachAllEventListeners() {
         // --- LISTENERS DEL MENÚ PRINCIPAL ---
         dom.newGameBtn.addEventListener('click', () => {
-            if (loadGame() && !confirm("¿Seguro? Se borrará tu progreso actual.")) {
+            if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) {
                 return;
             }
             localStorage.removeItem('iLupoDevTycoonSave');
@@ -205,35 +288,25 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.newProjectNameInput.value = '';
         let optionsHtml = '<h4>Elige un tipo de proyecto:</h4>';
         Object.keys(gameData.projectTypes).forEach(type => {
-            optionsHtml += `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type}</button>`;
+            const cost = gameData.projectTypes[type].baseCost;
+            optionsHtml += `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type} <span>(${cost} €)</span></button>`;
         });
         dom.projectCreationOptions.innerHTML = optionsHtml;
         dom.newProjectModal.classList.remove('hidden');
-        document.querySelectorAll('.project-type-choice').forEach(button => {
-            button.addEventListener('click', () => {
+
+        // Delegación de eventos para los botones de tipo de proyecto
+        dom.projectCreationOptions.addEventListener('click', (e) => {
+            const button = e.target.closest('.project-type-choice');
+            if (button) {
                 document.querySelectorAll('.project-type-choice').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 selectedProjectType = button.dataset.type;
-            });
+            }
         });
     }
 
-    function confirmNewProject() {
-        const name = dom.newProjectNameInput.value.trim();
-        if (!selectedProjectType) {
-            alert("Debes elegir un tipo de proyecto.");
-            return;
-        }
-        if (!name) {
-            alert("Debes darle un nombre a tu proyecto.");
-            return;
-        }
-        console.log(`Creando proyecto: "${name}" del tipo "${selectedProjectType}"`);
-        dom.newProjectModal.classList.add('hidden');
-    }
-
     // -----------------------------------------------------------------------------
-    //  5. INICIALIZACIÓN
+    //  6. INICIALIZACIÓN
     // -----------------------------------------------------------------------------
 
     initializeApp();
