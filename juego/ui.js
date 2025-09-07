@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - v4.0 - Actualización de la interfaz a los nuevos costes de energía.
+//  UI.JS - v5.1 - Añade funciones para renderizar Habilidades y Cursos (Completo)
 // =================================================================================
 
 function updateUI() {
@@ -11,6 +11,8 @@ function updateUI() {
     
     updateActiveProjectUI();
     renderCompletedProjects();
+    renderSkillsUI();
+    renderCoursesUI();
 }
 
 function updateActiveProjectUI() {
@@ -61,7 +63,6 @@ function updateActiveProjectUI() {
     html += `</div></div>`;
     dom.activeProjectSlot.innerHTML = html;
 
-    // Se añaden listeners a los botones recién creados
     if (proj.stage === 'debugging') document.getElementById('init-debug-minigame').onclick = startDebugMinigame;
     if (proj.stage === 'video') document.getElementById('init-seo-minigame').onclick = startSeoMinigame;
     if (proj.stage === 'post') document.getElementById('publish-project-button').onclick = publishProject;
@@ -84,13 +85,12 @@ function renderCompletedProjects() {
     }).join('');
 }
 
-// Función auxiliar solo para la UI, para no recalcular todo
 function calculatePassiveIncomeForProjectUI(proj) {
     const projData = gameData.projectTypes[proj.type];
     let dailyMoney = projData.baseIncome + (proj.quality / 2);
     dailyMoney *= gameState.appMonetization;
-    const followerBonus = 1 + (gameState.followers / 5000); // Refleja el nerfeo
-    const marketingBonus = 1 + (gameState.skills.marketing / 50);
+    const followerBonus = 1 + (gameState.followers / 5000);
+    const marketingBonus = 1 + (gameState.skills.marketing.level / 10);
     dailyMoney *= followerBonus * marketingBonus;
     if (gameState.currentTrend.category === proj.type) {
         dailyMoney *= (1 + gameState.currentTrend.bonus / 100);
@@ -153,4 +153,76 @@ function openNewProjectModal() {
             selectedProjectType = button.dataset.type;
         }
     });
+}
+
+function renderSkillsUI() {
+    let html = '<h3><i class="fas fa-star"></i> Habilidades</h3>';
+    for (const skillName in gameState.skills) {
+        const skill = gameState.skills[skillName];
+        const xpNeeded = gameData.skillData.xpCurve[skill.level] || 'MAX';
+        const progressPercent = xpNeeded === 'MAX' ? 100 : (skill.xp / xpNeeded) * 100;
+
+        html += `
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">${skillName}</span>
+                    <span class="skill-level">Nivel ${skill.level}</span>
+                </div>
+                <div class="xp-bar-container">
+                    <div class="xp-bar" style="width: ${progressPercent}%;"></div>
+                </div>
+                <div class="skill-xp">${skill.xp} / ${xpNeeded} XP</div>
+            </div>
+        `;
+    }
+    dom.skillsPanel.innerHTML = html;
+}
+
+function renderCoursesUI() {
+    let html = '<h4>Cursos Disponibles</h4>';
+    let availableCourses = 0;
+    
+    for (const skillType in gameData.courses) {
+        gameData.courses[skillType].forEach(course => {
+            const isCompleted = gameState.completedCourses.includes(course.id);
+            if (isCompleted) return;
+
+            const hasRequirement = course.requires ? gameState.completedCourses.includes(course.requires) : true;
+            if (!hasRequirement) return;
+
+            availableCourses++;
+            html += `
+                <div class="course-card">
+                    <h4>${course.name}</h4>
+                    <p>${course.desc}</p>
+                    <div class="course-info">
+                        <span><i class="fas fa-coins"></i> ${course.cost} €</span>
+                        <span><i class="fas fa-clock"></i> ${course.duration} día(s)</span>
+                        <span><i class="fas fa-star"></i> +${course.xp} XP</span>
+                    </div>
+                    <button class="start-course-button" data-course-id="${course.id}" data-skill-type="${skillType}" ${gameState.activeCourse ? 'disabled' : ''}>
+                        ${gameState.activeCourse ? 'Estudiando...' : 'Iniciar Curso'}
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    if (availableCourses === 0) {
+        html += '<p>No hay nuevos cursos disponibles por ahora.</p>';
+    }
+    
+    dom.coursesContainer.innerHTML = html;
+    
+    if (gameState.activeCourse) {
+        dom.activeCourseContainer.innerHTML = `
+            <div class="active-course-display">
+                <h4>Actualmente estudiando:</h4>
+                <p><strong>${gameState.activeCourse.name}</strong></p>
+                <p>Tiempo restante: ${gameState.activeCourse.daysRemaining} día(s)</p>
+            </div>
+        `;
+    } else {
+        dom.activeCourseContainer.innerHTML = '';
+    }
 }
