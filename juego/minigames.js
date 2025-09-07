@@ -1,5 +1,5 @@
 // =================================================================================
-//  MINIGAMES.JS - v4.0 - Lógica de minijuegos con costes de energía actualizados.
+//  MINIGAMES.JS - v4.2 - Lógica de minijuegos con penalización por fallo.
 // =================================================================================
 
 function startDebugMinigame() {
@@ -36,7 +36,9 @@ function startDebugMinigame() {
             }
         };
         dom.debugPlayArea.appendChild(bug);
-        setTimeout(() => { if (bug.parentElement) bug.remove(); }, 2000); // El bug desaparece si no se pulsa
+        setTimeout(() => {
+            if (bug.parentElement) bug.remove();
+        }, 2000);
     }
 
     minigameInterval = setInterval(() => {
@@ -59,7 +61,7 @@ function startDebugMinigame() {
             proj.stage = 'video';
         } else {
             showNotification(`Quedaron ${bugsToSpawn} bugs. ¡Calidad penalizada!`, 'error');
-            proj.quality = Math.floor(proj.quality * 0.8); // Penalización del 20%
+            proj.quality = Math.floor(proj.quality * 0.8);
             proj.stage = 'video';
         }
         updateUI();
@@ -84,13 +86,13 @@ function startSeoMinigame() {
     const goodTags = allTags.slice(0, 6);
     
     let tagsToDisplay = goodTags.slice(0, goodTagsCount);
-    while(tagsToDisplay.length < 12) {
+    while (tagsToDisplay.length < 12) {
         const randomTag = allTags[Math.floor(Math.random() * allTags.length)];
         if (!tagsToDisplay.includes(randomTag)) {
             tagsToDisplay.push(randomTag);
         }
     }
-    tagsToDisplay.sort(() => Math.random() - 0.5); // Shuffle
+    tagsToDisplay.sort(() => Math.random() - 0.5);
 
     dom.seoTagsContainer.innerHTML = tagsToDisplay.map(tag => `<button class="seo-tag">${tag}</button>`).join('');
     dom.seoScore.textContent = `${score} / ${goodTagsCount}`;
@@ -100,7 +102,7 @@ function startSeoMinigame() {
         const button = e.target;
         if (button.classList.contains('seo-tag') && !button.disabled) {
             button.disabled = true;
-            if(goodTags.includes(button.textContent)) {
+            if (goodTags.includes(button.textContent)) {
                 score++;
                 button.classList.add('correct');
             } else {
@@ -124,9 +126,16 @@ function startSeoMinigame() {
     function endMinigame() {
         clearInterval(minigameInterval);
         minigameInterval = null;
-        const qualityBonus = Math.floor(score * 5); // +5 de calidad por cada etiqueta correcta
+        const qualityBonus = Math.floor(score * 5);
         gameState.activeProject.quality += qualityBonus;
-        showNotification(`SEO completo. Bonus de calidad: +${qualityBonus}`, 'success');
+
+        if (score < 3) {
+            gameState.activeProject.seoPenalty = 0.5;
+            showNotification(`SEO terrible. ¡Bonus de calidad: +${qualityBonus}, pero penalización de seguidores!`, 'error');
+        } else {
+            showNotification(`SEO completo. Bonus de calidad: +${qualityBonus}`, 'success');
+        }
+
         dom.finishSeoButton.classList.remove('hidden');
         dom.finishSeoButton.onclick = () => {
             gameState.activeProject.stage = 'post';
