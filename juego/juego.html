@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iLupo Dev Tycoon</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <link rel="stylesheet" href="../style.css"> <link rel="stylesheet" href="juego.css">
+
+    <link rel="icon" href="/favicon/favicon.ico" />
+</head>
+<body>
+
+    <div id="game-container">
+        <header id="game-header">
+            <div class="resource-display">
+                <span class="resource-item" id="money-display"><i class="fas fa-coins"></i> 1000 €</span>
+                <span class="resource-item" id="followers-display"><i class="fas fa-users"></i> 100</span>
+                <span class="resource-item" id="energy-display"><i class="fas fa-bolt"></i> 10 / 10</span>
+            </div>
+            <div class="date-display">
+                <span id="date-text">Día 1</span>
+                <button id="next-day-button">Dormir (Pasar al día siguiente)</button>
+            </div>
+        </header>
+
+        <main id="main-view">
+
+            <section id="dev-panel" class="view-panel active">
+                <h2>Oficina de Desarrollo</h2>
+                <div id="project-list-container">
+                    </div>
+                <button id="new-project-button">+ Iniciar Nuevo Proyecto</button>
+            </section>
+
+            <section id="shop-panel" class="view-panel">
+                <h2>Tienda de Mejoras</h2>
+                <div id="shop-items-container">
+                    </div>
+            </section>
+            
+            <aside id="news-panel">
+                <h3><i class="fas fa-fire"></i> Noticias y Tendencias</h3>
+                <div id="news-content">
+                    </div>
+            </aside>
+        </main>
+        
+        <nav id="game-nav">
+            <button class="nav-button active" data-view="dev-panel"><i class="fas fa-code"></i> Desarrollo</button>
+            <button class="nav-button" data-view="shop-panel"><i class="fas fa-shopping-cart"></i> Tienda</button>
+            </nav>
+    </div>
+
+    <div id="new-project-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Iniciar Nuevo Proyecto</h3>
+            <div id="project-creation-options">
+                </div>
+            <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
+            <button id="confirm-new-project-button">Empezar Desarrollo</button>
+            <button class="close-modal-button">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="debug-minigame-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>¡Hora de Depurar!</h3>
+            <p>Aplastavlos bugs (<i class="fas fa-bug"></i>) antes de que se acabe el tiempo.</p>
+            <div id="debug-area"></div>
+            <div id="debug-timer"></div>
+        </div>
+    </div>
+    
+    <div id="video-seo-minigame-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Optimizando el Vídeo</h3>
+            <p>Haz clic en las etiquetas buenas para mejorar el alcance del vídeo.</p>
+            <input type="text" id="video-title-input" placeholder="Título del vídeo...">
+            <div id="video-seo-area"></div>
+            <button id="finish-video-button">Publicar Vídeo</button>
+        </div>
+    </div>
+    
+    <div id="post-creation-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Crear Post en la Web</h3>
+            <p>Dale un buen título a tu post para atraer descargas.</p>
+            <input type="text" id="post-title-input" placeholder="Título del post...">
+            <button id="finish-post-button">Publicar Post</button>
+        </div>
+    </div>
+
+    <div id="save-menu">
+        <button id="export-save-button" title="Exportar Partida"><i class="fas fa-file-export"></i></button>
+        <button id="import-save-button" title="Importar Partida"><i class="fas fa-file-import"></i></button>
+        <input type="file" id="import-file-input" style="display: none;" accept=".txt">
+    </div>
+
+    <a href="../index.html" class="back-to-portfolio-link">← Volver al Portfolio</a>
+
+    <script src="juego.js" defer></script>
+
+</body>
+</html>
