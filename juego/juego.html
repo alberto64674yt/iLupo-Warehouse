@@ -113,14 +113,23 @@
                 <div class="help-section">
                     <h4><i class="fas fa-sync-alt"></i> El Bucle de Juego</h4>
                     <ol>
-                        <li><strong>Inicia un Proyecto:</strong> Cuesta dinero inicial, pero es tu única forma de empezar. ¡Solo puedes trabajar en uno por día!</li>
+                        <li><strong>Iniciar un Proyecto:</strong> Cuesta dinero inicial y solo puedes trabajar en uno a la vez (ampliable en la tienda).</li>
                         <li><strong>Desarrollo Automático:</strong> El proyecto avanzará solo en tiempo real. Durante este tiempo, pueden aparecer bugs.</li>
-                        <li><strong>Depuración (Minijuego):</strong> Una vez desarrollado, deberás eliminar los bugs en un minijuego de "aplastar bugs". ¡Tu habilidad de programación te ayudará!</li>
-                        <li><strong>Producción de Vídeo (Minijuego):</strong> A continuación, optimiza el SEO de tu vídeo promocional en un minijuego de seleccionar etiquetas. ¡Esto potenciará la calidad final!</li>
-                        <li><strong>Publicación:</strong> El último paso. Publicar consume energía pero añade el proyecto a tu catálogo.</li>
+                        <li><strong>Depuración (Minijuego):</strong> Una vez desarrollado, deberás eliminar los bugs. Tu habilidad de <strong>Programación</strong> te da más tiempo. Ganas XP de Programación al superar el minijuego.</li>
+                        <li><strong>Producción de Vídeo (Minijuego):</strong> A continuación, optimiza el SEO de tu vídeo promocional. Ganas XP de <strong>Diseño</strong> según tu puntuación.</li>
+                        <li><strong>Publicación:</strong> El último paso. Publicar consume energía pero añade el proyecto a tu catálogo de ingresos pasivos.</li>
                         <li><strong>Ingresos Pasivos:</strong> ¡Aquí está la clave! Cada proyecto completado te generará ingresos y seguidores <strong>todos los días</strong>.</li>
-                        <li><strong>Dormir:</strong> Pasa al día siguiente para cobrar tus ingresos pasivos, recuperar energía y empezar de nuevo.</li>
+                        <li><strong>Dormir:</strong> Pasa al día siguiente para cobrar tus ingresos, recuperar energía y empezar de nuevo.</li>
                     </ol>
+                </div>
+                 <div class="help-section">
+                    <h4><i class="fas fa-graduation-cap"></i> Cursos y Formación</h4>
+                    <p>La forma principal de mejorar tus habilidades es a través de los cursos. Puedes acceder a ellos desde la pestaña "Cursos".</p>
+                    <ul>
+                        <li><span><strong>Tomar un curso:</strong></span><div>Cuesta dinero y tarda varios días en completarse. Puedes seguir desarrollando proyectos mientras estudias.</div></li>
+                        <li><span><strong>Ganancia de XP:</strong></span><div>Al finalizar, recibirás una gran cantidad de XP para la habilidad correspondiente y desbloquearás el siguiente nivel del curso.</div></li>
+                         <li><span><strong>Marketing:</strong></span><div>La habilidad de Marketing solo puede mejorarse a través de cursos, lo que la convierte en una inversión estratégica.</div></li>
+                    </ul>
                 </div>
                  <div class="help-section">
                     <h4><i class="fas fa-server"></i> Gastos y Game Over</h4>
@@ -129,12 +138,12 @@
                 <div class="help-section">
                     <h4><i class="fas fa-star"></i> Recursos y Habilidades</h4>
                     <ul>
-                        <li><span><i class="fas fa-coins"></i> <strong>Dinero:</strong></span> Se usa para empezar proyectos y comprar mejoras. Se gana pasivamente cada día.</li>
-                        <li><span><i class="fas fa-users"></i> <strong>Seguidores:</strong></span> Aumentan tus ingresos diarios. ¡Más gente ve tu contenido!</li>
-                        <li><span><i class="fas fa-bolt"></i> <strong>Energía:</strong></span> Se gasta en las fases críticas (depurar, vídeo, publicar). Se recupera al dormir.</li>
-                        <li><span><i class="fas fa-code"></i> <strong>Programación:</strong></span> Reduce la aparición de bugs y mejora tu rendimiento en el minijuego de depuración.</li>
-                        <li><span><i class="fas fa-palette"></i> <strong>Diseño:</strong></span> Aumenta la calidad base de tus proyectos.</li>
-                        <li><span><i class="fas fa-chart-line"></i> <strong>Marketing:</strong></span> Potencia enormemente tus ganancias de dinero y seguidores diarios.</li>
+                        <li><span><i class="fas fa-coins"></i> <strong>Dinero:</strong></span><div>Se usa para empezar proyectos, cursos y comprar mejoras. Se gana pasivamente cada día.</div></li>
+                        <li><span><i class="fas fa-users"></i> <strong>Seguidores:</strong></span><div>Aumentan tus ingresos diarios. ¡Más gente ve tu contenido!</div></li>
+                        <li><span><i class="fas fa-bolt"></i> <strong>Energía:</strong></span><div>Se gasta en las fases críticas (depurar, vídeo, publicar). Se recupera al dormir.</div></li>
+                        <li><span><i class="fas fa-code"></i> <strong>Programación:</strong></span><div>(Nivel) Reduce la probabilidad de que aparezcan bugs y te da más tiempo en el minijuego de depuración.</div></li>
+                        <li><span><i class="fas fa-palette"></i> <strong>Diseño:</strong></span><div>(Nivel) Aumenta la calidad base de tus proyectos, lo que se traduce en mayores ingresos pasivos.</div></li>
+                        <li><span><i class="fas fa-chart-line"></i> <strong>Marketing:</strong></span><div>(Nivel) Potencia enormemente tus ganancias de dinero y seguidores diarios. Es la habilidad más importante para crecer económicamente.</div></li>
                     </ul>
                 </div>
             </div>
@@ -146,7 +155,7 @@
             <h3>Iniciar Nuevo Proyecto</h3>
             <div id="project-creation-options"></div>
             <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
-            <div>
+            <div class="modal-actions">
                 <button id="confirm-new-project-button">Empezar Desarrollo</button>
                 <button class="close-modal-button">Cancelar</button>
             </div>
