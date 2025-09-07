@@ -1,4 +1,4 @@
-// Contenido 100% completo, con corrección de bugs y lógica de proyectos v1.3 para juego.js
+// Contenido 100% completo, v1.4 - Implementación del Núcleo Jugable Completo
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         money: 500, followers: 0, energy: 10, maxEnergy: 10, day: 1,
         skills: { programming: 5, design: 5, marketing: 5 },
         activeProjects: [],
+        completedProjects: [],
         shopUpgrades: {},
         currentTrend: { name: 'Ninguna', bonus: 0, category: '' }
     };
     let gameState = {};
 
-    // Referencias a los elementos del DOM
     const dom = {
         mainMenu: document.getElementById('main-menu'),
         gameContainer: document.getElementById('game-container'),
@@ -38,8 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
         exportSaveBtn: document.getElementById('export-save-button'),
         importSaveBtn: document.getElementById('import-save-button'),
         importFileInput: document.getElementById('import-file-input'),
-        // Referencia corregida para el panel de noticias
-        newsContent: document.getElementById('news-content')
+        newsContent: document.getElementById('news-content'),
+        notificationContainer: document.getElementById('notification-container'),
+        // Modales de minijuegos
+        debugMinigameOverlay: document.getElementById('debug-minigame-overlay'),
     };
 
     const gameData = {
@@ -65,11 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeApp() {
         attachAllEventListeners();
-        if (localStorage.getItem('iLupoDevTycoonSave')) {
-            dom.continueBtn.disabled = false;
-        } else {
-            dom.continueBtn.disabled = true;
-        }
+        if (localStorage.getItem('iLupoDevTycoonSave')) dom.continueBtn.disabled = false;
+        else dom.continueBtn.disabled = true;
     }
 
     function startGame(saveData = null) {
@@ -85,10 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.followers.innerHTML = `<i class="fas fa-users"></i> ${gameState.followers}`;
         dom.energy.innerHTML = `<i class="fas fa-bolt"></i> ${gameState.energy} / ${gameState.maxEnergy}`;
         dom.date.innerHTML = `Día ${gameState.day}`;
-        // Lógica de noticias reparada: apunta al elemento correcto
-        dom.newsContent.innerHTML = `<p><strong>Tendencia del día:</strong> ${gameState.currentTrend.name} <span>(+${gameState.currentTrend.bonus}% bonus)</span></p>`;
-        
-        // Renderiza los proyectos activos
+        dom.newsContent.innerHTML = `<p><strong>Tendencia:</strong> ${gameState.currentTrend.name} <span>(+${gameState.currentTrend.bonus}% bonus)</span></p>`;
         renderActiveProjects();
     }
     
@@ -109,192 +105,294 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bonus = Math.floor(Math.random() * (trendTier.bonusRange[1] - trendTier.bonusRange[0] + 1)) + trendTier.bonusRange[0];
                 const categoryKeys = Object.keys(gameData.projectTypes);
                 const categoryName = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
-                const messageTemplate = trendTier.messages[0];
-                gameState.currentTrend = { name: messageTemplate.replace('{category}', categoryName), bonus: bonus, category: categoryName };
+                gameState.currentTrend = { name: trendTier.messages[0].replace('{category}', categoryName), bonus: bonus, category: categoryName };
                 return;
             }
         }
     }
-
+    
     // -----------------------------------------------------------------------------
-    //  3. LÓGICA DE PROYECTOS
+    //  3. LÓGICA DE PROYECTOS (NÚCLEO DEL JUEGO)
     // -----------------------------------------------------------------------------
 
     function confirmNewProject() {
         const name = dom.newProjectNameInput.value.trim();
-        if (!selectedProjectType) {
-            alert("Debes elegir un tipo de proyecto.");
+        if (!selectedProjectType || !name) {
+            alert("Debes elegir un tipo y un nombre para el proyecto.");
             return;
         }
-        if (!name) {
-            alert("Debes darle un nombre a tu proyecto.");
-            return;
-        }
-
         const projectData = gameData.projectTypes[selectedProjectType];
         if (gameState.money < projectData.baseCost) {
-            alert("No tienes suficiente dinero para empezar este proyecto.");
+            alert("No tienes suficiente dinero.");
             return;
         }
-
         gameState.money -= projectData.baseCost;
-
         const newProject = {
-            id: Date.now(), // ID único para el proyecto
-            name: name,
-            type: selectedProjectType,
-            effortRequired: projectData.baseEffort,
-            progress: 0,
-            bugs: 0,
-            quality: 0,
-            stage: 'development' // development -> video -> post -> complete
+            id: Date.now(), name: name, type: selectedProjectType,
+            effortRequired: projectData.baseEffort, progress: 0,
+            bugs: 0, quality: 0,
+            stage: 'development' // Fases: development -> video -> post -> complete
         };
-
         gameState.activeProjects.push(newProject);
-        
-        console.log(`Creando proyecto: "${name}" del tipo "${selectedProjectType}"`);
         dom.newProjectModal.classList.add('hidden');
-        updateUI(); // Actualiza la UI para mostrar el nuevo proyecto
+        updateUI();
     }
+
+    function handleProjectActions(e) {
+        const button = e.target.closest('.action-button');
+        if (!button) return;
+        
+        const projectId = parseInt(button.closest('.project-card').dataset.id);
+        const action = button.dataset.action;
+
+        switch(action) {
+            case 'develop': developProject(projectId); break;
+            case 'debug': debugProject(projectId); break;
+            case 'make-video': changeProjectStage(projectId, 'video'); break;
+            case 'make-post': changeProjectStage(projectId, 'post'); break;
+            case 'publish': publishProject(projectId); break;
+        }
+    }
+
+    function developProject(projectId) {
+        if (gameState.energy < 5) {
+            showNotification("¡Sin energía!", 'error');
+            return;
+        }
+        const project = gameState.activeProjects.find(p => p.id === projectId);
+        if (!project) return;
+        
+        gameState.energy -= 5;
+        const progressMade = Math.floor(5 + gameState.skills.programming / 2);
+        project.progress += progressMade;
+
+        // Probabilidad de generar un bug (menor con más habilidad)
+        const bugChance = Math.max(0.05, 0.4 - gameState.skills.programming * 0.02);
+        if (Math.random() < bugChance) {
+            project.bugs++;
+            showNotification("+1 Bug", 'error');
+        }
+
+        if (project.progress >= project.effortRequired) {
+            project.progress = project.effortRequired;
+            // Calcular calidad final del desarrollo
+            const baseQuality = (gameState.skills.programming + gameState.skills.design) / 2;
+            project.quality = Math.floor(baseQuality + Math.random() * 20 - 10); // Rango de aleatoriedad
+            showNotification("¡Desarrollo completado!", 'success');
+        } else {
+            showNotification(`+${progressMade} Progreso`, 'info');
+        }
+        updateUI();
+    }
+    
+    function debugProject(projectId) {
+        if (gameState.energy < 3) {
+            showNotification("¡Sin energía!", 'error');
+            return;
+        }
+        const project = gameState.activeProjects.find(p => p.id === projectId);
+        if (!project || project.bugs <= 0) return;
+        
+        gameState.energy -= 3;
+        const bugsFixed = Math.max(1, Math.floor(gameState.skills.programming / 5));
+        project.bugs = Math.max(0, project.bugs - bugsFixed);
+        showNotification(`-${bugsFixed} Bug${bugsFixed > 1 ? 's' : ''}`, 'success');
+        updateUI();
+    }
+    
+    function changeProjectStage(projectId, newStage) {
+        const project = gameState.activeProjects.find(p => p.id === projectId);
+        if (project) {
+            project.stage = newStage;
+            updateUI();
+        }
+    }
+
+    function publishProject(projectId) {
+        const projectIndex = gameState.activeProjects.findIndex(p => p.id === projectId);
+        if (projectIndex === -1) return;
+
+        const project = gameState.activeProjects[projectIndex];
+        const [moneyGained, followersGained] = calculateRewards(project);
+
+        gameState.money += moneyGained;
+        gameState.followers += followersGained;
+
+        showNotification(`+${Math.floor(moneyGained)}€ / +${followersGained} seguidores`, 'success');
+        
+        gameState.activeProjects.splice(projectIndex, 1);
+        gameState.completedProjects.push(project);
+        
+        updateUI();
+    }
+
+    function calculateRewards(project) {
+        const projectData = gameData.projectTypes[project.type];
+        
+        let moneyGained = project.effortRequired * (project.quality / 10);
+        let followersGained = Math.floor(project.quality + (gameState.skills.marketing * 1.5));
+        
+        // Bonus por tendencia
+        if (gameState.currentTrend.category === project.type) {
+            const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
+            moneyGained *= trendBonus;
+            followersGained *= trendBonus;
+        }
+        
+        // Bonus por marketing
+        moneyGained *= (1 + gameState.skills.marketing / 50);
+
+        return [Math.floor(moneyGained), Math.floor(followersGained)];
+    }
+
+    // -----------------------------------------------------------------------------
+    //  4. RENDERIZADO Y UI
+    // -----------------------------------------------------------------------------
 
     function renderActiveProjects() {
         if (gameState.activeProjects.length === 0) {
-            dom.projectListContainer.innerHTML = '<p class="no-projects-message">No hay proyectos en desarrollo. ¡Crea uno para empezar!</p>';
+            dom.projectListContainer.innerHTML = '<p class="no-projects-message">No hay proyectos en desarrollo. ¡Crea uno!</p>';
             return;
         }
 
-        let projectsHtml = '';
-        gameState.activeProjects.forEach(proj => {
+        dom.projectListContainer.innerHTML = gameState.activeProjects.map(proj => {
             const progressPercent = (proj.progress / proj.effortRequired) * 100;
-            projectsHtml += `
+            const isComplete = progressPercent >= 100;
+            let bodyHtml = '', actionsHtml = '';
+
+            // Lógica de la Máquina de Estados para la UI
+            if (isComplete) {
+                if(proj.bugs > 0) {
+                    bodyHtml = `<div class="project-stat"><i class="fas fa-bug"></i> Bugs: <span class="stat-value error">${proj.bugs}</span></div>`;
+                    actionsHtml = `<button class="action-button debug-button" data-action="debug"><i class="fas fa-spider"></i> Depurar</button>`;
+                } else {
+                    switch(proj.stage) {
+                        case 'development': // Desarrollo completo, sin bugs, listo para vídeo
+                            changeProjectStage(proj.id, 'video'); // Auto-transición
+                            // Recurse para re-renderizar con el nuevo estado
+                            return renderActiveProjects();
+                        case 'video':
+                            bodyHtml = `<div class="project-stat"><i class="fas fa-star"></i> Calidad: <span class="stat-value info">${proj.quality}</span></div>`;
+                            actionsHtml = `<button class="action-button video-button" data-action="make-post"><i class="fas fa-video"></i> Grabar Vídeo</button>`;
+                            break;
+                        case 'post':
+                            bodyHtml = `<div class="project-stat"><i class="fas fa-thumbs-up"></i> Potencial: <span class="stat-value success">¡Listo!</span></div>`;
+                            actionsHtml = `<button class="action-button publish-button" data-action="publish"><i class="fas fa-rocket"></i> Publicar</button>`;
+                            break;
+                    }
+                }
+            } else { // Todavía en desarrollo
+                bodyHtml = `
+                    <p>Progreso:</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+                        <span>${Math.floor(progressPercent)}%</span>
+                    </div>
+                    ${proj.bugs > 0 ? `<div class="project-stat"><i class="fas fa-bug"></i> Bugs: <span class="stat-value error">${proj.bugs}</span></div>` : ''}`;
+                actionsHtml = proj.bugs > 0
+                    ? `<button class="action-button debug-button" data-action="debug"><i class="fas fa-spider"></i> Depurar</button>`
+                    : `<button class="action-button develop-button" data-action="develop"><i class="fas fa-hammer"></i> Desarrollar</button>`;
+            }
+
+            return `
                 <div class="project-card" data-id="${proj.id}">
                     <div class="project-card-header">
                         <span class="project-title"><i class="fas ${gameData.projectTypes[proj.type].icon}"></i> ${proj.name}</span>
-                        <span class="project-stage">${proj.stage}</span>
+                        <span class="project-stage ${isComplete ? proj.stage : 'dev'}">${isComplete ? proj.stage : 'development'}</span>
                     </div>
-                    <div class="project-card-body">
-                        <p>Progreso:</p>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: ${progressPercent}%;"></div>
-                            <span>${Math.floor(progressPercent)}%</span>
-                        </div>
-                    </div>
-                    <div class="project-card-actions">
-                        <button class="action-button develop-button">Desarrollar</button>
-                    </div>
-                </div>
-            `;
-        });
-        dom.projectListContainer.innerHTML = projectsHtml;
+                    <div class="project-card-body">${bodyHtml}</div>
+                    <div class="project-card-actions">${actionsHtml}</div>
+                </div>`;
+        }).join('');
     }
 
+    function showNotification(message, type = 'info') {
+        const notif = document.createElement('div');
+        notif.className = `notification ${type}`;
+        notif.textContent = message;
+        dom.notificationContainer.appendChild(notif);
+        setTimeout(() => notif.remove(), 3000);
+    }
 
     // -----------------------------------------------------------------------------
-    //  4. SISTEMA DE GUARDADO
+    //  5. SISTEMA DE GUARDADO
     // -----------------------------------------------------------------------------
-
+    
     function saveGame() {
         try {
             const encodedSave = btoa(JSON.stringify(gameState));
             localStorage.setItem('iLupoDevTycoonSave', encodedSave);
-            console.log("Partida guardada.");
             dom.continueBtn.disabled = false;
-        } catch (e) {
-            console.error("Error al guardar la partida:", e);
-        }
+        } catch (e) { console.error("Error al guardar:", e); }
     }
-
     function loadGame() { return localStorage.getItem('iLupoDevTycoonSave'); }
-
     function exportSave() {
         const saveData = loadGame();
-        if (saveData) {
-            const blob = new Blob([saveData], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `iLupoDevTycoon_save_dia_${gameState.day}.txt`;
-            a.click();
-            URL.revokeObjectURL(a.href);
-        } else {
-            alert("No hay partida guardada para exportar.");
-        }
+        if (!saveData) return alert("No hay partida guardada.");
+        const blob = new Blob([saveData], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `iLupoDevTycoon_save_dia_${gameState.day}.txt`;
+        a.click();
+        URL.revokeObjectURL(a.href);
     }
-
     function importSave() { dom.importFileInput.click(); }
-    
     function handleFileImport(event) {
         const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    JSON.parse(atob(content)); // Valida que el archivo es correcto
-                    localStorage.setItem('iLupoDevTycoonSave', content);
-                    alert("Partida importada con éxito. El juego se reiniciará.");
-                    window.location.reload();
-                } catch (err) {
-                    alert("Error: El archivo de guardado no es válido o está corrupto.");
-                }
-            };
-            reader.readAsText(file);
-        }
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const content = e.target.result;
+                JSON.parse(atob(content)); // Validar
+                localStorage.setItem('iLupoDevTycoonSave', content);
+                alert("Partida importada. El juego se reiniciará.");
+                window.location.reload();
+            } catch (err) { alert("Error: Archivo de guardado no válido."); }
+        };
+        reader.readAsText(file);
     }
-
+    
     // -----------------------------------------------------------------------------
-    //  5. MANEJO DE EVENTOS Y LÓGICA DE LA UI
+    //  6. MANEJO DE EVENTOS
     // -----------------------------------------------------------------------------
     
     function attachAllEventListeners() {
-        // --- LISTENERS DEL MENÚ PRINCIPAL ---
         dom.newGameBtn.addEventListener('click', () => {
-            if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) {
-                return;
-            }
+            if (loadGame() && !confirm("¿Seguro? Se borrará tu progreso.")) return;
             localStorage.removeItem('iLupoDevTycoonSave');
             startGame();
         });
-        dom.continueBtn.addEventListener('click', () => {
-            const saveData = loadGame();
-            if (saveData) startGame(saveData);
-        });
+        dom.continueBtn.addEventListener('click', () => { if(loadGame()) startGame(loadGame()); });
         dom.helpBtn.addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
         dom.exportSaveBtn.addEventListener('click', exportSave);
         dom.importSaveBtn.addEventListener('click', importSave);
         dom.importFileInput.addEventListener('change', handleFileImport);
-        
-        // --- LISTENERS DEL JUEGO ---
         dom.nextDayBtn.addEventListener('click', nextDay);
         dom.navButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const targetViewId = button.dataset.view;
-                document.querySelectorAll('.view-panel').forEach(panel => panel.classList.toggle('active', panel.id === targetViewId));
-                dom.navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === targetViewId));
+                document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(button.dataset.view).classList.add('active');
+                dom.navButtons.forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
             });
         });
         dom.newProjectBtn.addEventListener('click', openNewProjectModal);
-        
-        // --- LISTENERS DE MODALES ---
         dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
-        document.querySelectorAll('.close-modal-button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                btn.closest('.modal-overlay').classList.add('hidden');
-            });
-        });
+        document.querySelectorAll('.close-modal-button').forEach(btn => btn.addEventListener('click', () => btn.closest('.modal-overlay').classList.add('hidden')));
+        
+        // Delegación de eventos para las acciones de los proyectos
+        dom.projectListContainer.addEventListener('click', handleProjectActions);
     }
     
     function openNewProjectModal() {
         selectedProjectType = null;
         dom.newProjectNameInput.value = '';
-        let optionsHtml = '<h4>Elige un tipo de proyecto:</h4>';
-        Object.keys(gameData.projectTypes).forEach(type => {
+        dom.projectCreationOptions.innerHTML = Object.keys(gameData.projectTypes).map(type => {
             const cost = gameData.projectTypes[type].baseCost;
-            optionsHtml += `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type} <span>(${cost} €)</span></button>`;
-        });
-        dom.projectCreationOptions.innerHTML = optionsHtml;
+            return `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type} <span>(${cost} €)</span></button>`;
+        }).join('');
         dom.newProjectModal.classList.remove('hidden');
-
-        // Delegación de eventos para los botones de tipo de proyecto
         dom.projectCreationOptions.addEventListener('click', (e) => {
             const button = e.target.closest('.project-type-choice');
             if (button) {
@@ -306,9 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------------------------------------
-    //  6. INICIALIZACIÓN
+    //  7. INICIALIZACIÓN
     // -----------------------------------------------------------------------------
-
     initializeApp();
-
 });
