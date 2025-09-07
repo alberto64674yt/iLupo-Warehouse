@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - v5.1 - Añade funciones para renderizar Habilidades y Cursos (Completo)
+//  UI.JS - v7.0 - Reconstruido el modal de proyectos como un asistente de 2 pasos
 // =================================================================================
 
 function updateUI() {
@@ -13,6 +13,7 @@ function updateUI() {
     renderCompletedProjects();
     renderSkillsUI();
     renderCoursesUI();
+    renderResearchUI();
 }
 
 function updateActiveProjectUI() {
@@ -137,23 +138,107 @@ function showNotification(message, type = 'info') {
     setTimeout(() => notif.remove(), 3000);
 }
 
+// -----------------------------------------------------------------------------
+//  LÓGICA DEL NUEVO MODAL DE PROYECTOS (ASISTENTE)
+// -----------------------------------------------------------------------------
+
 function openNewProjectModal() {
+    // Resetear estado del modal
     selectedProjectType = null;
+    selectedTechnologies = [];
     dom.newProjectNameInput.value = '';
-    dom.projectCreationOptions.innerHTML = Object.keys(gameData.projectTypes).map(type => {
+
+    // Configurar la vista inicial (Paso 1)
+    dom.modalStep1.classList.remove('hidden');
+    dom.modalStep2.classList.add('hidden');
+    dom.modalNextButton.classList.remove('hidden');
+    dom.modalBackButton.classList.add('hidden');
+    dom.confirmNewProjectBtn.classList.add('hidden');
+    
+    // Renderizar tipos de proyecto
+    dom.projectTypeSelection.innerHTML = Object.keys(gameData.projectTypes).map(type => {
         const cost = gameData.projectTypes[type].baseCost;
         return `<button class="project-type-choice" data-type="${type}"><i class="fas ${gameData.projectTypes[type].icon}"></i> ${type} <span>(${cost} €)</span></button>`;
     }).join('');
+
     dom.newProjectModal.classList.remove('hidden');
-    dom.projectCreationOptions.addEventListener('click', (e) => {
-        const button = e.target.closest('.project-type-choice');
-        if (button) {
-            document.querySelectorAll('.project-type-choice').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            selectedProjectType = button.dataset.type;
+}
+
+function renderModalStep2() {
+    if (!selectedProjectType || !dom.newProjectNameInput.value.trim()) {
+        showNotification("Debes seleccionar un tipo de proyecto y darle un nombre.", "error");
+        return;
+    }
+    
+    // Cambiar de vista
+    dom.modalStep1.classList.add('hidden');
+    dom.modalStep2.classList.remove('hidden');
+    dom.modalNextButton.classList.add('hidden');
+    dom.modalBackButton.classList.remove('hidden');
+    dom.confirmNewProjectBtn.classList.remove('hidden');
+
+    // Renderizar tecnologías disponibles
+    const availableTechs = gameState.completedResearch;
+    if (availableTechs.length > 0) {
+        dom.techSelectionContainer.innerHTML = '<h4>Tecnologías Desbloqueadas</h4>';
+        availableTechs.forEach(techId => {
+            const { node } = findResearchNode(techId);
+            if(node) {
+                dom.techSelectionContainer.innerHTML += `
+                    <button class="tech-choice" data-tech-id="${node.id}">
+                        ${node.name} (+${node.effect.cost}€, +${node.effect.quality} Q)
+                    </button>
+                `;
+            }
+        });
+    } else {
+        dom.techSelectionContainer.innerHTML = '<h4>Tecnologías Desbloqueadas</h4><p>Aún no has investigado ninguna tecnología.</p>';
+    }
+    
+    updateProjectSummary();
+}
+
+function updateProjectSummary() {
+    if (!selectedProjectType) return;
+
+    const baseData = gameData.projectTypes[selectedProjectType];
+    let totalCost = baseData.baseCost;
+    let totalTime = baseData.baseTime;
+    let qualityBonus = 0;
+
+    selectedTechnologies.forEach(techId => {
+        const { node } = findResearchNode(techId);
+        if (node) {
+            totalCost += node.effect.cost;
+            totalTime += node.effect.time;
+            qualityBonus += node.effect.quality;
         }
     });
+
+    const canAfford = gameState.money >= totalCost;
+    dom.confirmNewProjectBtn.disabled = !canAfford;
+
+    dom.projectSummaryContainer.innerHTML = `
+        <h4>Resumen del Proyecto</h4>
+        <div class="summary-line">
+            <span>Coste Total:</span>
+            <span class="value ${canAfford ? '' : 'negative'}">${totalCost} €</span>
+        </div>
+        <div class="summary-line">
+            <span>Tiempo Base:</span>
+            <span class="value">${totalTime}s</span>
+        </div>
+        <div class="summary-line">
+            <span>Bonus Calidad:</span>
+            <span class="value positive">+${qualityBonus} Q</span>
+        </div>
+        ${!canAfford ? '<p class="negative">No tienes suficiente dinero.</p>' : ''}
+    `;
 }
+
+// -----------------------------------------------------------------------------
+//  RESTO DE FUNCIONES DE UI
+// -----------------------------------------------------------------------------
 
 function renderSkillsUI() {
     let html = '<h3><i class="fas fa-star"></i> Habilidades</h3>';
@@ -200,8 +285,8 @@ function renderCoursesUI() {
                         <span><i class="fas fa-clock"></i> ${course.duration} día(s)</span>
                         <span><i class="fas fa-star"></i> +${course.xp} XP</span>
                     </div>
-                    <button class="start-course-button" data-course-id="${course.id}" data-skill-type="${skillType}" ${gameState.activeCourse ? 'disabled' : ''}>
-                        ${gameState.activeCourse ? 'Estudiando...' : 'Iniciar Curso'}
+                    <button class="start-course-button" data-course-id="${course.id}" data-skill-type="${skillType}" ${gameState.activeCourse || gameState.activeResearch ? 'disabled' : ''}>
+                        ${gameState.activeCourse ? 'Estudiando...' : (gameState.activeResearch ? 'Investigando...' : 'Iniciar Curso')}
                     </button>
                 </div>
             `;
@@ -224,5 +309,56 @@ function renderCoursesUI() {
         `;
     } else {
         dom.activeCourseContainer.innerHTML = '';
+    }
+}
+
+function renderResearchUI() {
+    let html = '';
+    for (const skillType in gameData.researchData) {
+        const tree = gameData.researchData[skillType];
+        html += `<div class="research-tree">`;
+        html += `<h4 class="research-tree-header"><i class="fas ${tree.icon}"></i> ${tree.name}</h4>`;
+        html += `<div class="research-nodes">`;
+
+        tree.nodes.forEach(node => {
+            const isCompleted = gameState.completedResearch.includes(node.id);
+            const reqSkill = node.requires.skill;
+            const reqLevel = node.requires.level;
+            const reqResearch = node.requires.research;
+
+            const hasSkillReq = gameState.skills[reqSkill].level >= reqLevel;
+            const hasResearchReq = reqResearch ? gameState.completedResearch.includes(reqResearch) : true;
+            const canResearch = hasSkillReq && hasResearchReq && !isCompleted;
+            
+            html += `<div class="research-node ${isCompleted ? 'completed' : ''}">
+                <h5>${node.name}</h5>
+                <p class="research-node-desc">${node.desc}</p>
+                <div class="research-node-info">
+                    <span><i class="fas fa-coins"></i> ${node.cost} €</span>
+                    <span><i class="fas fa-clock"></i> ${node.duration} día(s)</span>
+                    <span class="research-node-req ${hasSkillReq && hasResearchReq ? 'hidden' : ''}">
+                        <i class="fas fa-lock"></i>
+                        ${!hasSkillReq ? `${reqSkill} Nivel ${reqLevel}` : ''}
+                        ${!hasResearchReq ? ` (Requiere ${findResearchNode(reqResearch)?.node.name || 'inv. previa'})` : ''}
+                    </span>
+                </div>
+                ${!isCompleted ? `<button class="start-research-button" data-research-id="${node.id}" data-skill-type="${skillType}" ${!canResearch || gameState.activeResearch || gameState.activeCourse ? 'disabled' : ''}>Investigar</button>` : '<h5><i class="fas fa-check-circle"></i> Completado</h5>'}
+            </div>`;
+        });
+
+        html += `</div></div>`;
+    }
+    dom.researchContainer.innerHTML = html;
+
+    if (gameState.activeResearch) {
+        dom.activeResearchContainer.innerHTML = `
+            <div class="active-research-display">
+                <h4>Investigación en progreso:</h4>
+                <p><strong>${gameState.activeResearch.name}</strong></p>
+                <p>Tiempo restante: ${gameState.activeResearch.daysRemaining} día(s)</p>
+            </div>
+        `;
+    } else {
+        dom.activeResearchContainer.innerHTML = '';
     }
 }
