@@ -72,6 +72,12 @@
                 <div id="active-course-container"></div>
             </section>
 
+            <section id="research-panel" class="view-panel">
+                <h2><i class="fas fa-flask"></i> Investigación y Desarrollo</h2>
+                <div id="active-research-container"></div>
+                <div id="research-container"></div>
+            </section>
+
             <aside id="news-panel">
                 <h3><i class="fas fa-fire"></i> Noticias y Tendencias</h3>
                 <div id="news-content"></div>
@@ -82,6 +88,7 @@
             <button class="nav-button active" data-view="dev-panel"><i class="fas fa-code"></i> Desarrollo</button>
             <button class="nav-button" data-view="shop-panel"><i class="fas fa-shopping-cart"></i> Tienda</button>
             <button class="nav-button" data-view="courses-panel"><i class="fas fa-graduation-cap"></i> Cursos</button>
+            <button class="nav-button" data-view="research-panel"><i class="fas fa-flask"></i> I+D</button>
         </nav>
     </div>
 
@@ -151,12 +158,32 @@
     </div>
     
     <div id="new-project-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3>Iniciar Nuevo Proyecto</h3>
-            <div id="project-creation-options"></div>
-            <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
+        <div class="modal-content large">
+            <button class="close-modal-button" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem;">&times;</button>
+            
+            <div id="modal-step-1">
+                <h3>Iniciar Nuevo Proyecto (Paso 1 de 2)</h3>
+                <p>Elige el tipo de proyecto base y dale un nombre.</p>
+                <div id="project-type-selection"></div>
+                <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
+            </div>
+
+            <div id="modal-step-2" class="hidden">
+                <h3>Añadir Tecnologías (Paso 2 de 2)</h3>
+                <div class="step2-layout">
+                    <div id="tech-selection-container">
+                        <h4>Tecnologías Desbloqueadas</h4>
+                        </div>
+                    <div id="project-summary-container">
+                        <h4>Resumen del Proyecto</h4>
+                        </div>
+                </div>
+            </div>
+
             <div class="modal-actions">
-                <button id="confirm-new-project-button">Empezar Desarrollo</button>
+                <button id="modal-back-button" class="hidden">Atrás</button>
+                <button id="modal-next-button">Siguiente</button>
+                <button id="confirm-new-project-button" class="hidden">Empezar Desarrollo</button>
                 <button class="close-modal-button">Cancelar</button>
             </div>
         </div>
@@ -192,6 +219,7 @@
 
     <script src="data.js" defer></script>
     <script src="courses.js" defer></script>
+    <script src="research.js" defer></script>
     <script src="ui.js" defer></script>
     <script src="shop.js" defer></script>
     <script src="minigames.js" defer></script>
