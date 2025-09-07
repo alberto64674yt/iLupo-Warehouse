@@ -1,14 +1,10 @@
 // =================================================================================
-//  MAIN.JS - v4.0 - Lógica principal con nuevo balance de economía y eventos.
+//  MAIN.JS - v4.2 - Lógica principal con balance final de economía y eventos.
 // =================================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
 });
-
-// -----------------------------------------------------------------------------
-//  1. BUCLE DE JUEGO PRINCIPAL
-// -----------------------------------------------------------------------------
 
 function initializeApp() {
     attachAllEventListeners();
@@ -23,15 +19,12 @@ function startGame(saveData = null) {
     gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
     dom.mainMenu.classList.add('hidden');
     dom.gameContainer.classList.remove('hidden');
-    
     if (gameState.activeProject) {
         startProjectTimer();
     }
-
     if (gameState.day === 1) {
         generateNewTrend();
     }
-    
     renderShop();
     updateUI();
 }
@@ -39,14 +32,11 @@ function startGame(saveData = null) {
 function gameTick() {
     const proj = gameState.activeProject;
     if (!proj || proj.stage !== 'development') return;
-
-    proj.timeRemaining -= 0.1; // Se ejecuta cada 100ms
-
+    proj.timeRemaining -= 0.1;
     const bugChance = Math.max(0.001, 0.015 - gameState.skills.programming * 0.001);
     if (Math.random() < bugChance) {
         proj.bugs++;
     }
-
     if (proj.timeRemaining <= 0) {
         proj.timeRemaining = 0;
         proj.stage = 'debugging';
@@ -63,34 +53,32 @@ function nextDay() {
         alert("No puedes pasar de día con un proyecto activo. ¡Termínalo!");
         return;
     }
-
-    let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
+    let {
+        totalIncome,
+        totalFollowers,
+        incomeBreakdown
+    } = calculatePassiveIncome();
     let expenses = 0;
     let expenseReason = '';
-    
-    // Sistema de Eventos
-    const eventResult = handleDailyEvent({ totalIncome, totalFollowers, incomeBreakdown });
+    const eventResult = handleDailyEvent({
+        totalIncome,
+        totalFollowers,
+        incomeBreakdown
+    });
     totalIncome = eventResult.totals.totalIncome;
     totalFollowers = eventResult.totals.totalFollowers;
-    
-    // Sistema de Alquiler con escalado agresivo
     if ((gameState.day - gameState.lastRentDay) >= 6) {
         expenses = gameState.rentCost;
         expenseReason = `Alquiler del Servidor (Día ${gameState.day})`;
         gameState.lastRentDay = gameState.day;
-        // El nuevo alquiler escala con tus proyectos y seguidores
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
-
     const netIncome = totalIncome - expenses;
-
     if (gameState.money + netIncome < 0) {
         handleGameOver(`Te has quedado sin dinero para pagar el alquiler de ${expenses}€.`);
         return;
     }
-
     showDailySummary(incomeBreakdown, expenses, expenseReason, totalIncome, totalFollowers, eventResult.eventMessage);
-    
     const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
@@ -114,15 +102,15 @@ function generateNewTrend() {
             const bonus = Math.floor(Math.random() * (trendTier.bonusRange[1] - trendTier.bonusRange[0] + 1)) + trendTier.bonusRange[0];
             const categoryKeys = Object.keys(gameData.projectTypes);
             const categoryName = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
-            gameState.currentTrend = { name: trendTier.messages[0].replace('{category}', categoryName), bonus: bonus, category: categoryName };
+            gameState.currentTrend = {
+                name: trendTier.messages[0].replace('{category}', categoryName),
+                bonus: bonus,
+                category: categoryName
+            };
             return;
         }
     }
 }
-
-// -----------------------------------------------------------------------------
-//  2. LÓGICA DE PROYECTOS, INGRESOS Y GAME OVER
-// -----------------------------------------------------------------------------
 
 function confirmNewProject() {
     if (gameState.activeProject || gameState.completedProjectsToday.length >= gameState.maxProjectsPerDay) {
@@ -140,9 +128,7 @@ function confirmNewProject() {
         return;
     }
     gameState.money -= projectData.baseCost;
-
     const totalTime = Math.max(30, projectData.baseTime - gameState.hardwareTimeReduction);
-
     gameState.activeProject = {
         id: Date.now(),
         name: name,
@@ -151,9 +137,9 @@ function confirmNewProject() {
         timeRemaining: totalTime,
         bugs: 0,
         quality: 0,
-        stage: 'development'
+        stage: 'development',
+        seoPenalty: 1
     };
-
     dom.newProjectModal.classList.add('hidden');
     startProjectTimer();
     updateUI();
@@ -171,9 +157,7 @@ function publishProject() {
         return;
     }
     gameState.energy -= gameData.energyCosts.publish;
-    
     showNotification(`${proj.name} se ha añadido a tu portfolio.`, 'success');
-    
     gameState.completedProjects.push(proj);
     gameState.completedProjectsToday.push(proj);
     gameState.activeProject = null;
@@ -184,36 +168,39 @@ function calculatePassiveIncome() {
     let totalIncome = 0;
     let totalFollowers = 0;
     const incomeBreakdown = [];
-
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
         let dailyMoney = projData.baseIncome + (proj.quality / 2);
-        let dailyFollowers = Math.ceil(proj.quality / 20); // Nerfeado, se ganan más lento
-        
+        let dailyFollowers = Math.ceil(proj.quality / 20);
         dailyMoney *= gameState.appMonetization;
         dailyFollowers *= gameState.postMonetization;
-        
-        const followerBonus = 1 + (gameState.followers / 5000); // Nerfeado, los seguidores dan un bonus menor
+        if (proj.seoPenalty) {
+            dailyFollowers *= proj.seoPenalty;
+        }
+        const followerBonus = 1 + (gameState.followers / 5000);
         const marketingBonus = 1 + (gameState.skills.marketing / 50);
-        
         dailyMoney *= followerBonus * marketingBonus;
         dailyFollowers *= marketingBonus;
-        
         if (gameState.currentTrend.category === proj.type) {
             const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
             dailyMoney *= trendBonus;
             dailyFollowers *= trendBonus;
         }
-
         dailyMoney = Math.floor(dailyMoney);
         dailyFollowers = Math.floor(dailyFollowers);
-
         totalIncome += dailyMoney;
         totalFollowers += dailyFollowers;
-        incomeBreakdown.push({ name: proj.name, income: dailyMoney, followers: dailyFollowers });
+        incomeBreakdown.push({
+            name: proj.name,
+            income: dailyMoney,
+            followers: dailyFollowers
+        });
     });
-
-    return { totalIncome, totalFollowers, incomeBreakdown };
+    return {
+        totalIncome,
+        totalFollowers,
+        incomeBreakdown
+    };
 }
 
 function handleGameOver(reason) {
@@ -226,13 +213,7 @@ function resetGame() {
     window.location.reload();
 }
 
-
-// -----------------------------------------------------------------------------
-//  3. EVENT LISTENERS Y GUARDADO/CARGADO
-// -----------------------------------------------------------------------------
-
 function attachAllEventListeners() {
-    // Menú Principal
     dom.newGameBtn.addEventListener('click', () => {
         if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) {
             return;
@@ -240,16 +221,15 @@ function attachAllEventListeners() {
         localStorage.removeItem('iLupoDevTycoonSave');
         startGame();
     });
-    dom.continueBtn.addEventListener('click', () => { const saveData = loadGame(); if (saveData) startGame(saveData); });
+    dom.continueBtn.addEventListener('click', () => {
+        const saveData = loadGame();
+        if (saveData) startGame(saveData);
+    });
     dom.helpBtn.addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
     dom.restartGameButton.addEventListener('click', resetGame);
-    
-    // Guardado/Cargado
     dom.exportSaveBtn.addEventListener('click', exportSave);
     dom.importSaveBtn.addEventListener('click', importSave);
     dom.importFileInput.addEventListener('change', handleFileImport);
-    
-    // Juego Principal
     dom.nextDayBtn.addEventListener('click', nextDay);
     dom.navButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -259,15 +239,11 @@ function attachAllEventListeners() {
             button.classList.add('active');
         });
     });
-    
-    // Tienda
     document.getElementById('shop-items-container').addEventListener('click', (e) => {
         if (e.target.closest('.buy-button')) {
             buyUpgrade(e.target.closest('.buy-button').dataset.itemId);
         }
     });
-    
-    // Modales
     dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
     document.body.addEventListener('click', (e) => {
         const closeButton = e.target.closest('.close-modal-button');
@@ -279,8 +255,6 @@ function attachAllEventListeners() {
             }
         }
     });
-    
-    // Minijuegos (botones de inicio)
     dom.startDebugButton.onclick = startDebugMinigame;
 }
 
@@ -289,7 +263,9 @@ function saveGame() {
         const encodedSave = btoa(JSON.stringify(gameState));
         localStorage.setItem('iLupoDevTycoonSave', encodedSave);
         dom.continueBtn.disabled = false;
-    } catch (e) { console.error("Error al guardar:", e); }
+    } catch (e) {
+        console.error("Error al guardar:", e);
+    }
 }
 
 function loadGame() {
@@ -302,7 +278,9 @@ function exportSave() {
         alert("No hay partida guardada.");
         return;
     }
-    const blob = new Blob([saveData], { type: 'text/plain' });
+    const blob = new Blob([saveData], {
+        type: 'text/plain'
+    });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `iLupoDevTycoon_save_dia_${gameState.day}.txt`;
@@ -318,7 +296,7 @@ function handleFileImport(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         try {
             const content = e.target.result;
             JSON.parse(atob(content));
