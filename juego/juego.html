@@ -47,13 +47,24 @@
         <main id="main-view">
             <section id="dev-panel" class="view-panel active">
                 <h2>Oficina de Desarrollo</h2>
-                <div id="project-list-container"></div>
-                <button id="new-project-button">+ Iniciar Nuevo Proyecto</button>
+                <div id="active-project-slot">
+                    </div>
+                <div id="completed-projects-container">
+                    <h3>Proyectos Completados Hoy</h3>
+                    <ul id="completed-projects-list"></ul>
+                </div>
             </section>
+            
             <section id="shop-panel" class="view-panel">
-                <h2>Tienda de Mejoras</h2>
-                <div id="shop-items-container"></div>
+                <h2><i class="fas fa-shopping-cart"></i> Tienda de Mejoras</h2>
+                <div id="shop-items-container">
+                    <h3><i class="fas fa-desktop"></i> Hardware</h3>
+                    <div id="shop-hardware" class="shop-category"></div>
+                    <h3><i class="fas fa-coffee"></i> Personal</h3>
+                    <div id="shop-personal" class="shop-category"></div>
+                </div>
             </section>
+
             <aside id="news-panel">
                 <h3><i class="fas fa-fire"></i> Noticias y Tendencias</h3>
                 <div id="news-content"></div>
@@ -64,21 +75,6 @@
             <button class="nav-button active" data-view="dev-panel"><i class="fas fa-code"></i> Desarrollo</button>
             <button class="nav-button" data-view="shop-panel"><i class="fas fa-shopping-cart"></i> Tienda</button>
         </nav>
-    </div>
-
-    <div id="help-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button class="close-modal-button" style="position: absolute; top: 15px; right: 15px;">&times;</button>
-            <h3>Ayuda del Juego</h3>
-            <ul>
-                <li><span><i class="fas fa-coins"></i></span><div><strong>Dinero:</strong> Se usa para comprar mejoras en la tienda y empezar proyectos. Se gana con los vídeos y la publicidad.</div></li>
-                <li><span><i class="fas fa-users"></i></span><div><strong>Seguidores:</strong> Representa tu popularidad. A más seguidores, más visitas en tus vídeos.</div></li>
-                <li><span><i class="fas fa-bolt"></i></span><div><strong>Energía:</strong> Se consume al realizar acciones importantes como desarrollar o grabar. Se recupera cada día al "Dormir".</div></li>
-                <li><span><i class="fas fa-code"></i></span><div><strong>Programación:</strong> Tu habilidad para desarrollar. Reduce la cantidad de bugs.</div></li>
-                <li><span><i class="fas fa-palette"></i></span><div><strong>Diseño:</strong> Tu habilidad artística. Mejora la calidad de los juegos y la interfaz de las utilidades.</div></li>
-                <li><span><i class="fas fa-chart-line"></i></span><div><strong>Marketing:</strong> Tu habilidad para promocionarte. Aumenta la ganancia de seguidores y puede influir en las "Tendencias".</div></li>
-            </ul>
-        </div>
     </div>
 
     <div id="new-project-modal" class="modal-overlay hidden">
@@ -92,18 +88,38 @@
             </div>
         </div>
     </div>
-    
+
     <div id="debug-minigame-overlay" class="modal-overlay hidden">
+        <div class="minigame-container">
+            <h3><i class="fas fa-bug"></i> ¡A Depurar!</h3>
+            <div class="minigame-hud">
+                <span>Bugs restantes: <span id="debug-bugs-left">0</span></span>
+                <span>Tiempo: <span id="debug-timer">0s</span></span>
+            </div>
+            <div id="debug-play-area">
+                </div>
+            <button id="start-debug-button">Empezar a Depurar</button>
         </div>
+    </div>
+    
     <div id="video-seo-minigame-overlay" class="modal-overlay hidden">
+        <div class="minigame-container">
+            <h3><i class="fas fa-chart-line"></i> Optimización SEO</h3>
+            <p>Selecciona las <strong>5 etiquetas correctas</strong> antes de que se acabe el tiempo.</p>
+            <div class="minigame-hud">
+                <span>Puntuación: <span id="seo-score">0 / 5</span></span>
+                <span>Tiempo: <span id="seo-timer">15s</span></span>
+            </div>
+            <div id="seo-tags-container">
+                </div>
+             <button id="finish-seo-button" class="hidden">Finalizar Vídeo</button>
         </div>
-    <div id="post-creation-modal" class="modal-overlay hidden">
-        </div>
+    </div>
+
+    <div id="help-modal" class="modal-overlay hidden"></div>
 
     <a href="../index.html" class="back-to-portfolio-link">← Volver al Portfolio</a>
-
     <div id="notification-container"></div>
-
     <script src="juego.js" defer></script>
 
 </body>
