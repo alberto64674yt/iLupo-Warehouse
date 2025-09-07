@@ -214,7 +214,41 @@ body {
 .modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; }
 .modal-content.large { max-width: 800px; }
 .modal-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
-.modal-content button { padding: 0.8rem 1.5rem; margin: 0; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
+.modal-content button {
+    padding: 0.8rem 1.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    transition: all 0.2s ease; /* Añadida transición para consistencia */
+}
+/* Estilo específico para el botón de cerrar modal (la X) */
+button.close-modal-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Para que sea circular */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    padding: 0;
+    line-height: 1;
+}
+button.close-modal-button:hover {
+    background-color: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+    transform: scale(1.05);
+}
+
 #restart-game-button { background-color: var(--danger-color); color: white; }
 .summary-event { background-color: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-style: italic; }
 .back-to-portfolio-link { position: fixed; top: 1.2rem; left: 1.2rem; z-index: 2000; color: var(--light-text); text-decoration: none; background-color: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); transition: all 0.2s ease; }
@@ -222,12 +256,34 @@ body {
 #save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .hidden { display: none !important; }
 
-/* --- Modal de Nuevo Proyecto (Botones y Selección) --- */
-#project-creation-options { margin: 1.5rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+/* --- Modal de Nuevo Proyecto (Asistente) --- */
+/* Añadido flex-direction y gap para la estructura de los pasos */
+#modal-step-1, #modal-step-2 { display: flex; flex-direction: column; gap: 1rem; }
+#project-type-selection { margin: 1.5rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
 .project-type-choice { background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); padding: 0.8rem 1.2rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
 .project-type-choice:hover { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); }
 .project-type-choice.active { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color-trans); transform: scale(1.05); }
 .project-type-choice span { font-size: 0.9rem; opacity: 0.8; }
+
+/* Estilos para el paso 2 del modal (selección de tecnología y resumen) */
+.step2-layout { display: flex; gap: 2rem; margin-top: 1.5rem; text-align: left; }
+#tech-selection-container { flex: 2; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.8rem; }
+#tech-selection-container h4 { margin: 0 0 1rem 0; text-align: center; }
+.tech-choice { background-color: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); width: 100%; padding: 0.8rem; text-align: left; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.9rem; transition: all 0.2s ease; }
+.tech-choice:hover { border-color: var(--primary-color); }
+.tech-choice.active { background-color: var(--primary-color); color: var(--dark-bg); border-color: var(--primary-color); font-weight: bold; }
+#project-summary-container { flex: 1; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+#project-summary-container h4 { margin: 0 0 1rem 0; text-align: center; }
+.summary-line { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem; }
+.summary-line .value { font-weight: bold; }
+.summary-line .value.positive { color: var(--success-color); }
+.summary-line .value.negative { color: var(--danger-color); }
+
+/* Estilos específicos para los botones del asistente */
+#modal-next-button { background-color: var(--edit-color); color: white; }
+#modal-back-button { background-color: #6c757d; color: white; }
+#confirm-new-project-button { background-color: var(--success-color); color: white; }
+
 
 /* --- Modal de Ayuda (Formato de Guía) --- */
 .help-container { text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 1rem; }
