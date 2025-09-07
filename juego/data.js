@@ -1,5 +1,5 @@
 // =================================================================================
-//  DATA.JS - Almacén de todos los datos estáticos y estado inicial del juego.
+//  DATA.JS - v4.0 - Rebalance de Energía, Economía y Tienda.
 // =================================================================================
 
 // -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ const initialGameState = {
     shopUpgrades: [],
     maxProjectsPerDay: 1,
     hardwareTimeReduction: 0,
-    rentCost: 100,
+    rentCost: 150, // Aumentado para que sea una amenaza inicial
     lastRentDay: 1,
     appMonetization: 1,
     postMonetization: 1,
@@ -99,19 +99,19 @@ const gameData = {
             icon: 'fa-wrench',
             baseCost: 50,
             baseTime: 120,
-            baseIncome: 10
+            baseIncome: 4 // Nerfeado de 10
         },
         'Juego Arcade': {
             icon: 'fa-gamepad',
             baseCost: 100,
             baseTime: 180,
-            baseIncome: 20
+            baseIncome: 8 // Nerfeado de 20
         },
         'Mod': {
             icon: 'fa-puzzle-piece',
             baseCost: 25,
             baseTime: 90,
-            baseIncome: 5
+            baseIncome: 2 // Nerfeado de 5
         }
     },
     shopItems: {
@@ -136,7 +136,7 @@ const gameData = {
         }, {
             id: 'hw3',
             name: 'CPU de 8 núcleos',
-            desc: 'Reduce el tiempo de desarrollo 30 segundos más.',
+            desc: 'Reduce el tiempo de desarrollo 30 segundos más. (Máx. 90s de reducción)',
             cost: 3000,
             effect: {
                 type: 'hardwareTimeReduction',
@@ -147,7 +147,7 @@ const gameData = {
             id: 'ps1',
             name: 'Monetizar Apps',
             desc: 'Tus proyectos generan un 25% más de ingresos.',
-            cost: 500,
+            cost: 800, // Aumentado
             effect: {
                 type: 'appMonetization',
                 value: 1.25
@@ -156,25 +156,26 @@ const gameData = {
             id: 'ps2',
             name: 'Monetizar Posts',
             desc: 'Tus vídeos/posts generan un 25% más de seguidores.',
-            cost: 500,
+            cost: 800, // Aumentado
             effect: {
                 type: 'postMonetization',
                 value: 1.25
             }
         }, {
             id: 'ps3',
-            name: 'Curso de Productividad',
-            desc: 'Permite gestionar 2 proyectos por día.',
-            cost: 2500,
+            name: 'Curso Productividad I',
+            desc: 'Permite gestionar 2 proyectos/día y aumenta la Energía Máxima a 200.',
+            cost: 4000, // Aumentado significativamente
             effect: {
                 type: 'maxProjectsPerDay',
-                value: 1
+                value: 1,
+                energy: 200
             }
         }, {
             id: 'ps4',
             name: 'Silla Ergonómica',
-            desc: '+25 Energía Máxima.',
-            cost: 800,
+            desc: '+25 Energía Máxima. Útil si quieres reintentar minijuegos.',
+            cost: 1000, // Aumentado
             effect: {
                 type: 'maxEnergy',
                 value: 25
@@ -225,7 +226,7 @@ const gameData = {
         negative: [{
             message: "Una polémica en redes sociales te salpica. ¡Has perdido un 10% de tus seguidores!",
             effect: (totals) => {
-                const followersLost = Math.floor(gameState.followers * 0.1);
+                const followersLost = Math.max(1, Math.floor(gameState.followers * 0.1));
                 gameState.followers -= followersLost;
                 totals.totalFollowers -= followersLost;
                 return totals;
@@ -243,5 +244,11 @@ const gameData = {
                 return totals;
             }
         }]
+    },
+    // Nuevas constantes de balance
+    energyCosts: {
+        debug: 50,
+        video: 40,
+        publish: 10,
     }
 };
