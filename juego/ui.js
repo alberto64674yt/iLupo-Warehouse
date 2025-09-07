@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - Todas las funciones que manipulan el DOM y actualizan la interfaz.
+//  UI.JS - v4.0 - Actualización de la interfaz a los nuevos costes de energía.
 // =================================================================================
 
 function updateUI() {
@@ -46,15 +46,15 @@ function updateActiveProjectUI() {
             break;
         case 'debugging':
              html += `<p>El desarrollo ha finalizado con <strong>${proj.bugs} bugs</strong>. ¡Hay que eliminarlos!</p>
-                <button class="action-button debug-button" id="init-debug-minigame"><i class="fas fa-spider"></i> Iniciar Depuración (30 Energía)</button>`;
+                <button class="action-button debug-button" id="init-debug-minigame"><i class="fas fa-spider"></i> Iniciar Depuración (${gameData.energyCosts.debug} Energía)</button>`;
             break;
         case 'video':
             html += `<p>¡Proyecto limpio! Ahora a grabar el vídeo y optimizar el SEO para maximizar el impacto.</p>
-                <button class="action-button video-button" id="init-seo-minigame"><i class="fas fa-video"></i> Producir Vídeo (30 Energía)</button>`;
+                <button class="action-button video-button" id="init-seo-minigame"><i class="fas fa-video"></i> Producir Vídeo (${gameData.energyCosts.video} Energía)</button>`;
             break;
         case 'post':
             html += `<p>El vídeo está listo. ¡Es hora de lanzar el proyecto al mundo!</p>
-                <button class="action-button publish-button" id="publish-project-button"><i class="fas fa-rocket"></i> Publicar (20 Energía)</button>`;
+                <button class="action-button publish-button" id="publish-project-button"><i class="fas fa-rocket"></i> Publicar (${gameData.energyCosts.publish} Energía)</button>`;
             break;
     }
 
@@ -89,7 +89,7 @@ function calculatePassiveIncomeForProjectUI(proj) {
     const projData = gameData.projectTypes[proj.type];
     let dailyMoney = projData.baseIncome + (proj.quality / 2);
     dailyMoney *= gameState.appMonetization;
-    const followerBonus = 1 + (gameState.followers / 2000);
+    const followerBonus = 1 + (gameState.followers / 5000); // Refleja el nerfeo
     const marketingBonus = 1 + (gameState.skills.marketing / 50);
     dailyMoney *= followerBonus * marketingBonus;
     if (gameState.currentTrend.category === proj.type) {
