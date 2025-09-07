@@ -1,4 +1,4 @@
-// Contenido 100% completo, v2.0.1 - Mega Update: Bucle en Tiempo Real, Minijuegos y Tienda (Versión corregida sin omisiones)
+// Contenido 100% completo, v3.0.1 - Mega Update: Ingresos Pasivos, Gastos, Balance y Guía (Versión corregida sin omisiones)
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -15,9 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
         money: 500, followers: 0, energy: 100, maxEnergy: 100, day: 1,
         skills: { programming: 5, design: 5, marketing: 5 },
         activeProject: null,
+        completedProjects: [],
         completedProjectsToday: [],
         shopUpgrades: [],
-        timeMultiplier: 1, // 1 = 100% del tiempo. Mejoras lo reducirán.
+        maxProjectsPerDay: 1,
+        hardwareTimeReduction: 0,
+        rentCost: 100,
+        lastRentDay: 1,
+        appMonetization: 1,
+        postMonetization: 1,
         currentTrend: { name: 'Ninguna', bonus: 0, category: '' }
     };
     
@@ -39,24 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
         shopPersonal: document.getElementById('shop-personal'),
         newsContent: document.getElementById('news-content'),
         notificationContainer: document.getElementById('notification-container'),
-        // Modales
         newProjectModal: document.getElementById('new-project-modal'),
         confirmNewProjectBtn: document.getElementById('confirm-new-project-button'),
         newProjectNameInput: document.getElementById('new-project-name-input'),
         projectCreationOptions: document.getElementById('project-creation-options'),
-        // Minijuego de Depuración
+        helpModal: document.getElementById('help-modal'),
+        dailySummaryModal: document.getElementById('daily-summary-modal'),
+        summaryTitle: document.getElementById('summary-title'),
+        summaryContent: document.getElementById('summary-content'),
+        gameOverModal: document.getElementById('game-over-modal'),
+        gameOverReason: document.getElementById('game-over-reason'),
+        restartGameButton: document.getElementById('restart-game-button'),
         debugMinigameOverlay: document.getElementById('debug-minigame-overlay'),
         debugBugsLeft: document.getElementById('debug-bugs-left'),
         debugTimer: document.getElementById('debug-timer'),
         debugPlayArea: document.getElementById('debug-play-area'),
         startDebugButton: document.getElementById('start-debug-button'),
-        // Minijuego de SEO
         videoSeoMinigameOverlay: document.getElementById('video-seo-minigame-overlay'),
         seoScore: document.getElementById('seo-score'),
         seoTimer: document.getElementById('seo-timer'),
         seoTagsContainer: document.getElementById('seo-tags-container'),
         finishSeoButton: document.getElementById('finish-seo-button'),
-        // Guardado
         exportSaveBtn: document.getElementById('export-save-button'),
         importSaveBtn: document.getElementById('import-save-button'),
         importFileInput: document.getElementById('import-file-input'),
@@ -64,20 +73,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gameData = {
         projectTypes: {
-            'Utilidad': { programming: 0.7, design: 0.1, marketing: 0.2, icon: 'fa-wrench', baseCost: 50, baseTime: 120 }, // en segundos
-            'Juego Arcade': { programming: 0.4, design: 0.5, marketing: 0.1, icon: 'fa-gamepad', baseCost: 100, baseTime: 180 },
-            'Mod': { programming: 0.8, design: 0.1, marketing: 0.1, icon: 'fa-puzzle-piece', baseCost: 25, baseTime: 90 }
+            'Utilidad': { icon: 'fa-wrench', baseCost: 50, baseTime: 120, baseIncome: 10 },
+            'Juego Arcade': { icon: 'fa-gamepad', baseCost: 100, baseTime: 180, baseIncome: 20 },
+            'Mod': { icon: 'fa-puzzle-piece', baseCost: 25, baseTime: 90, baseIncome: 5 }
         },
         shopItems: {
             hardware: [
-                { id: 'hw1', name: 'SSD Básico', desc: 'Reduce el tiempo de desarrollo un 10%.', cost: 300, effect: { type: 'timeMultiplier', value: 0.9 } },
-                { id: 'hw2', name: 'RAM 16GB', desc: 'Reduce el tiempo de desarrollo un 15% adicional.', cost: 800, effect: { type: 'timeMultiplier', value: 0.85 } },
-                { id: 'hw3', name: 'CPU de 8 núcleos', desc: 'Reduce el tiempo de desarrollo un 20% adicional.', cost: 2000, effect: { type: 'timeMultiplier', value: 0.80 } },
+                { id: 'hw1', name: 'SSD Básico', desc: 'Reduce el tiempo de desarrollo 15 segundos.', cost: 400, effect: { type: 'hardwareTimeReduction', value: 15 } },
+                { id: 'hw2', name: 'RAM 16GB', desc: 'Reduce el tiempo de desarrollo 25 segundos más.', cost: 1200, effect: { type: 'hardwareTimeReduction', value: 25 } },
+                { id: 'hw3', name: 'CPU de 8 núcleos', desc: 'Reduce el tiempo de desarrollo 30 segundos más.', cost: 3000, effect: { type: 'hardwareTimeReduction', value: 30 } },
             ],
             personal: [
-                { id: 'ps1', name: 'Cafetera de Cápsulas', desc: '+10 Energía Máxima.', cost: 150, effect: { type: 'maxEnergy', value: 10 } },
-                { id: 'ps2', name: 'Silla Ergonómica', desc: '+15 Energía Máxima.', cost: 500, effect: { type: 'maxEnergy', value: 15 } },
-                { id: 'ps3', name: 'Curso de Marketing', desc: '+5 a la habilidad de Marketing.', cost: 1000, effect: { type: 'skill', skill: 'marketing', value: 5 } },
+                { id: 'ps1', name: 'Monetizar Apps', desc: 'Tus proyectos generan un 25% más de ingresos.', cost: 500, effect: { type: 'appMonetization', value: 1.25 } },
+                { id: 'ps2', name: 'Monetizar Posts', desc: 'Tus vídeos/posts generan un 25% más de seguidores.', cost: 500, effect: { type: 'postMonetization', value: 1.25 } },
+                { id: 'ps3', name: 'Curso de Productividad', desc: 'Permite gestionar 2 proyectos por día.', cost: 2500, effect: { type: 'maxProjectsPerDay', value: 1 } },
+                { id: 'ps4', name: 'Silla Ergonómica', desc: '+25 Energía Máxima.', cost: 800, effect: { type: 'maxEnergy', value: 25 } },
             ]
         },
         trends: [
@@ -90,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // -----------------------------------------------------------------------------
-    //  2. BUCLE DE JUEGO PRINCIPAL Y TEMPORIZADOR
+    //  2. BUCLE DE JUEGO PRINCIPAL
     // -----------------------------------------------------------------------------
 
     function initializeApp() {
@@ -103,34 +113,24 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
         dom.mainMenu.classList.add('hidden');
         dom.gameContainer.classList.remove('hidden');
-        
-        if (gameState.activeProject) {
-            startProjectTimer();
-        }
-
+        if (gameState.activeProject) startProjectTimer();
         if (gameState.day === 1) generateNewTrend();
         renderShop();
         updateUI();
     }
 
     function gameTick() {
-        if (!gameState.activeProject || gameState.activeProject.stage !== 'development') return;
-
         const proj = gameState.activeProject;
+        if (!proj || proj.stage !== 'development') return;
         proj.timeRemaining -= 0.1;
-
         const bugChance = Math.max(0.001, 0.015 - gameState.skills.programming * 0.001);
-        if (Math.random() < bugChance) {
-            proj.bugs++;
-        }
-
+        if (Math.random() < bugChance) proj.bugs++;
         if (proj.timeRemaining <= 0) {
             proj.timeRemaining = 0;
             proj.stage = 'debugging';
             clearInterval(gameTickInterval);
             gameTickInterval = null;
-            const baseQuality = (gameState.skills.programming + gameState.skills.design);
-            proj.quality = Math.floor(baseQuality + Math.random() * 20 - 10);
+            proj.quality = Math.floor((gameState.skills.programming + gameState.skills.design) + Math.random() * 20 - 10);
             showNotification('¡Desarrollo terminado! Listo para depurar.', 'success');
         }
         updateActiveProjectUI();
@@ -141,12 +141,39 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("No puedes pasar de día con un proyecto activo. ¡Termínalo!");
             return;
         }
-        gameState.day++;
-        gameState.energy = gameState.maxEnergy;
-        gameState.completedProjectsToday = [];
-        generateNewTrend();
-        updateUI();
-        saveGame();
+
+        const { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
+        let expenses = 0;
+        let expenseReason = '';
+
+        if ((gameState.day - gameState.lastRentDay) >= 6) {
+            expenses = gameState.rentCost;
+            expenseReason = `Alquiler del Servidor (Día ${gameState.day})`;
+            gameState.lastRentDay = gameState.day;
+            gameState.rentCost = Math.floor(gameState.rentCost * 1.15);
+        }
+
+        const netIncome = totalIncome - expenses;
+
+        if (gameState.money + netIncome < 0) {
+            handleGameOver(`Te has quedado sin dinero para pagar el alquiler de ${expenses}€.`);
+            return;
+        }
+
+        showDailySummary(incomeBreakdown, expenses, expenseReason, totalIncome, totalFollowers);
+        
+        const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
+        continueButton.onclick = () => {
+            gameState.day++;
+            gameState.money += netIncome;
+            gameState.followers += totalFollowers;
+            gameState.energy = gameState.maxEnergy;
+            gameState.completedProjectsToday = [];
+            generateNewTrend();
+            updateUI();
+            saveGame();
+            dom.dailySummaryModal.classList.add('hidden');
+        };
     }
 
     function generateNewTrend() {
@@ -165,12 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------------------------------------
-    //  3. LÓGICA DE PROYECTOS
+    //  3. LÓGICA DE PROYECTOS, INGRESOS Y GAME OVER
     // -----------------------------------------------------------------------------
 
     function confirmNewProject() {
-        if (gameState.activeProject) {
-            alert("Ya tienes un proyecto en desarrollo.");
+        if (gameState.activeProject || gameState.completedProjectsToday.length >= gameState.maxProjectsPerDay) {
+            alert(`Ya has completado tu cupo de ${gameState.maxProjectsPerDay} proyecto(s) por hoy.`);
             return;
         }
         const name = dom.newProjectNameInput.value.trim();
@@ -185,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         gameState.money -= projectData.baseCost;
 
-        const totalTime = Math.max(30, projectData.baseTime * gameState.timeMultiplier);
+        const totalTime = Math.max(30, projectData.baseTime - gameState.hardwareTimeReduction);
 
         gameState.activeProject = {
             id: Date.now(), name: name, type: selectedProjectType,
@@ -210,34 +237,63 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         gameState.energy -= 20;
-
-        const [moneyGained, followersGained] = calculateRewards(proj);
-        gameState.money += moneyGained;
-        gameState.followers += followersGained;
-
-        showNotification(`+${Math.floor(moneyGained)}€ / +${followersGained} seguidores`, 'success');
         
+        showNotification(`${proj.name} se ha añadido a tu portfolio.`, 'success');
+        
+        gameState.completedProjects.push(proj);
         gameState.completedProjectsToday.push(proj);
         gameState.activeProject = null;
         updateUI();
     }
     
-    function calculateRewards(project) {
-        let quality = project.quality;
-        let moneyGained = gameData.projectTypes[project.type].baseTime * (quality / 10);
-        let followersGained = Math.floor(quality + (gameState.skills.marketing * 1.5));
-        
-        if (gameState.currentTrend.category === project.type) {
-            const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
-            moneyGained *= trendBonus;
-            followersGained *= trendBonus;
-        }
-        moneyGained *= (1 + gameState.skills.marketing / 50);
-        return [Math.floor(moneyGained), Math.floor(followersGained)];
+    function calculatePassiveIncome() {
+        let totalIncome = 0;
+        let totalFollowers = 0;
+        const incomeBreakdown = [];
+
+        gameState.completedProjects.forEach(proj => {
+            const projData = gameData.projectTypes[proj.type];
+            let dailyMoney = projData.baseIncome + (proj.quality / 2);
+            let dailyFollowers = Math.ceil(proj.quality / 10);
+            
+            dailyMoney *= gameState.appMonetization;
+            dailyFollowers *= gameState.postMonetization;
+            
+            const followerBonus = 1 + (gameState.followers / 2000);
+            const marketingBonus = 1 + (gameState.skills.marketing / 50);
+            
+            dailyMoney *= followerBonus * marketingBonus;
+            dailyFollowers *= marketingBonus;
+            
+            if (gameState.currentTrend.category === proj.type) {
+                const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
+                dailyMoney *= trendBonus;
+                dailyFollowers *= trendBonus;
+            }
+
+            dailyMoney = Math.floor(dailyMoney);
+            dailyFollowers = Math.floor(dailyFollowers);
+
+            totalIncome += dailyMoney;
+            totalFollowers += dailyFollowers;
+            incomeBreakdown.push({ name: proj.name, income: dailyMoney, followers: dailyFollowers });
+        });
+
+        return { totalIncome, totalFollowers, incomeBreakdown };
+    }
+
+    function handleGameOver(reason) {
+        dom.gameOverReason.textContent = reason;
+        dom.gameOverModal.classList.remove('hidden');
+    }
+
+    function resetGame() {
+        localStorage.removeItem('iLupoDevTycoonSave');
+        window.location.reload();
     }
 
     // -----------------------------------------------------------------------------
-    //  4. MINIJUEGO DE DEPURACIÓN
+    //  4. MINIJUEGOS
     // -----------------------------------------------------------------------------
 
     function startDebugMinigame() {
@@ -303,10 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUI();
         }
     }
-
-    // -----------------------------------------------------------------------------
-    //  5. MINIJUEGO DE SEO
-    // -----------------------------------------------------------------------------
 
     function startSeoMinigame() {
         if (gameState.energy < 30) {
@@ -379,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------------------------------------
-    //  6. TIENDA Y MEJORAS
+    //  5. TIENDA Y MEJORAS
     // -----------------------------------------------------------------------------
 
     function renderShop() {
@@ -387,6 +439,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = dom[`shop${category.charAt(0).toUpperCase() + category.slice(1)}`];
             container.innerHTML = gameData.shopItems[category].map(item => {
                 const isOwned = gameState.shopUpgrades.includes(item.id);
+                if (item.effect.type === 'maxProjectsPerDay' && gameState.maxProjectsPerDay >= 2 && !isOwned) return '';
+
                 return `
                     <div class="shop-item ${isOwned ? 'owned' : ''}">
                         <div class="item-name">${item.name}</div>
@@ -407,10 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let item;
         for (const cat in gameData.shopItems) {
             const found = gameData.shopItems[cat].find(i => i.id === itemId);
-            if (found) {
-                item = found;
-                break;
-            }
+            if (found) { item = found; break; }
         }
 
         if (!item || gameState.shopUpgrades.includes(itemId) || gameState.money < item.cost) {
@@ -419,15 +470,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         gameState.money -= item.cost;
-        gameState.shopUpgrades.push(itemId);
+        gameState.shopUpgrades.push(item.id);
 
         switch(item.effect.type) {
-            case 'timeMultiplier': gameState.timeMultiplier *= item.effect.value; break;
+            case 'hardwareTimeReduction': gameState.hardwareTimeReduction += item.effect.value; break;
+            case 'appMonetization': gameState.appMonetization = item.effect.value; break;
+            case 'postMonetization': gameState.postMonetization = item.effect.value; break;
+            case 'maxProjectsPerDay': gameState.maxProjectsPerDay += item.effect.value; break;
             case 'maxEnergy':
                 gameState.maxEnergy += item.effect.value;
                 gameState.energy = gameState.maxEnergy;
                 break;
-            case 'skill': gameState.skills[item.effect.skill] += item.effect.value; break;
         }
         
         showNotification(`¡${item.name} comprado!`, 'success');
@@ -436,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------------------------------------
-    //  7. RENDERIZADO Y UI
+    //  6. RENDERIZADO Y UI
     // -----------------------------------------------------------------------------
     
     function updateUI() {
@@ -447,8 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.newsContent.innerHTML = `<p><strong>Tendencia:</strong> ${gameState.currentTrend.name} <span>(+${gameState.currentTrend.bonus}% bonus)</span></p>`;
         
         updateActiveProjectUI();
-        
-        dom.completedProjectsList.innerHTML = gameState.completedProjectsToday.map(p => `<li><i class="fas ${gameData.projectTypes[p.type].icon}"></i> ${p.name}</li>`).join('') || '<li>Ninguno por ahora.</li>';
+        renderCompletedProjects();
     }
     
     function updateActiveProjectUI() {
@@ -503,7 +555,62 @@ document.addEventListener('DOMContentLoaded', () => {
         if (proj.stage === 'video') document.getElementById('init-seo-minigame').onclick = startSeoMinigame;
         if (proj.stage === 'post') document.getElementById('publish-project-button').onclick = publishProject;
     }
+
+    function renderCompletedProjects() {
+        if (gameState.completedProjects.length === 0) {
+            dom.completedProjectsList.innerHTML = '<p class="no-projects-message">Aún no has publicado ningún proyecto.</p>';
+            return;
+        }
+        dom.completedProjectsList.innerHTML = gameState.completedProjects.map(p => {
+            const income = calculatePassiveIncomeForProject(p);
+            return `
+            <div class="completed-project-card">
+                <span><i class="fas ${gameData.projectTypes[p.type].icon}"></i> ${p.name}</span>
+                <span class="stat">Calidad: ${p.quality}</span>
+                <span class="stat success"><i class="fas fa-coins"></i> ${income.money}€/día</span>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function calculatePassiveIncomeForProject(proj) {
+        const projData = gameData.projectTypes[proj.type];
+        let dailyMoney = projData.baseIncome + (proj.quality / 2);
+        dailyMoney *= gameState.appMonetization;
+        const followerBonus = 1 + (gameState.followers / 2000);
+        const marketingBonus = 1 + (gameState.skills.marketing / 50);
+        dailyMoney *= followerBonus * marketingBonus;
+        if (gameState.currentTrend.category === proj.type) {
+            dailyMoney *= (1 + gameState.currentTrend.bonus / 100);
+        }
+        return { money: Math.floor(dailyMoney) };
+    }
     
+    function showDailySummary(incomeBreakdown, expenses, expenseReason, totalIncome, totalFollowers) {
+        dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
+        let contentHtml = '<h4><i class="fas fa-arrow-up"></i> Ingresos</h4><ul>';
+        incomeBreakdown.forEach(item => {
+            contentHtml += `<li>${item.name}: <strong>+${item.income}€</strong> y <strong>+${item.followers} seguidores</strong></li>`;
+        });
+        if (incomeBreakdown.length === 0) contentHtml += '<li>Sin ingresos hoy. ¡Publica proyectos!</li>';
+        contentHtml += '</ul>';
+
+        if (expenses > 0) {
+            contentHtml += `<h4><i class="fas fa-arrow-down"></i> Gastos</h4><ul>`;
+            contentHtml += `<li>${expenseReason}: <strong>-${expenses}€</strong></li>`;
+            contentHtml += '</ul>';
+        }
+
+        contentHtml += `<div class="summary-total">
+            <p>Total Hoy: <span class="success">+${totalIncome}€</span> y <span class="info">+${totalFollowers} seguidores</span></p>
+            ${expenses > 0 ? `<p>Gastos: <span class="error">-${expenses}€</span></p>` : ''}
+            <p>Resultado Neto: <span class="${(totalIncome-expenses) >= 0 ? 'success' : 'error'}">${(totalIncome-expenses)}€</span></p>
+        </div>`;
+
+        dom.summaryContent.innerHTML = contentHtml;
+        dom.dailySummaryModal.classList.remove('hidden');
+    }
+
     function showNotification(message, type = 'info') {
         const notif = document.createElement('div');
         notif.className = `notification ${type}`;
@@ -513,25 +620,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // -----------------------------------------------------------------------------
-    //  8. EVENT LISTENERS, GUARDADO Y MODALES
+    //  7. EVENT LISTENERS, GUARDADO Y MODALES
     // -----------------------------------------------------------------------------
     
     function attachAllEventListeners() {
-        // Menú Principal
-        dom.newGameBtn.addEventListener('click', () => {
-            if (loadGame() && !confirm("¿Seguro? Se borrará tu progreso.")) return;
-            localStorage.removeItem('iLupoDevTycoonSave');
-            startGame();
-        });
-        dom.continueBtn.addEventListener('click', () => { if(loadGame()) startGame(loadGame()); });
-        dom.helpBtn.addEventListener('click', () => document.getElementById('help-modal').classList.remove('hidden'));
+        dom.newGameBtn.addEventListener('click', () => { if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) return; resetGame(); });
+        dom.continueBtn.addEventListener('click', () => { const saveData = loadGame(); if (saveData) startGame(saveData); });
+        dom.helpBtn.addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
+        dom.restartGameButton.addEventListener('click', resetGame);
         
-        // Guardado
         dom.exportSaveBtn.addEventListener('click', exportSave);
         dom.importSaveBtn.addEventListener('click', importSave);
         dom.importFileInput.addEventListener('change', handleFileImport);
         
-        // Juego Principal
         dom.nextDayBtn.addEventListener('click', nextDay);
         dom.navButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -542,20 +643,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Tienda
         document.getElementById('shop-items-container').addEventListener('click', (e) => {
-            if (e.target.classList.contains('buy-button')) {
-                buyUpgrade(e.target.dataset.itemId);
+            if (e.target.closest('.buy-button')) {
+                buyUpgrade(e.target.closest('.buy-button').dataset.itemId);
             }
         });
         
-        // Modales
         dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
         document.querySelectorAll('.close-modal-button').forEach(btn => {
             btn.addEventListener('click', () => btn.closest('.modal-overlay').classList.add('hidden'));
         });
         
-        // Botón inicial del modal de depuración
         dom.startDebugButton.onclick = startDebugMinigame;
     }
     
@@ -612,8 +710,5 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
     }
 
-    // -----------------------------------------------------------------------------
-    //  9. INICIALIZACIÓN
-    // -----------------------------------------------------------------------------
     initializeApp();
 });
