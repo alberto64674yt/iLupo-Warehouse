@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - Contiene el cerebro y el bucle principal del juego.
+//  MAIN.JS - v4.0 - Lógica principal con nuevo balance de economía y eventos.
 // =================================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -73,12 +73,13 @@ function nextDay() {
     totalIncome = eventResult.totals.totalIncome;
     totalFollowers = eventResult.totals.totalFollowers;
     
-    // Sistema de Alquiler
+    // Sistema de Alquiler con escalado agresivo
     if ((gameState.day - gameState.lastRentDay) >= 6) {
         expenses = gameState.rentCost;
         expenseReason = `Alquiler del Servidor (Día ${gameState.day})`;
         gameState.lastRentDay = gameState.day;
-        gameState.rentCost = Math.floor(gameState.rentCost * 1.15);
+        // El nuevo alquiler escala con tus proyectos y seguidores
+        gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
 
     const netIncome = totalIncome - expenses;
@@ -165,11 +166,11 @@ function startProjectTimer() {
 
 function publishProject() {
     const proj = gameState.activeProject;
-    if (!proj || gameState.energy < 20) {
-        showNotification('Se necesitan 20 de energía para publicar.', 'error');
+    if (!proj || gameState.energy < gameData.energyCosts.publish) {
+        showNotification(`Se necesitan ${gameData.energyCosts.publish} de energía para publicar.`, 'error');
         return;
     }
-    gameState.energy -= 20;
+    gameState.energy -= gameData.energyCosts.publish;
     
     showNotification(`${proj.name} se ha añadido a tu portfolio.`, 'success');
     
@@ -187,12 +188,12 @@ function calculatePassiveIncome() {
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
         let dailyMoney = projData.baseIncome + (proj.quality / 2);
-        let dailyFollowers = Math.ceil(proj.quality / 10);
+        let dailyFollowers = Math.ceil(proj.quality / 20); // Nerfeado, se ganan más lento
         
         dailyMoney *= gameState.appMonetization;
         dailyFollowers *= gameState.postMonetization;
         
-        const followerBonus = 1 + (gameState.followers / 2000);
+        const followerBonus = 1 + (gameState.followers / 5000); // Nerfeado, los seguidores dan un bonus menor
         const marketingBonus = 1 + (gameState.skills.marketing / 50);
         
         dailyMoney *= followerBonus * marketingBonus;
