@@ -1,4 +1,4 @@
-// Contenido 100% completo, con correcciones de botones y menú v1.2 para juego.js
+// Contenido 100% completo, con menú principal y correcciones v1.2 para juego.js
 
 document.addEventListener('DOMContentLoaded', () => {
 
