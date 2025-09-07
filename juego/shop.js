@@ -1,5 +1,5 @@
 // =================================================================================
-//  SHOP.JS - Lógica para renderizar la tienda y comprar mejoras.
+//  SHOP.JS - v4.0 - Lógica de compra ajustada al nuevo balance.
 // =================================================================================
 
 function renderShop() {
@@ -59,11 +59,19 @@ function buyUpgrade(itemId) {
             break;
         case 'maxProjectsPerDay':
             gameState.maxProjectsPerDay += item.effect.value;
+            // Aumenta la energía máxima al comprar esta mejora
+            if(item.effect.energy) {
+                gameState.maxEnergy = item.effect.energy;
+            }
             break;
         case 'maxEnergy':
             gameState.maxEnergy += item.effect.value;
-            gameState.energy = gameState.maxEnergy; // Rellena la energía al comprar
             break;
+    }
+
+    // Rellena siempre la energía al comprar una mejora que la afecte
+    if(item.effect.type === 'maxProjectsPerDay' || item.effect.type === 'maxEnergy') {
+        gameState.energy = gameState.maxEnergy;
     }
     
     showNotification(`¡${item.name} comprado!`, 'success');
