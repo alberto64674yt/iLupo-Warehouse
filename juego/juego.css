@@ -1,4 +1,4 @@
-/* Contenido 100% completo, v2.0 - Estilos para la Mega Update */
+/* Contenido 100% completo, v2.0.1 - Corrección de visibilidad de la UI */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -150,7 +150,11 @@ body {
 
 /* --- Modales, Guardado y otros --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-overlay.hidden { display: none !important; }
 .modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; }
 #save-menu { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .back-to-portfolio-link { position: fixed; top: 1.2rem; left: 1.2rem; z-index: 2000; }
+
+/* REGLA DE VISIBILIDAD RESTAURADA */
+.hidden {
+    display: none !important;
+}
