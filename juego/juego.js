@@ -1,4 +1,4 @@
-// Contenido 100% completo, v3.0.1 - Mega Update: Ingresos Pasivos, Gastos, Balance y Guía (Versión corregida sin omisiones)
+// Contenido 100% completo y funcional, v3.1 - Reparación del botón "Nueva Partida" y revisión final.
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -105,16 +105,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeApp() {
         attachAllEventListeners();
-        if (localStorage.getItem('iLupoDevTycoonSave')) dom.continueBtn.disabled = false;
-        else dom.continueBtn.disabled = true;
+        if (localStorage.getItem('iLupoDevTycoonSave')) {
+            dom.continueBtn.disabled = false;
+        } else {
+            dom.continueBtn.disabled = true;
+        }
     }
 
     function startGame(saveData = null) {
         gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
         dom.mainMenu.classList.add('hidden');
         dom.gameContainer.classList.remove('hidden');
-        if (gameState.activeProject) startProjectTimer();
-        if (gameState.day === 1) generateNewTrend();
+        if (gameState.activeProject) {
+            startProjectTimer();
+        }
+        if (gameState.day === 1) {
+            generateNewTrend();
+        }
         renderShop();
         updateUI();
     }
@@ -124,7 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!proj || proj.stage !== 'development') return;
         proj.timeRemaining -= 0.1;
         const bugChance = Math.max(0.001, 0.015 - gameState.skills.programming * 0.001);
-        if (Math.random() < bugChance) proj.bugs++;
+        if (Math.random() < bugChance) {
+            proj.bugs++;
+        }
         if (proj.timeRemaining <= 0) {
             proj.timeRemaining = 0;
             proj.stage = 'debugging';
@@ -624,7 +633,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
     
     function attachAllEventListeners() {
-        dom.newGameBtn.addEventListener('click', () => { if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) return; resetGame(); });
+        // --- INICIO DE LA CORRECCIÓN ---
+        dom.newGameBtn.addEventListener('click', () => {
+            if (loadGame() && !confirm("¿Seguro que quieres empezar una nueva partida? Se borrará tu progreso actual.")) {
+                return;
+            }
+            localStorage.removeItem('iLupoDevTycoonSave');
+            startGame(); // Llama a startGame directamente en lugar de recargar
+        });
+        // --- FIN DE LA CORRECCIÓN ---
+
         dom.continueBtn.addEventListener('click', () => { const saveData = loadGame(); if (saveData) startGame(saveData); });
         dom.helpBtn.addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
         dom.restartGameButton.addEventListener('click', resetGame);
@@ -650,8 +668,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
-        document.querySelectorAll('.close-modal-button').forEach(btn => {
-            btn.addEventListener('click', () => btn.closest('.modal-overlay').classList.add('hidden'));
+        
+        // Delegación de eventos para todos los botones de cerrar modales
+        document.body.addEventListener('click', (e) => {
+            const closeButton = e.target.closest('.close-modal-button');
+            if (closeButton) {
+                const modal = closeButton.closest('.modal-overlay');
+                if (modal) {
+                    if (modal.id === 'daily-summary-modal') return;
+                    modal.classList.add('hidden');
+                }
+            }
         });
         
         dom.startDebugButton.onclick = startDebugMinigame;
@@ -682,10 +709,17 @@ document.addEventListener('DOMContentLoaded', () => {
             dom.continueBtn.disabled = false;
         } catch (e) { console.error("Error al guardar:", e); }
     }
-    function loadGame() { return localStorage.getItem('iLupoDevTycoonSave'); }
+
+    function loadGame() {
+        return localStorage.getItem('iLupoDevTycoonSave');
+    }
+
     function exportSave() {
         const saveData = loadGame();
-        if (!saveData) return alert("No hay partida guardada.");
+        if (!saveData) {
+            alert("No hay partida guardada.");
+            return;
+        }
         const blob = new Blob([saveData], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -693,7 +727,11 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         URL.revokeObjectURL(a.href);
     }
-    function importSave() { dom.importFileInput.click(); }
+
+    function importSave() {
+        dom.importFileInput.click();
+    }
+
     function handleFileImport(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -705,10 +743,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('iLupoDevTycoonSave', content);
                 alert("Partida importada. El juego se reiniciará.");
                 window.location.reload();
-            } catch (err) { alert("Error: Archivo de guardado no válido."); }
+            } catch (err) {
+                alert("Error: Archivo de guardado no válido.");
+            }
         };
         reader.readAsText(file);
     }
 
+    // -----------------------------------------------------------------------------
+    //  8. INICIALIZACIÓN
+    // -----------------------------------------------------------------------------
     initializeApp();
 });
