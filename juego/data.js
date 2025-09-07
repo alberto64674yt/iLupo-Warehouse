@@ -1,5 +1,5 @@
 // =================================================================================
-//  DATA.JS - v5.0 - Añadidos datos de Habilidades y Cursos
+//  DATA.JS - v7.0 - Añadidos efectos a los nodos de I+D y refs para nuevo modal
 // =================================================================================
 
 // -----------------------------------------------------------------------------
@@ -18,9 +18,11 @@ const initialGameState = {
         marketing: { level: 1, xp: 0 }
     },
     activeProject: null,
-    activeCourse: null, // Para saber si hay un curso en progreso
+    activeCourse: null,
+    activeResearch: null, // Para la investigación activa
     completedProjects: [],
-    completedCourses: [], // Para saber qué cursos hemos completado
+    completedCourses: [],
+    completedResearch: [], // Para guardar las IDs de las investigaciones completadas
     completedProjectsToday: [],
     shopUpgrades: [],
     maxProjectsPerDay: 1,
@@ -40,6 +42,7 @@ let gameState = {};
 let gameTickInterval = null;
 let minigameInterval = null;
 let selectedProjectType = null;
+let selectedTechnologies = []; // Rastreador para el nuevo modal
 
 
 // -----------------------------------------------------------------------------
@@ -65,12 +68,22 @@ const dom = {
     shopPersonal: document.getElementById('shop-personal'),
     coursesContainer: document.getElementById('courses-container'),
     activeCourseContainer: document.getElementById('active-course-container'),
+    researchContainer: document.getElementById('research-container'),
+    activeResearchContainer: document.getElementById('active-research-container'),
     newsContent: document.getElementById('news-content'),
     notificationContainer: document.getElementById('notification-container'),
     newProjectModal: document.getElementById('new-project-modal'),
-    confirmNewProjectBtn: document.getElementById('confirm-new-project-button'),
+    // Referencias al nuevo modal
+    modalStep1: document.getElementById('modal-step-1'),
+    modalStep2: document.getElementById('modal-step-2'),
+    projectTypeSelection: document.getElementById('project-type-selection'),
     newProjectNameInput: document.getElementById('new-project-name-input'),
-    projectCreationOptions: document.getElementById('project-creation-options'),
+    techSelectionContainer: document.getElementById('tech-selection-container'),
+    projectSummaryContainer: document.getElementById('project-summary-container'),
+    modalNextButton: document.getElementById('modal-next-button'),
+    modalBackButton: document.getElementById('modal-back-button'),
+    confirmNewProjectBtn: document.getElementById('confirm-new-project-button'),
+    // Fin referencias nuevo modal
     helpModal: document.getElementById('help-modal'),
     dailySummaryModal: document.getElementById('daily-summary-modal'),
     summaryTitle: document.getElementById('summary-title'),
@@ -99,7 +112,7 @@ const dom = {
 
 const gameData = {
     skillData: {
-        xpCurve: [0, 100, 250, 500, 1000, 1750, 2500, 5000] 
+        xpCurve: [0, 100, 250, 500, 1000, 1750, 2500, 5000]
     },
     courses: {
         programming: [
@@ -117,6 +130,32 @@ const gameData = {
             { id: 'mkt2', name: 'Marketing II: SEO y Contenido', desc: 'Atrae público de forma orgánica a tus webs.', cost: 800, duration: 2, xp: 120, requires: 'mkt1' },
             { id: 'mkt3', name: 'Marketing III: Campañas Virales', desc: 'Aprende las claves para que tu contenido explote.', cost: 2000, duration: 3, xp: 250, requires: 'mkt2' },
         ]
+    },
+    researchData: {
+        programming: {
+            name: 'Programación',
+            icon: 'fa-code',
+            nodes: [
+                { id: 'res_prog1', name: 'Motor 2D Básico', desc: 'Desbloquea la capacidad de crear proyectos con gráficos 2D simples.', cost: 1000, duration: 3, requires: { skill: 'programming', level: 1 }, effect: { cost: 50, time: 20, quality: 10 } },
+                { id: 'res_prog2', name: 'Guardado Local', desc: 'Permite que tus proyectos guarden el progreso del jugador.', cost: 2500, duration: 4, requires: { skill: 'programming', level: 3, research: 'res_prog1' }, effect: { cost: 100, time: 10, quality: 5 } },
+            ]
+        },
+        design: {
+            name: 'Diseño',
+            icon: 'fa-palette',
+            nodes: [
+                { id: 'res_design1', name: 'Pixel Art', desc: 'Desbloquea un estilo visual retro para tus proyectos.', cost: 800, duration: 2, requires: { skill: 'design', level: 1 }, effect: { cost: 20, time: 0, quality: 15 } },
+                { id: 'res_design2', name: 'Interfaz Personalizada', desc: 'Crea menús e interfaces más atractivos y únicos.', cost: 2000, duration: 4, requires: { skill: 'design', level: 2, research: 'res_design1' }, effect: { cost: 80, time: 30, quality: 20 } },
+            ]
+        },
+        marketing: {
+            name: 'Marketing',
+            icon: 'fa-chart-line',
+            nodes: [
+                { id: 'res_mkt1', name: 'Página Web Simple', desc: 'Crea una web para promocionar tu proyecto y ganar más seguidores.', cost: 500, duration: 2, requires: { skill: 'marketing', level: 1 }, effect: { cost: 150, time: 0, quality: 0 } },
+                { id: 'res_mkt2', name: 'Tráiler de Lanzamiento', desc: 'Genera expectación con un vídeo promocional antes del lanzamiento.', cost: 1500, duration: 3, requires: { skill: 'marketing', level: 2, research: 'res_mkt1' }, effect: { cost: 300, time: 0, quality: 5 } },
+            ]
+        }
     },
     projectTypes: {
         'Utilidad': {
