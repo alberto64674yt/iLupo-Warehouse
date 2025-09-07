@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v5.1 - Integración del sistema de Habilidades y Cursos (Completo)
+//  MAIN.JS - v7.0 - Lógica de nuevo proyecto adaptada al asistente de I+D
 // =================================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,8 +50,8 @@ function gameTick() {
         proj.stage = 'debugging';
         clearInterval(gameTickInterval);
         gameTickInterval = null;
-        // La calidad base ahora depende del NIVEL de diseño
-        proj.quality = Math.floor((gameState.skills.programming.level + (gameState.skills.design.level * 2)) + Math.random() * 20 - 10);
+        // La calidad base ahora incluye el bonus de las tecnologías
+        proj.quality = Math.floor(proj.qualityBonus + (gameState.skills.programming.level + (gameState.skills.design.level * 2)) + Math.random() * 20 - 10);
         showNotification('¡Desarrollo terminado! Listo para depurar.', 'success');
     }
     updateActiveProjectUI();
@@ -63,7 +63,7 @@ function nextDay() {
         return;
     }
 
-    // Comprobar si se ha completado un curso
+    // Progresar curso activo
     if (gameState.activeCourse) {
         gameState.activeCourse.daysRemaining--;
         if (gameState.activeCourse.daysRemaining <= 0) {
@@ -74,6 +74,15 @@ function nextDay() {
             gameState.activeCourse = null;
         }
     }
+    
+    // Progresar investigación activa
+    if (gameState.activeResearch) {
+        gameState.activeResearch.daysRemaining--;
+        if (gameState.activeResearch.daysRemaining <= 0) {
+            completeResearch(gameState.activeResearch.id);
+        }
+    }
+
 
     let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
     let expenses = 0;
@@ -155,39 +164,49 @@ function confirmNewProject() {
         alert("Ya tienes un proyecto en desarrollo.");
         return;
     }
-    
-    // Con el sistema de cursos concurrente, esta comprobación ya no es necesaria
-    // if (gameState.activeCourse) {
-    //     alert("No puedes iniciar un proyecto mientras estudias.");
-    //     return;
-    // }
-
     if (gameState.completedProjectsToday.length >= gameState.maxProjectsPerDay) {
         alert(`Ya has completado tu cupo de ${gameState.maxProjectsPerDay} proyecto(s) por hoy.`);
         return;
     }
     const name = dom.newProjectNameInput.value.trim();
     if (!selectedProjectType || !name) {
-        alert("Elige un tipo y nombre para el proyecto.");
+        alert("Error inesperado: Faltan datos del proyecto.");
         return;
     }
-    const projectData = gameData.projectTypes[selectedProjectType];
-    if (gameState.money < projectData.baseCost) {
-        alert("No tienes suficiente dinero.");
-        return;
-    }
-    gameState.money -= projectData.baseCost;
 
-    const totalTime = Math.max(30, projectData.baseTime - gameState.hardwareTimeReduction);
+    // Calcular coste, tiempo y bonus a partir de la selección
+    const baseData = gameData.projectTypes[selectedProjectType];
+    let totalCost = baseData.baseCost;
+    let totalTime = baseData.baseTime;
+    let qualityBonus = 0;
+
+    selectedTechnologies.forEach(techId => {
+        const { node } = findResearchNode(techId);
+        if (node) {
+            totalCost += node.effect.cost;
+            totalTime += node.effect.time;
+            qualityBonus += node.effect.quality;
+        }
+    });
+    
+    if (gameState.money < totalCost) {
+        alert("No tienes suficiente dinero para este proyecto con las tecnologías seleccionadas.");
+        return;
+    }
+
+    gameState.money -= totalCost;
+    const finalTime = Math.max(30, totalTime - gameState.hardwareTimeReduction);
 
     gameState.activeProject = {
         id: Date.now(),
         name: name,
         type: selectedProjectType,
-        totalTime: totalTime,
-        timeRemaining: totalTime,
+        technologies: [...selectedTechnologies],
+        totalTime: finalTime,
+        timeRemaining: finalTime,
         bugs: 0,
-        quality: 0,
+        quality: 0, // La calidad final se calcula en gameTick
+        qualityBonus: qualityBonus, // El bonus base de las tecnologías
         stage: 'development',
         seoPenalty: 1
     };
@@ -326,8 +345,44 @@ function attachAllEventListeners() {
         }
     });
     
-    // Modales
+    // I+D
+    dom.researchContainer.addEventListener('click', (e) => {
+        if (e.target.closest('.start-research-button')) {
+            const button = e.target.closest('.start-research-button');
+            startResearch(button.dataset.researchId, button.dataset.skillType);
+        }
+    });
+
+    // --- Listeners del Modal de Nuevo Proyecto ---
     dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
+    dom.modalNextButton.addEventListener('click', renderModalStep2);
+    dom.modalBackButton.addEventListener('click', openNewProjectModal);
+    
+    dom.projectTypeSelection.addEventListener('click', (e) => {
+        const button = e.target.closest('.project-type-choice');
+        if (button) {
+            document.querySelectorAll('.project-type-choice').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            selectedProjectType = button.dataset.type;
+        }
+    });
+
+    dom.techSelectionContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.tech-choice');
+        if(button) {
+            const techId = button.dataset.techId;
+            if (selectedTechnologies.includes(techId)) {
+                selectedTechnologies = selectedTechnologies.filter(id => id !== techId);
+                button.classList.remove('active');
+            } else {
+                selectedTechnologies.push(techId);
+                button.classList.add('active');
+            }
+            updateProjectSummary();
+        }
+    });
+    
+    // Listener general para cerrar modales
     document.body.addEventListener('click', (e) => {
         const closeButton = e.target.closest('.close-modal-button');
         if (closeButton) {
