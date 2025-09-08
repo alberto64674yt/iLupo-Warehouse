@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v9.5 - SOLUCIÓN DEFINITIVA DE LAYOUT */
+/* Contenido 100% completo y funcional, v10.0 - ALTERNATIVA RADICAL CON CSS GRID */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -10,7 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    padding: 1rem; /* Añade un pequeño margen exterior a todo */
+    padding: 1.5rem; /* Aumentado ligeramente para mejor estética */
     box-sizing: border-box;
 }
 
@@ -33,28 +33,28 @@ body {
 .main-menu-link { background-color: var(--surface-color); color: var(--light-text); }
 .menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: none; }
 
-/* --- Contenedor del Juego (El recuadro del juego visible en la ventana) --- */
+/* --- CONTENEDOR DEL JUEGO: LA NUEVA LÓGICA CON GRID --- */
 #game-container {
-    display: flex;
-    flex-direction: column;
+    display: grid; /* CAMBIO CLAVE */
+    grid-template-rows: auto 1fr; /* Fila 1 (auto) para el header, Fila 2 (1fr) para el monitor */
     position: relative;
     width: 100%; 
     height: 100%; 
     box-shadow: 0 0 30px rgba(0,0,0,0.6);
     border-radius: 10px;
     overflow: hidden;
-    background-color: var(--dark-bg); /* Fondo para las franjas */
+    background-color: var(--dark-bg);
 }
 
-/* --- Barra Superior de Recursos (Encima del monitor) --- */
+/* --- Barra Superior de Recursos --- */
 #game-header { 
+    grid-row: 1; /* Ocupa la primera fila de la grid */
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     padding: 0.8rem 1.5rem; 
     background-color: var(--dark-bg);
     border-bottom: 1px solid var(--border-color); 
-    flex-shrink: 0; 
     z-index: 100; 
 }
 .resource-display { display: flex; gap: 2rem; font-size: 1.1rem; font-weight: 500; }
@@ -62,22 +62,22 @@ body {
 .date-display { display: flex; align-items: center; gap: 1rem; }
 #date-text { font-size: 1.1rem; font-weight: 700; color: var(--text-color); }
 
-/* --- Contenedor del Monitor (El marco visual del PC) --- */
+/* --- Contenedor del Monitor --- */
 #monitor {
-    flex-grow: 1;
+    grid-row: 2; /* Ocupa la segunda fila de la grid */
     position: relative;
     overflow: hidden;
     border: 3px solid #111;
     border-top: none;
     border-radius: 0 0 10px 10px;
-    display: flex;
-    flex-direction: column;
+    display: grid; /* CAMBIO CLAVE */
+    grid-template-rows: 1fr auto; /* Fila 1 (1fr) para el desktop, Fila 2 (auto) para la taskbar */
 }
 
-/* --- Escritorio (Donde está el fondo de pantalla y los iconos) --- */
+/* --- Escritorio --- */
 #desktop { 
+    grid-row: 1; /* Ocupa la primera fila del monitor */
     background: url('https://i.ibb.co/GvTnS8t7/pc-bck.jpg') no-repeat center center/cover; 
-    flex-grow: 1; /* Ocupa todo el espacio vertical menos la barra de tareas */
     position: relative;
     overflow: hidden;
     padding: 1.5rem;
@@ -106,7 +106,7 @@ body {
 
 /* --- Barra de Tareas --- */
 #taskbar { 
-    width: 100%; 
+    grid-row: 2; /* Ocupa la segunda fila del monitor */
     height: 50px; 
     background-color: rgba(16, 18, 27, 0.8); 
     backdrop-filter: blur(5px); 
@@ -116,7 +116,6 @@ body {
     align-items: center; 
     padding: 0 1rem; 
     gap: 1rem; 
-    flex-shrink: 0;
 }
 #start-button { background: none; border: 2px solid transparent; border-radius: 6px; color: white; font-size: 1.5rem; padding: 0.5rem; cursor: pointer; transition: all 0.2s ease; }
 #start-button:hover, #start-button.active { background-color: var(--primary-color); }
@@ -126,7 +125,7 @@ body {
 #clock { margin-left: auto; margin-right: 1.5rem; color: white; font-weight: 500; }
 
 /* --- Menú de Inicio --- */
-#start-menu { position: absolute; bottom: 55px; left: 1rem; width: 350px; height: auto; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; z-index: 99; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+#start-menu { position: absolute; bottom: 55px; left: 1rem; width: 350px; height: auto; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; z-index: 101; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
 .start-menu-header { padding: 1rem; display: flex; align-items: center; gap: 1rem; }
 .start-menu-header img { width: 40px; height: 40px; border-radius: 50%; }
 .start-menu-header span { font-weight: bold; font-size: 1.1rem; }
