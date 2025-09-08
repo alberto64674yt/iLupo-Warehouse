@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v9.0 - Rework a interfaz de OS (Fase 2) */
+/* Contenido 100% completo y funcional, v9.1 - Correcciones visuales */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -45,7 +45,7 @@ body {
 /* --- INICIO: NUEVA INTERFAZ DE OS --- */
 
 /* --- Escritorio --- */
-#desktop { flex-grow: 1; background: url('https://i.imgur.com/8z6Q4p2.jpg') no-repeat center center/cover; position: relative; overflow: hidden; padding: 2rem; }
+#desktop { flex-grow: 1; background: url('https://i.ibb.co/GvTnS8t7/pc-bck.jpg') no-repeat center center/cover; position: relative; overflow: hidden; padding: 2rem; }
 #desktop-icons { display: flex; flex-direction: column; flex-wrap: wrap; gap: 1.5rem; align-content: flex-start; }
 .desktop-icon { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); cursor: pointer; text-align: center; width: 80px; padding: 0.5rem; border-radius: 6px; transition: background-color 0.2s ease; }
 .desktop-icon:hover { background-color: rgba(255, 255, 255, 0.15); }
@@ -83,8 +83,6 @@ body {
 /* --- FIN: NUEVA INTERFAZ DE OS --- */
 
 /* --- INICIO: ESTILOS APPS FASE 2 --- */
-
-/* --- Code Studio App --- */
 .code-studio-layout { display: flex; height: 100%; }
 .code-editor { flex: 3; background-color: #1e1e1e; color: #d4d4d4; font-family: 'Courier New', Courier, monospace; display: flex; border-radius: 6px; overflow: hidden; }
 .line-numbers { padding: 1rem 0.5rem; background-color: #333; color: #858585; text-align: right; user-select: none; }
@@ -93,21 +91,16 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .ide-project-info .project-title { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
 .ide-project-info .project-stage { margin-top: 0.5rem; }
 .ide-actions { margin-top: auto; }
-
-/* --- MyTube App --- */
 .mytube-layout { display: flex; flex-direction: column; gap: 1.5rem; }
 .video-preview { position: relative; }
 .video-preview img { width: 100%; border-radius: 8px; }
 .video-title-overlay { position: absolute; bottom: 1rem; left: 1rem; color: white; background-color: rgba(0,0,0,0.7); padding: 0.5rem 1rem; border-radius: 6px; margin: 0; }
 .seo-minigame-container { margin-top: 1rem; }
-
-/* --- Browser App --- */
 .browser-layout { display: flex; flex-direction: column; height: 100%; }
 .browser-header { background-color: var(--dark-bg); padding: 0.8rem; border-radius: 6px 6px 0 0; border-bottom: 1px solid var(--border-color); color: var(--light-text); }
 .browser-content { flex-grow: 1; background-color: var(--dark-bg); padding: 2rem; border-radius: 0 0 6px 6px; }
 .publish-area { text-align: center; }
 .publish-area .action-button { background-color: var(--success-color); color: white; margin-top: 1rem; }
-
 /* --- FIN: ESTILOS APPS FASE 2 --- */
 
 /* --- Estilos de contenido (reutilizados dentro de las ventanas) --- */
@@ -171,7 +164,8 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 button.close-modal-button { background-color: var(--danger-color); color: white; }
 #restart-game-button { background-color: var(--danger-color); color: white; }
 .summary-event { background-color: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-style: italic; }
-.back-to-portfolio-link { position: fixed; top: 1rem; left: 1rem; z-index: 2000; }
+.back-to-portfolio-link { position: fixed; top: 1rem; left: 1rem; z-index: 2000; color: var(--light-text); text-decoration: none; background-color: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); transition: all 0.2s ease; }
+.back-to-portfolio-link:hover { background-color: var(--primary-color); color: var(--dark-bg); box-shadow: 0 0 10px var(--primary-color-trans); }
 #save-menu { position: absolute; top: 1rem; right: 1rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .hidden { display: none !important; }
 
@@ -192,5 +186,8 @@ button.close-modal-button { background-color: var(--danger-color); color: white;
 /* --- Modal de Ayuda (Formato de Guía) --- */
 .help-container { text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 1rem; }
 .help-section { margin-bottom: 2rem; }
-.help-section h4 { color: var(--primary-color); }
+.help-section h4 { color: var(--primary-color); display: flex; align-items: center; gap: 0.8rem; }
 .help-section p, .help-section ol, .help-section ul { line-height: 1.6; }
+.help-section ul { list-style: none; padding-left: 0; }
+.help-section ul li { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+.help-section ul li span { flex-shrink: 0; width: 150px; font-weight: bold; }
