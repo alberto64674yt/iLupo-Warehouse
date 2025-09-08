@@ -1,5 +1,5 @@
 // =================================================================================
-//  SHOP.JS - v4.3 - Lógica de compra (UI movida a ui.js)
+//  SHOP.JS - v5.0 - Lógica de compra con registro de gastos
 // =================================================================================
 
 function buyUpgrade(itemId) {
@@ -18,6 +18,8 @@ function buyUpgrade(itemId) {
     }
 
     gameState.money -= item.cost;
+    // FIX: Se registra el coste de la mejora como un gasto del día.
+    gameState.dailyExpenses.push({ reason: `Mejora: ${item.name}`, amount: item.cost });
     gameState.shopUpgrades.push(item.id);
 
     switch(item.effect.type) {
@@ -46,5 +48,5 @@ function buyUpgrade(itemId) {
     }
     
     showNotification(`¡${item.name} comprado!`, 'success');
-    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
+    refreshUI();
 }
