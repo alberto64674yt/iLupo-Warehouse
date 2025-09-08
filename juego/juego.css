@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v9.4 - SOLUCIÓN FRanjas y Fondo Monitor */
+/* Contenido 100% completo y funcional, v9.5 - SOLUCIÓN DEFINITIVA DE LAYOUT */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -9,9 +9,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Ajuste crucial: asegurar que el body ocupe el 100% de la altura de la ventana */
-    min-height: 100vh; /* Usar min-height para asegurar que siempre haya al menos 100vh */
-    margin: 0; /* Eliminar márgenes por defecto del body */
+    height: 100vh;
+    padding: 1rem; /* Añade un pequeño margen exterior a todo */
+    box-sizing: border-box;
 }
 
 #game-container, #main-menu {
@@ -33,18 +33,17 @@ body {
 .main-menu-link { background-color: var(--surface-color); color: var(--light-text); }
 .menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: none; }
 
-/* --- Contenedor del Juego (El "recuadro" del juego visible en la ventana) --- */
+/* --- Contenedor del Juego (El recuadro del juego visible en la ventana) --- */
 #game-container {
     display: flex;
     flex-direction: column;
     position: relative;
-    /* Aseguramos que ocupe casi toda la ventana, dejando un pequeño margen real del body */
-    width: 98vw; 
-    height: 98vh; 
-    margin: auto; /* Para centrarlo en la pantalla */
+    width: 100%; 
+    height: 100%; 
     box-shadow: 0 0 30px rgba(0,0,0,0.6);
     border-radius: 10px;
-    overflow: hidden; /* Muy importante para que el fondo no se desborde fuera de este contenedor */
+    overflow: hidden;
+    background-color: var(--dark-bg); /* Fondo para las franjas */
 }
 
 /* --- Barra Superior de Recursos (Encima del monitor) --- */
@@ -53,7 +52,7 @@ body {
     justify-content: space-between; 
     align-items: center; 
     padding: 0.8rem 1.5rem; 
-    background-color: var(--dark-bg); /* Fondo sólido para la barra de recursos */
+    background-color: var(--dark-bg);
     border-bottom: 1px solid var(--border-color); 
     flex-shrink: 0; 
     z-index: 100; 
@@ -65,32 +64,31 @@ body {
 
 /* --- Contenedor del Monitor (El marco visual del PC) --- */
 #monitor {
-    flex-grow: 1; /* Ocupa todo el espacio vertical restante dentro de #game-container */
+    flex-grow: 1;
     position: relative;
-    overflow: hidden; /* Clave: recorta cualquier cosa que se salga de su caja */
-    border-radius: 0 0 10px 10px; /* Bordes redondeados solo abajo para que se una a #game-container */
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Sombra interna para efecto de pantalla */
-    border: 3px solid #111; /* Marco exterior del monitor */
-    border-top: none; /* No hay borde superior, se une al header */
-    display: flex; 
-    flex-direction: column; /* Apila #desktop y #taskbar */
+    overflow: hidden;
+    border: 3px solid #111;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Escritorio (Donde está el fondo de pantalla y los iconos) --- */
 #desktop { 
     background: url('https://i.ibb.co/GvTnS8t7/pc-bck.jpg') no-repeat center center/cover; 
-    position: relative; 
-    padding: 1.5rem; /* Margen interior para los iconos */
     flex-grow: 1; /* Ocupa todo el espacio vertical menos la barra de tareas */
-    overflow: hidden; /* Asegura que la imagen de fondo no se desborde del escritorio */
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
 }
 #desktop-icons { 
     display: flex; 
     flex-direction: column; 
     flex-wrap: wrap; 
-    gap: 1rem; /* Ajustado para 7 iconos */
+    gap: 1.1rem; 
     align-content: flex-start; 
-    height: 100%; /* Ocupa toda la altura del escritorio */
+    height: 100%; 
 }
 .desktop-icon { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); cursor: pointer; text-align: center; width: 80px; padding: 0.5rem; border-radius: 6px; transition: background-color 0.2s ease; }
 .desktop-icon:hover { background-color: rgba(255, 255, 255, 0.15); }
@@ -118,7 +116,7 @@ body {
     align-items: center; 
     padding: 0 1rem; 
     gap: 1rem; 
-    flex-shrink: 0; /* Impide que se encoja */
+    flex-shrink: 0;
 }
 #start-button { background: none; border: 2px solid transparent; border-radius: 6px; color: white; font-size: 1.5rem; padding: 0.5rem; cursor: pointer; transition: all 0.2s ease; }
 #start-button:hover, #start-button.active { background-color: var(--primary-color); }
