@@ -1,5 +1,5 @@
 // =================================================================================
-//  COURSES.JS - Lógica para el sistema de Cursos de Habilidades (Corregido)
+//  COURSES.JS - Lógica para el sistema de Cursos (con registro de gastos)
 // =================================================================================
 
 function startCourse(courseId, skillType) {
@@ -30,6 +30,9 @@ function startCourse(courseId, skillType) {
     }
 
     gameState.money -= courseData.cost;
+    // FIX: Se registra el coste del curso como un gasto del día.
+    gameState.dailyExpenses.push({ reason: `Curso: ${courseData.name}`, amount: courseData.cost });
+
     gameState.activeCourse = {
         id: courseId,
         skill: skillType,
@@ -38,5 +41,5 @@ function startCourse(courseId, skillType) {
     };
 
     showNotification(`¡Has empezado el curso "${courseData.name}"!`, "success");
-    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
+    refreshUI();
 }
