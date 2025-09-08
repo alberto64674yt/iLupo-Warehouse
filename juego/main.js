@@ -1,8 +1,8 @@
 // =================================================================================
-//  MAIN.JS - v10.0 - Lógica de seguidores y alquiler corregida
+//  MAIN.JS - v11.0 - Sistema de gastos y botones de guardado corregidos
 // =================================================================================
 
-let desktopManager; // Variable global para el gestor del escritorio
+let desktopManager;
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initializeApp() {
     attachBaseEventListeners();
-    // Esto debería estar en data.js, pero lo dejamos aquí por ahora.
-    dom.continueBtn = document.getElementById('continue-button');
     if (localStorage.getItem('iLupoDevTycoonSave')) {
         dom.continueBtn.disabled = false;
     } else {
@@ -25,6 +23,11 @@ function initializeApp() {
 
 function startGame(saveData = null) {
     gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
+    // FIX: Asegurarse de que el registro de gastos exista al iniciar/cargar partida.
+    if (!gameState.dailyExpenses) {
+        gameState.dailyExpenses = [];
+    }
+    
     dom.mainMenu.classList.add('hidden');
     dom.gameContainer.classList.remove('hidden');
     
@@ -62,7 +65,6 @@ function gameTick() {
         refreshUI();
     }
     
-    // No es necesario refrescar toda la UI, solo la ventana de Code Studio
     if (desktopManager.openWindows['codeStudio']) {
         const codeStudioWindow = desktopManager.openWindows['codeStudio'];
         renderCodeStudioApp(codeStudioWindow.querySelector('.window-body'));
@@ -93,36 +95,36 @@ function nextDay() {
         }
     }
 
-    // FIX: Se llama a la función que calcula ingresos Y seguidores.
     let { totalIncome, totalFollowers } = calculatePassiveIncome();
-    let expenses = 0;
+    
+    // FIX: Se suman los gastos del día (cursos, etc.) al total de gastos.
+    let totalExpenses = gameState.dailyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-    // FIX: Se cambia a '>= 7' para que se cobre cada 7 días exactos.
     if ((gameState.day - gameState.lastRentDay) >= 7) {
-        expenses = gameState.rentCost;
+        totalExpenses += gameState.rentCost;
         gameState.lastRentDay = gameState.day;
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
 
-    const netIncome = totalIncome - expenses;
+    const netIncome = totalIncome - totalExpenses;
     if (gameState.money + netIncome < 0) {
-        handleGameOver(`Te has quedado sin dinero para pagar el alquiler de ${expenses}€.`);
+        handleGameOver(`Te has quedado sin dinero para pagar los gastos de ${totalExpenses}€.`);
         return;
     }
 
     dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
-    // FIX: Se añade el resumen de seguidores al modal.
-    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Nuevos Seguidores: +${totalFollowers}</p><p>Gastos: -${expenses}€</p>`;
+    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Nuevos Seguidores: +${totalFollowers}</p><p>Gastos Totales: -${totalExpenses}€</p>`;
     dom.dailySummaryModal.classList.remove('hidden');
     
     const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
         gameState.money += netIncome;
-        // FIX: Se suman los nuevos seguidores al total.
         gameState.followers += totalFollowers;
         gameState.energy = gameState.maxEnergy;
         gameState.completedProjectsToday = [];
+        // FIX: Se limpia el registro de gastos para el nuevo día.
+        gameState.dailyExpenses = [];
         generateNewTrend();
         refreshUI();
         saveGame();
@@ -163,7 +165,7 @@ function checkForLevelUp(skill) {
         currentSkill.level++;
         currentSkill.xp -= xpNeeded;
         showNotification(`¡${skill.toUpperCase()} ha subido al Nivel ${currentSkill.level}!`, 'success');
-        checkForLevelUp(skill); // Llamada recursiva por si sube varios niveles
+        checkForLevelUp(skill);
     }
 }
 
@@ -198,6 +200,9 @@ function confirmNewProject() {
         return;
     }
     gameState.money -= totalCost;
+    // FIX: Se registra el coste del proyecto como un gasto del día.
+    gameState.dailyExpenses.push({ reason: `Proyecto: ${name}`, amount: totalCost });
+    
     const finalTime = Math.max(30, totalTime - gameState.hardwareTimeReduction);
     gameState.activeProject = {
         id: Date.now(),
@@ -243,16 +248,14 @@ function publishProject() {
 
 function calculatePassiveIncome() {
     let totalIncome = 0;
-    let totalFollowers = 0; // FIX: Se inicializa la variable de seguidores.
+    let totalFollowers = 0;
 
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
         let dailyMoney = projData.baseIncome + (proj.quality / 2);
-        // FIX: Se añade el cálculo de seguidores diarios.
         let dailyFollowers = Math.ceil(proj.quality / 20);
 
         dailyMoney *= gameState.appMonetization;
-        // FIX: Se aplica la monetización de posts a los seguidores.
         dailyFollowers *= gameState.postMonetization;
 
         if (proj.seoPenalty) { dailyFollowers *= proj.seoPenalty; }
@@ -272,8 +275,7 @@ function calculatePassiveIncome() {
         totalIncome += Math.floor(dailyMoney);
         totalFollowers += Math.floor(dailyFollowers);
     });
-
-    // FIX: Se devuelven ambos valores.
+    
     return { totalIncome, totalFollowers };
 }
 
@@ -303,6 +305,10 @@ function attachBaseEventListeners() {
     });
     document.getElementById('help-button').addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
     
+    // FIX: Se conectan los botones de Importar y Exportar a sus funciones.
+    document.getElementById('export-save-button').addEventListener('click', exportSave);
+    document.getElementById('import-save-button').addEventListener('click', importSave);
+
     document.getElementById('main-menu-button').addEventListener('click', () => {
         if (confirm("¿Seguro que quieres volver al menú principal? Perderás el progreso que no hayas guardado desde que empezó el día.")) {
             window.location.reload();
@@ -361,4 +367,39 @@ function saveGame() {
 
 function loadGame() {
     return localStorage.getItem('iLupoDevTycoonSave');
+}
+
+function exportSave() {
+    const saveData = loadGame();
+    if (!saveData) { alert("No hay partida guardada."); return; }
+    const blob = new Blob([saveData], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `iLupoDevTycoon_save_dia_${gameState.day}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function importSave() {
+    const importFileInput = document.getElementById('import-file-input');
+    importFileInput.click();
+    importFileInput.onchange = handleFileImport;
+}
+
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const content = e.target.result;
+            JSON.parse(atob(content));
+            localStorage.setItem('iLupoDevTycoonSave', content);
+            alert("Partida importada. El juego se reiniciará.");
+            window.location.reload();
+        } catch (err) {
+            alert("Error: Archivo de guardado no válido.");
+        }
+    };
+    reader.readAsText(file);
 }
