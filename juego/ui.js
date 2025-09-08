@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - v10.0 - Implementación final de renderizado de apps
+//  UI.JS - v11.0 - Solución final de bugs de UI (Scroll, Almacén, Cursos)
 // =================================================================================
 
 function refreshUI() {
@@ -32,21 +32,28 @@ function refreshUI() {
 // -----------------------------------------------------------------------------
 
 function renderCodeStudioApp(container) {
-    const template = document.getElementById('code-studio-template');
-    container.innerHTML = template.innerHTML;
+    // FIX: Se reestructura la función para no destruir y recrear el DOM en cada tick,
+    // lo que permite conservar la posición del scroll.
+    
+    // Si el contenedor está vacío, crea la estructura base.
+    if (!container.querySelector('.code-studio-layout')) {
+        const template = document.getElementById('code-studio-template');
+        container.innerHTML = template.innerHTML;
+    }
 
+    // Ahora, en lugar de recrear, solo busca los elementos y los actualiza.
     const proj = gameState.activeProject;
     const projectInfoContainer = container.querySelector('.ide-project-info');
     const actionsContainer = container.querySelector('.ide-actions');
-    const codeContent = container.querySelector('.code-content');
-    const lineNumbers = container.querySelector('.line-numbers');
+    const codeContentEl = container.querySelector('.code-content');
+    const lineNumbersEl = container.querySelector('.line-numbers');
 
     if (!proj || proj.stage === 'video' || proj.stage === 'post') {
         projectInfoContainer.innerHTML = '<p>Ningún proyecto activo en fase de desarrollo o depuración.</p>';
         actionsContainer.innerHTML = `<button id="new-project-button-main" class="action-button"> + Iniciar Nuevo Proyecto</button>`;
         container.querySelector('#new-project-button-main').onclick = openNewProjectModal;
-        codeContent.textContent = '// Esperando para empezar a programar...';
-        lineNumbers.textContent = '1';
+        codeContentEl.textContent = '// Esperando para empezar a programar...';
+        lineNumbersEl.textContent = '1';
         return;
     }
 
@@ -67,50 +74,53 @@ function renderCodeStudioApp(container) {
     switch(proj.stage) {
         case 'development':
             actionsContainer.innerHTML = `<p>Desarrollando... El código aparecerá en el editor.</p>`;
+            // Animación de código
+            const maxSnippets = gameData.codeSnippets.length;
+            const snippetsToShow = Math.min(maxSnippets, Math.floor(progressPercent / (100 / maxSnippets)));
+            let codeText = '';
+            let lineText = '';
+            let currentLine = 1;
+
+            for(let i = 0; i < snippetsToShow; i++) {
+                const snippet = gameData.codeSnippets[i];
+                const snippetLines = snippet.split('\n');
+                codeText += snippet + '\n\n';
+                snippetLines.forEach(() => {
+                    lineText += currentLine + '\n';
+                    currentLine++;
+                });
+                lineText += currentLine + '\n';
+                currentLine++;
+            }
+            codeContentEl.textContent = codeText;
+            lineNumbersEl.textContent = lineText;
             break;
         case 'debugging':
              actionsContainer.innerHTML = `<button class="action-button debug-button" id="init-debug-minigame"><i class="fas fa-spider"></i> Depurar (${gameData.energyCosts.debug} Energía)</button>`;
+             container.querySelector('#init-debug-minigame').onclick = startDebugMinigame;
             break;
     }
-    
-    const maxSnippets = gameData.codeSnippets.length;
-    const snippetsToShow = Math.min(maxSnippets, Math.floor(progressPercent / (100 / maxSnippets)));
-    let codeText = '';
-    let lineText = '';
-    let currentLine = 1;
-
-    for(let i = 0; i < snippetsToShow; i++) {
-        const snippet = gameData.codeSnippets[i];
-        const snippetLines = snippet.split('\n');
-        codeText += snippet + '\n\n';
-        
-        snippetLines.forEach(() => {
-            lineText += currentLine + '\n';
-            currentLine++;
-        });
-        lineText += currentLine + '\n';
-        currentLine++;
-    }
-    codeContent.textContent = codeText;
-    lineNumbers.textContent = lineText;
-
-    if (proj.stage === 'debugging') container.querySelector('#init-debug-minigame').onclick = startDebugMinigame;
 }
 
+
 function renderMyTubeApp(container) {
-    const template = document.getElementById('mytube-template');
-    container.innerHTML = template.innerHTML;
+    // Si el contenedor está vacío, crea la estructura base.
+    if (!container.querySelector('.mytube-layout')) {
+        const template = document.getElementById('mytube-template');
+        container.innerHTML = template.innerHTML;
+    }
+
     const proj = gameState.activeProject;
 
     if (proj && proj.stage === 'video') {
         container.querySelector('.video-title-overlay').textContent = proj.name;
         container.querySelector('.upload-section').innerHTML = `
-            <p>¡Proyecto listo para promocionar!</p>
+            <h4>¡Proyecto listo para promocionar!</h4>
             <button class="action-button video-button" id="init-seo-minigame"><i class="fas fa-video"></i> Producir Vídeo (${gameData.energyCosts.video} Energía)</button>
         `;
         container.querySelector('#init-seo-minigame').onclick = startSeoMinigame;
     } else {
-        container.innerHTML = '<p>Abre esta aplicación cuando un proyecto esté en la fase de "vídeo" para promocionarlo.</p>';
+        container.innerHTML = '<div class="app-placeholder"><p>Abre esta aplicación cuando un proyecto esté en la fase de "vídeo" para promocionarlo.</p></div>';
     }
 }
 
@@ -123,7 +133,7 @@ function renderBrowserApp(container) {
         container.querySelector('.publish-area p').textContent = `El proyecto "${proj.name}" está listo para ser publicado en tu Almacén.`;
         container.querySelector('.publish-button').onclick = publishProject;
     } else {
-        container.innerHTML = '<p>Abre esta aplicación cuando un proyecto esté listo para ser "publicado".</p>';
+        container.innerHTML = '<div class="app-placeholder"><p>Abre esta aplicación cuando un proyecto esté listo para ser "publicado".</p></div>';
     }
 }
 
@@ -139,48 +149,53 @@ function renderStatsApp(container) {
     renderSkillsUI(container.querySelector('#skills-panel'));
 }
 
-// ---- IMPLEMENTACIÓN FINAL DE APPS ----
 function renderShopApp(container) {
-    container.innerHTML = `
-        <h3><i class="fas fa-desktop"></i> Hardware</h3>
-        <div id="shop-hardware" class="shop-category"></div>
-        <h3><i class="fas fa-coffee"></i> Personal y Software</h3>
-        <div id="shop-personal" class="shop-category"></div>
-    `;
+    if (!container.querySelector('.shop-category')) {
+        container.innerHTML = `
+            <h3><i class="fas fa-desktop"></i> Hardware</h3>
+            <div id="shop-hardware" class="shop-category"></div>
+            <h3><i class="fas fa-coffee"></i> Personal y Software</h3>
+            <div id="shop-personal" class="shop-category"></div>
+        `;
+        container.addEventListener('click', (e) => {
+            if (e.target.classList.contains('buy-button')) {
+                buyUpgrade(e.target.dataset.itemId);
+            }
+        });
+    }
     renderShopUI(container); 
-    container.addEventListener('click', (e) => {
-        if (e.target.classList.contains('buy-button')) {
-            buyUpgrade(e.target.dataset.itemId);
-        }
-    });
 }
 
 function renderCoursesApp(container) {
-    container.innerHTML = `
-        <div id="courses-container"></div>
-        <div id="active-course-container"></div>
-    `;
+    if (!container.querySelector('#courses-container')) {
+        container.innerHTML = `
+            <div id="courses-container"></div>
+            <div id="active-course-container"></div>
+        `;
+        container.addEventListener('click', (e) => {
+            const button = e.target.closest('.start-course-button');
+            if (button && !button.disabled) {
+                startCourse(button.dataset.courseId, button.dataset.skillType);
+            }
+        });
+    }
     renderCoursesUI(container);
-    container.addEventListener('click', (e) => {
-        const button = e.target.closest('.start-course-button');
-        if (button) {
-            startCourse(button.dataset.courseId, button.dataset.skillType);
-        }
-    });
 }
 
 function renderResearchApp(container) {
-    container.innerHTML = `
-        <div id="active-research-container"></div>
-        <div id="research-container" class="research-tree"></div>
-    `;
+     if (!container.querySelector('#research-container')) {
+        container.innerHTML = `
+            <div id="active-research-container"></div>
+            <div id="research-container" class="research-tree"></div>
+        `;
+        container.addEventListener('click', (e) => {
+            const button = e.target.closest('.start-research-button');
+            if (button && !button.disabled) {
+                startResearch(button.dataset.researchId, button.dataset.skillType);
+            }
+        });
+    }
     renderResearchUI(container);
-    container.addEventListener('click', (e) => {
-        const button = e.target.closest('.start-research-button');
-        if (button) {
-            startResearch(button.dataset.researchId, button.dataset.skillType);
-        }
-    });
 }
 
 function renderNewsApp(container) {
@@ -234,10 +249,19 @@ function renderCoursesUI(container) {
             const isCompleted = gameState.completedCourses.includes(course.id);
             const hasRequirement = course.requires ? gameState.completedCourses.includes(course.requires) : true;
             const canAfford = gameState.money >= course.cost;
-            const isDisabled = isCompleted || !hasRequirement || !canAfford;
+            // FIX: Se añade la condición de si hay un curso activo para deshabilitar el botón.
+            const isDisabled = isCompleted || !hasRequirement || !canAfford || gameState.activeCourse;
+            
+            // FIX: El texto del botón ahora cambia si hay un curso activo.
+            let buttonText = 'Empezar';
+            if (isCompleted) {
+                buttonText = 'Completado';
+            } else if (gameState.activeCourse) {
+                buttonText = 'Estudiando';
+            }
 
             courseHtml += `
-                <div class="course-card ${isDisabled ? 'disabled' : ''}">
+                <div class="course-card ${isDisabled && !isCompleted ? 'disabled' : ''}">
                     <h4>${course.name}</h4>
                     <p>${course.desc}</p>
                     <div class="course-info">
@@ -246,7 +270,7 @@ function renderCoursesUI(container) {
                         <span><i class="fas fa-star"></i> ${course.xp} XP</span>
                     </div>
                     <button class="start-course-button" data-course-id="${course.id}" data-skill-type="${skillType}" ${isDisabled ? 'disabled' : ''}>
-                        ${isCompleted ? 'Completado' : 'Empezar'}
+                        ${buttonText}
                     </button>
                 </div>`;
         });
@@ -287,7 +311,14 @@ function renderResearchUI(container) {
             const hasSkillReq = gameState.skills[reqSkill].level >= reqLevel;
             const hasResearchReq = reqResearch ? gameState.completedResearch.includes(reqResearch) : true;
             const canAfford = gameState.money >= node.cost;
-            const isDisabled = isCompleted || !hasSkillReq || !hasResearchReq || !canAfford;
+            const isDisabled = isCompleted || !hasSkillReq || !hasResearchReq || !canAfford || gameState.activeResearch;
+
+            let buttonText = 'Investigar';
+            if (isCompleted) {
+                buttonText = 'Completado';
+            } else if (gameState.activeResearch) {
+                buttonText = 'Investigando';
+            }
 
             nodesHtml += `
                 <div class="research-node ${isCompleted ? 'completed' : ''} ${!hasResearchReq ? 'locked' : ''}">
@@ -297,7 +328,7 @@ function renderResearchUI(container) {
                     <div class="research-footer">
                         <span><i class="fas fa-coins"></i> ${node.cost}€ | <i class="fas fa-clock"></i> ${node.duration} día(s)</span>
                         <button class="start-research-button" data-research-id="${node.id}" data-skill-type="${skillType}" ${isDisabled ? 'disabled' : ''}>
-                            ${isCompleted ? 'Completado' : 'Investigar'}
+                            ${buttonText}
                         </button>
                     </div>
                 </div>`;
@@ -337,7 +368,15 @@ function renderCompletedProjects(container) {
     }
     container.innerHTML = gameState.completedProjects.map(p => {
         const income = calculatePassiveIncomeForProjectUI(p);
-        return `<div class="completed-project-card"><span><i class="fas ${gameData.projectTypes[p.type].icon}"></i> ${p.name}</span><span class="stat">Calidad: ${p.quality}</span><span class="stat success"><i class="fas fa-coins"></i> ${income.money}€/día</span></div>`;
+        // FIX: Se envuelven las estadísticas en su propio div para un mejor control del layout con CSS.
+        return `
+            <div class="completed-project-card">
+                <span class="project-name"><i class="fas ${gameData.projectTypes[p.type].icon}"></i> ${p.name}</span>
+                <div class="project-stats">
+                    <span class="stat">Calidad: ${p.quality}</span>
+                    <span class="stat success"><i class="fas fa-coins"></i> ${income.money}€/día</span>
+                </div>
+            </div>`;
     }).join('');
 }
 
