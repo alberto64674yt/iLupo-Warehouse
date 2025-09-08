@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - v9.1 - Corrección de bugs de renderizado y visuales
+//  UI.JS - v10.0 - Implementación final de renderizado de apps
 // =================================================================================
 
 function refreshUI() {
@@ -16,7 +16,6 @@ function refreshUI() {
         if (appData && windowEl) {
             const contentRenderer = window[appData.renderer];
             if (typeof contentRenderer === 'function') {
-                // Se envuelve en un try...catch para evitar que un error en una app rompa toda la UI
                 try {
                     contentRenderer(windowEl.querySelector('.window-body'));
                 } catch (e) {
@@ -74,7 +73,6 @@ function renderCodeStudioApp(container) {
             break;
     }
     
-    // Lógica de animación de código corregida
     const maxSnippets = gameData.codeSnippets.length;
     const snippetsToShow = Math.min(maxSnippets, Math.floor(progressPercent / (100 / maxSnippets)));
     let codeText = '';
@@ -90,12 +88,11 @@ function renderCodeStudioApp(container) {
             lineText += currentLine + '\n';
             currentLine++;
         });
-        lineText += currentLine + '\n'; // For the empty line between snippets
+        lineText += currentLine + '\n';
         currentLine++;
     }
     codeContent.textContent = codeText;
     lineNumbers.textContent = lineText;
-
 
     if (proj.stage === 'debugging') container.querySelector('#init-debug-minigame').onclick = startDebugMinigame;
 }
@@ -142,45 +139,185 @@ function renderStatsApp(container) {
     renderSkillsUI(container.querySelector('#skills-panel'));
 }
 
-// ---- APPS CORREGIDAS ----
+// ---- IMPLEMENTACIÓN FINAL DE APPS ----
 function renderShopApp(container) {
-    // FIX: Se evita llamar a una función externa (renderShop()) que causaba el error.
-    // Se añade contenido temporal. La funcionalidad completa requiere el archivo shop.js.
     container.innerHTML = `
         <h3><i class="fas fa-desktop"></i> Hardware</h3>
-        <div id="shop-hardware" class="shop-category"><p>El contenido de la tienda se mostrará aquí.</p></div>
+        <div id="shop-hardware" class="shop-category"></div>
         <h3><i class="fas fa-coffee"></i> Personal y Software</h3>
         <div id="shop-personal" class="shop-category"></div>
     `;
+    renderShopUI(container); 
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('buy-button')) {
+            buyUpgrade(e.target.dataset.itemId);
+        }
+    });
 }
 
 function renderCoursesApp(container) {
-    // FIX: Se evita llamar a una función externa (renderCoursesUI()) que causaba el error.
-    // Se añade contenido temporal. La funcionalidad completa requiere el archivo courses.js.
     container.innerHTML = `
-        <div id="courses-container"><p>El contenido de los cursos se mostrará aquí.</p></div>
+        <div id="courses-container"></div>
         <div id="active-course-container"></div>
     `;
+    renderCoursesUI(container);
+    container.addEventListener('click', (e) => {
+        const button = e.target.closest('.start-course-button');
+        if (button) {
+            startCourse(button.dataset.courseId, button.dataset.skillType);
+        }
+    });
 }
 
 function renderResearchApp(container) {
-    // FIX: Se evita llamar a una función externa (renderResearchUI()) que causaba el error.
-    // Se añade contenido temporal. La funcionalidad completa requiere el archivo research.js.
     container.innerHTML = `
         <div id="active-research-container"></div>
-        <div id="research-container"><p>El árbol de investigación se mostrará aquí.</p></div>
+        <div id="research-container" class="research-tree"></div>
     `;
+    renderResearchUI(container);
+    container.addEventListener('click', (e) => {
+        const button = e.target.closest('.start-research-button');
+        if (button) {
+            startResearch(button.dataset.researchId, button.dataset.skillType);
+        }
+    });
 }
 
 function renderNewsApp(container) {
-    // FIX: Se añade clase para colorear el texto del bonus.
     const bonus = gameState.currentTrend.bonus;
     const bonusClass = bonus >= 0 ? 'text-bonus' : 'text-malus';
     const bonusSign = bonus >= 0 ? '+' : '';
     container.innerHTML = `<p><strong>Tendencia:</strong> ${gameState.currentTrend.name} <span class="${bonusClass}">(${bonusSign}${bonus}% bonus)</span></p>`;
 }
-// -----------------------
 
+// -----------------------------------------------------------------------------
+//  FUNCIONES DE RENDERIZADO DE UI (MOVIDAS Y CREADAS)
+// -----------------------------------------------------------------------------
+
+function renderShopUI(container) {
+    ['hardware', 'personal'].forEach(category => {
+        const catContainer = container.querySelector(`#shop-${category}`);
+        catContainer.innerHTML = gameData.shopItems[category].map(item => {
+            const isOwned = gameState.shopUpgrades.includes(item.id);
+            if (item.requires && !gameState.shopUpgrades.includes(item.requires)) return '';
+            const hasTieredUpgrade = gameData.shopItems[category].some(other => other.requires === item.id);
+            if (isOwned && hasTieredUpgrade) return '';
+
+            return `
+                <div class="shop-item ${isOwned ? 'owned' : ''}">
+                    <h4 class="item-name">${item.name}</h4>
+                    <p class="item-desc">${item.desc}</p>
+                    <div class="item-buy">
+                        <span class="item-cost">${item.cost} €</span>
+                        <button class="buy-button" data-item-id="${item.id}" ${isOwned ? 'disabled' : ''}>
+                            ${isOwned ? 'Comprado' : 'Comprar'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    });
+}
+
+function renderCoursesUI(container) {
+    const coursesContainer = container.querySelector('#courses-container');
+    const activeCourseContainer = container.querySelector('#active-course-container');
+    let html = '';
+
+    for (const skillType in gameData.courses) {
+        html += `<h3>${skillType.charAt(0).toUpperCase() + skillType.slice(1)}</h3>`;
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'courses-category';
+        
+        let courseHtml = '';
+        gameData.courses[skillType].forEach(course => {
+            const isCompleted = gameState.completedCourses.includes(course.id);
+            const hasRequirement = course.requires ? gameState.completedCourses.includes(course.requires) : true;
+            const canAfford = gameState.money >= course.cost;
+            const isDisabled = isCompleted || !hasRequirement || !canAfford;
+
+            courseHtml += `
+                <div class="course-card ${isDisabled ? 'disabled' : ''}">
+                    <h4>${course.name}</h4>
+                    <p>${course.desc}</p>
+                    <div class="course-info">
+                        <span><i class="fas fa-coins"></i> ${course.cost} €</span>
+                        <span><i class="fas fa-clock"></i> ${course.duration} día(s)</span>
+                        <span><i class="fas fa-star"></i> ${course.xp} XP</span>
+                    </div>
+                    <button class="start-course-button" data-course-id="${course.id}" data-skill-type="${skillType}" ${isDisabled ? 'disabled' : ''}>
+                        ${isCompleted ? 'Completado' : 'Empezar'}
+                    </button>
+                </div>`;
+        });
+        categoryDiv.innerHTML = courseHtml;
+        html += categoryDiv.outerHTML;
+    }
+    coursesContainer.innerHTML = html;
+
+    if (gameState.activeCourse) {
+        activeCourseContainer.innerHTML = `
+            <div class="active-course-display">
+                <h4>Curso en Progreso</h4>
+                <p><strong>${gameState.activeCourse.name}</strong></p>
+                <p>Días restantes: ${gameState.activeCourse.daysRemaining}</p>
+            </div>`;
+    } else {
+        activeCourseContainer.innerHTML = '';
+    }
+}
+
+function renderResearchUI(container) {
+    const researchContainer = container.querySelector('#research-container');
+    const activeResearchContainer = container.querySelector('#active-research-container');
+    let html = '';
+
+    for (const skillType in gameData.researchData) {
+        const tree = gameData.researchData[skillType];
+        html += `<div class="research-tree-header"><i class="fas ${tree.icon}"></i> ${tree.name}</div>`;
+        const nodesDiv = document.createElement('div');
+        nodesDiv.className = 'research-nodes';
+
+        let nodesHtml = '';
+        tree.nodes.forEach(node => {
+            const isCompleted = gameState.completedResearch.includes(node.id);
+            const reqSkill = node.requires.skill;
+            const reqLevel = node.requires.level;
+            const reqResearch = node.requires.research;
+            const hasSkillReq = gameState.skills[reqSkill].level >= reqLevel;
+            const hasResearchReq = reqResearch ? gameState.completedResearch.includes(reqResearch) : true;
+            const canAfford = gameState.money >= node.cost;
+            const isDisabled = isCompleted || !hasSkillReq || !hasResearchReq || !canAfford;
+
+            nodesHtml += `
+                <div class="research-node ${isCompleted ? 'completed' : ''} ${!hasResearchReq ? 'locked' : ''}">
+                    <h5>${node.name}</h5>
+                    <p>${node.desc}</p>
+                    <p class="research-req">Req: Nivel ${reqLevel} de ${reqSkill}${reqResearch ? ' y ' + findResearchNode(reqResearch).node.name : ''}</p>
+                    <div class="research-footer">
+                        <span><i class="fas fa-coins"></i> ${node.cost}€ | <i class="fas fa-clock"></i> ${node.duration} día(s)</span>
+                        <button class="start-research-button" data-research-id="${node.id}" data-skill-type="${skillType}" ${isDisabled ? 'disabled' : ''}>
+                            ${isCompleted ? 'Completado' : 'Investigar'}
+                        </button>
+                    </div>
+                </div>`;
+        });
+        nodesDiv.innerHTML = nodesHtml;
+        html += nodesDiv.outerHTML;
+    }
+    researchContainer.innerHTML = html;
+
+    if (gameState.activeResearch) {
+        activeResearchContainer.innerHTML = `
+            <div class="active-research-display">
+                <h4>Investigación en Progreso</h4>
+                <p><strong>${gameState.activeResearch.name}</strong></p>
+                <p>Días restantes: ${gameState.activeResearch.daysRemaining}</p>
+            </div>`;
+    } else {
+        activeResearchContainer.innerHTML = '';
+    }
+}
 
 function renderSkillsUI(container) {
     let html = '<h3><i class="fas fa-star"></i> Habilidades</h3>';
