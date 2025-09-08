@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v9.0 - Rework a interfaz de OS (Fase 2)
+//  MAIN.JS - v9.1 - Corrección de bug de progreso de proyecto
 // =================================================================================
 
 let desktopManager; // Variable global para el gestor del escritorio
@@ -43,6 +43,9 @@ function gameTick() {
     if (!proj || proj.stage !== 'development') return;
 
     proj.timeRemaining -= 0.1;
+    // FIX: Redondear a 2 decimales para evitar errores de punto flotante que atascan el progreso.
+    proj.timeRemaining = parseFloat(proj.timeRemaining.toFixed(2));
+
     const bugChance = Math.max(0.001, 0.015 - (gameState.skills.programming.level * 0.002));
     if (Math.random() < bugChance) {
         proj.bugs++;
