@@ -78,6 +78,7 @@ body {
     height: 100%; /* <- CORREGIDO */
     padding: 1.5rem;
     box-sizing: border-box; /* <- AÑADIDO PARA MEJOR CÁLCULO */
+    max-width: none;
 }
 #desktop-icons { 
     display: flex; 
