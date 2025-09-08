@@ -94,7 +94,7 @@ body {
 .desktop-icon span { font-size: 0.9rem; }
 
 /* --- Ventanas de Aplicaciones --- */
-.app-window { position: absolute; min-width: 450px; min-height: 350px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; resize: both; overflow: auto; }
+.app-window { position: absolute; min-width: 450px; min-height: 350px; width: 700px; height: 500px; max-width: 85vw; max-height: 80vh; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; resize: both; overflow: auto; }
 .app-window.active { z-index: 50; border-color: var(--primary-color); }
 .window-header { background-color: var(--dark-bg); padding: 0.6rem 1rem; cursor: move; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
 .window-title { font-weight: bold; }
@@ -239,3 +239,12 @@ button.close-modal-button { background-color: var(--danger-color); color: white;
 .help-section ul { list-style: none; padding-left: 0; }
 .help-section ul li { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
 .help-section ul li span { flex-shrink: 0; width: 150px; font-weight: bold; }
+/* FIX: Oculta la barra de scroll en el cuerpo de las ventanas pero permite desplazar */
+.window-body::-webkit-scrollbar {
+    display: none; /* Para Chrome, Safari y Edge */
+}
+
+.window-body {
+    -ms-overflow-style: none;  /* Para Internet Explorer y Edge */
+    scrollbar-width: none;  /* Para Firefox */
+}
