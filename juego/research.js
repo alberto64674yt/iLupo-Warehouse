@@ -1,5 +1,5 @@
 // =================================================================================
-//  RESEARCH.JS - v1.1 - Lógica para el sistema de I+D (Corregido)
+//  RESEARCH.JS - v2.0 - Lógica de I+D con registro de gastos
 // =================================================================================
 
 function findResearchNode(researchId) {
@@ -42,6 +42,9 @@ function startResearch(researchId, skillType) {
     }
 
     gameState.money -= node.cost;
+    // FIX: Se registra el coste de la investigación como un gasto del día.
+    gameState.dailyExpenses.push({ reason: `I+D: ${node.name}`, amount: node.cost });
+
     gameState.activeResearch = {
         id: node.id,
         name: node.name,
@@ -49,7 +52,7 @@ function startResearch(researchId, skillType) {
     };
 
     showNotification(`Investigación "${node.name}" iniciada.`, "info");
-    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
+    refreshUI();
 }
 
 function completeResearch(researchId) {
@@ -59,5 +62,5 @@ function completeResearch(researchId) {
     gameState.completedResearch.push(researchId);
     gameState.activeResearch = null;
     showNotification(`¡Investigación "${node.name}" completada!`, "success");
-    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
+    refreshUI();
 }
