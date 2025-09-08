@@ -44,83 +44,55 @@
                 <span id="date-text">Día 1</span>
             </div>
         </header>
-		<div id="monitor">
-	        <main id="desktop">
-	            <div id="desktop-icons"></div>
-	        </main>
-	        
-	        <div id="taskbar">
-	            <button id="start-button"><i class="fas fa-desktop"></i></button>
-	            <div id="running-apps"></div>
-	            <div id="clock">12:00 PM</div>
-	        </div>
 
-	        <div id="start-menu" class="hidden">
-	            <div class="start-menu-header">
-	                <img src="https://i.ibb.co/S4ksHXhy/defava.png" alt="User Avatar">
-	                <span>Guest</span>
-	            </div>
-	            <div class="start-menu-body">
-				</div>
-	            <div class="start-menu-footer">
-		    <button id="shutdown-button"><i class="fas fa-power-off"></i> Dormir</button>
-		    <button id="main-menu-button" title="Volver al Menú Principal"><i class="fas fa-sign-out-alt"></i></button>
-		</div>
-	        </div>
-		</div>
+        <div id="screen">
+            <main id="desktop">
+                <div id="desktop-icons"></div>
+            </main>
+            
+            <div id="taskbar">
+                <button id="start-button"><i class="fas fa-desktop"></i></button>
+                <div id="running-apps"></div>
+                <div id="clock">12:00 PM</div>
+            </div>
+
+            <div id="start-menu" class="hidden">
+                <div class="start-menu-header">
+                    <img src="https://i.ibb.co/S4ksHXhy/defava.png" alt="User Avatar">
+                    <span>Guest</span>
+                </div>
+                <div class="start-menu-body">
+                    <a href="../index.html" class="back-to-portfolio-link">← Volver al Portfolio</a>
+                </div>
+                <div class="start-menu-footer">
+                    <button id="shutdown-button"><i class="fas fa-power-off"></i> Dormir</button>
+                    <button id="main-menu-button" title="Volver al Menú Principal"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <template id="code-studio-template">
         <div class="code-studio-layout">
-            <div class="code-editor">
-                <div class="line-numbers"></div>
-                <pre class="code-content"></pre>
-            </div>
-            <div class="ide-sidebar">
-                <h4>Proyecto Activo</h4>
-                <div class="ide-project-info"></div>
-                <div class="ide-actions"></div>
-            </div>
+            <div class="code-editor"><div class="line-numbers"></div><pre class="code-content"></pre></div>
+            <div class="ide-sidebar"><h4>Proyecto Activo</h4><div class="ide-project-info"></div><div class="ide-actions"></div></div>
         </div>
     </template>
-
     <template id="mytube-template">
         <div class="mytube-layout">
-            <div class="video-preview">
-                <img src="https://i.imgur.com/3fO0s3E.png" alt="Video Thumbnail">
-                <h3 class="video-title-overlay"></h3>
-            </div>
-            <div class="upload-section">
-                <h4>Subiendo Vídeo...</h4>
-                <div class="progress-bar-container"><div class="progress-bar"></div></div>
-                <div class="seo-minigame-container"></div>
-            </div>
+            <div class="video-preview"><img src="https://i.imgur.com/3fO0s3E.png" alt="Video Thumbnail"><h3 class="video-title-overlay"></h3></div>
+            <div class="upload-section"><h4>Subiendo Vídeo...</h4><div class="progress-bar-container"><div class="progress-bar"></div></div><div class="seo-minigame-container"></div></div>
         </div>
     </template>
-
     <template id="browser-template">
         <div class="browser-layout">
-            <div class="browser-header">
-                <i class="fas fa-globe"></i> <span class="browser-title">iLupo Warehouse</span>
-            </div>
-            <div class="browser-content">
-                <div class="publish-area">
-                    <h4>Publicar nuevo artículo en el Almacén</h4>
-                    <p>El proyecto se publicará para ganar ingresos y seguidores pasivos.</p>
-                    <button class="publish-button action-button"><i class="fas fa-rocket"></i> Publicar Proyecto</button>
-                </div>
-            </div>
+            <div class="browser-header"><i class="fas fa-globe"></i> <span class="browser-title">iLupo Warehouse</span></div>
+            <div class="browser-content"><div class="publish-area"><h4>Publicar nuevo artículo en el Almacén</h4><p>El proyecto se publicará para ganar ingresos y seguidores pasivos.</p><button class="publish-button action-button"><i class="fas fa-rocket"></i> Publicar Proyecto</button></div></div>
         </div>
     </template>
+    <template id="warehouse-template"><div id="completed-projects-list"></div></template>
+    <template id="stats-template"><div id="skills-panel"></div></template>
     
-    <template id="warehouse-template">
-        <div id="completed-projects-list"></div>
-    </template>
-
-    <template id="stats-template">
-        <div id="skills-panel"></div>
-    </template>
-
     <div id="daily-summary-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 id="summary-title">Resumen del Día X</h3>
@@ -226,7 +198,7 @@
                 <span>Tiempo: <span id="seo-timer">15s</span></span>
             </div>
             <div id="seo-tags-container"></div>
-             <button id="finish-seo-button" class="hidden">Finalizar Vídeo</button>
+            <button id="finish-seo-button" class="hidden">Finalizar Vídeo</button>
         </div>
     </div>
 
@@ -241,6 +213,5 @@
     <script src="desktop.js" defer></script> 
     <script src="ui.js" defer></script>
     <script src="main.js" defer></script>
-
 </body>
 </html>
