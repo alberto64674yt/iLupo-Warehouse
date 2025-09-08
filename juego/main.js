@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v9.1 - Corrección de bug de progreso de proyecto
+//  MAIN.JS - v9.2 - Lógica de energía corregida
 // =================================================================================
 
 let desktopManager; // Variable global para el gestor del escritorio
@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initializeApp() {
     attachBaseEventListeners();
+    // Esto debería estar en data.js, pero lo dejamos aquí por ahora.
+    dom.continueBtn = document.getElementById('continue-button');
     if (localStorage.getItem('iLupoDevTycoonSave')) {
         dom.continueBtn.disabled = false;
     } else {
@@ -43,7 +45,6 @@ function gameTick() {
     if (!proj || proj.stage !== 'development') return;
 
     proj.timeRemaining -= 0.1;
-    // FIX: Redondear a 2 decimales para evitar errores de punto flotante que atascan el progreso.
     proj.timeRemaining = parseFloat(proj.timeRemaining.toFixed(2));
 
     const bugChance = Math.max(0.001, 0.015 - (gameState.skills.programming.level * 0.002));
@@ -58,10 +59,9 @@ function gameTick() {
         gameTickInterval = null;
         proj.quality = Math.floor(proj.qualityBonus + (gameState.skills.programming.level + (gameState.skills.design.level * 2)) + Math.random() * 20 - 10);
         showNotification('¡Desarrollo terminado! Listo para depurar.', 'success');
-        refreshUI(); // Refrescar para mostrar el botón de depurar
+        refreshUI();
     }
     
-    // Actualizar en tiempo real solo la app Code Studio si está abierta
     if (desktopManager.openWindows['codeStudio']) {
         const codeStudioWindow = desktopManager.openWindows['codeStudio'];
         renderCodeStudioApp(codeStudioWindow.querySelector('.window-body'));
@@ -70,7 +70,7 @@ function gameTick() {
 
 function nextDay() {
     if (gameState.activeProject) {
-        alert("No puedes pasar de día con un proyecto activo. ¡Termínalo!");
+        showNotification("No puedes pasar de día con un proyecto activo. ¡Termínalo!", "error");
         return;
     }
 
@@ -92,16 +92,11 @@ function nextDay() {
         }
     }
 
-    let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
+    let { totalIncome } = calculatePassiveIncome();
     let expenses = 0;
-    let expenseReason = '';
-    const eventResult = handleDailyEvent({ totalIncome, totalFollowers, incomeBreakdown });
-    totalIncome = eventResult.totals.totalIncome;
-    totalFollowers = eventResult.totals.totalFollowers;
 
     if ((gameState.day - gameState.lastRentDay) >= 6) {
         expenses = gameState.rentCost;
-        expenseReason = `Alquiler del Servidor (Día ${gameState.day})`;
         gameState.lastRentDay = gameState.day;
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
@@ -112,22 +107,20 @@ function nextDay() {
         return;
     }
 
-    const summaryModal = document.getElementById('daily-summary-modal');
-    document.getElementById('summary-title').textContent = `Resumen del Día ${gameState.day}`;
-    document.getElementById('summary-content').innerHTML = `<p>Ingresos: +${totalIncome}€</p><p>Seguidores: +${totalFollowers}</p><p>Gastos: -${expenses}€</p>`;
-    summaryModal.classList.remove('hidden');
+    dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
+    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Gastos: -${expenses}€</p>`;
+    dom.dailySummaryModal.classList.remove('hidden');
     
-    const continueButton = summaryModal.querySelector('.close-modal-button');
+    const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
         gameState.money += netIncome;
-        gameState.followers += totalFollowers;
         gameState.energy = gameState.maxEnergy;
         gameState.completedProjectsToday = [];
         generateNewTrend();
         refreshUI();
         saveGame();
-        summaryModal.classList.add('hidden');
+        dom.dailySummaryModal.classList.add('hidden');
     };
 }
 
@@ -170,16 +163,16 @@ function checkForLevelUp(skill) {
 
 function confirmNewProject() {
     if (gameState.activeProject) {
-        alert("Ya tienes un proyecto en desarrollo.");
+        showNotification("Ya tienes un proyecto en desarrollo.", "error");
         return;
     }
     if (gameState.completedProjectsToday.length >= gameState.maxProjectsPerDay) {
-        alert(`Ya has completado tu cupo de ${gameState.maxProjectsPerDay} proyecto(s) por hoy.`);
+        showNotification(`Ya has completado tu cupo de ${gameState.maxProjectsPerDay} proyecto(s) por hoy.`, "error");
         return;
     }
     const name = dom.newProjectNameInput.value.trim();
     if (!selectedProjectType || !name) {
-        alert("Error inesperado: Faltan datos del proyecto.");
+        showNotification("Debes seleccionar un tipo de proyecto y darle un nombre.", "error");
         return;
     }
     const baseData = gameData.projectTypes[selectedProjectType];
@@ -195,7 +188,7 @@ function confirmNewProject() {
         }
     });
     if (gameState.money < totalCost) {
-        alert("No tienes suficiente dinero para este proyecto con las tecnologías seleccionadas.");
+        showNotification("No tienes suficiente dinero para este proyecto.", "error");
         return;
     }
     gameState.money -= totalCost;
@@ -225,10 +218,17 @@ function startProjectTimer() {
 
 function publishProject() {
     const proj = gameState.activeProject;
-    if (!proj || gameState.energy < gameData.energyCosts.publish) {
+    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
+    if (!proj || proj.stage !== 'post') {
+        showNotification("No hay ningún proyecto listo para publicar.", "info");
+        return;
+    }
+    if (gameState.energy < gameData.energyCosts.publish) {
         showNotification(`Se necesitan ${gameData.energyCosts.publish} de energía para publicar.`, 'error');
         return;
     }
+    
+    // FIX: La energía se resta y la UI se actualiza.
     gameState.energy -= gameData.energyCosts.publish;
     showNotification(`${proj.name} se ha añadido a tu portfolio.`, 'success');
     gameState.completedProjects.push(proj);
@@ -239,31 +239,19 @@ function publishProject() {
 
 function calculatePassiveIncome() {
     let totalIncome = 0;
-    let totalFollowers = 0;
-    const incomeBreakdown = [];
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
         let dailyMoney = projData.baseIncome + (proj.quality / 2);
-        let dailyFollowers = Math.ceil(proj.quality / 20);
         dailyMoney *= gameState.appMonetization;
-        dailyFollowers *= gameState.postMonetization;
-        if (proj.seoPenalty) { dailyFollowers *= proj.seoPenalty; }
         const followerBonus = 1 + (gameState.followers / 5000);
         const marketingBonus = 1 + (gameState.skills.marketing.level / 10);
         dailyMoney *= followerBonus * marketingBonus;
-        dailyFollowers *= marketingBonus;
         if (gameState.currentTrend.category === proj.type) {
-            const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
-            dailyMoney *= trendBonus;
-            dailyFollowers *= trendBonus;
+            dailyMoney *= (1 + gameState.currentTrend.bonus / 100);
         }
-        dailyMoney = Math.floor(dailyMoney);
-        dailyFollowers = Math.floor(dailyFollowers);
-        totalIncome += dailyMoney;
-        totalFollowers += dailyFollowers;
-        incomeBreakdown.push({ name: proj.name, income: dailyMoney, followers: dailyFollowers });
+        totalIncome += Math.floor(dailyMoney);
     });
-    return { totalIncome, totalFollowers, incomeBreakdown };
+    return { totalIncome };
 }
 
 function handleGameOver(reason) {
@@ -292,7 +280,6 @@ function attachBaseEventListeners() {
     });
     document.getElementById('help-button').addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
     
-    // Listener para el nuevo botón de volver al menú
     document.getElementById('main-menu-button').addEventListener('click', () => {
         if (confirm("¿Seguro que quieres volver al menú principal? Perderás el progreso que no hayas guardado desde que empezó el día.")) {
             window.location.reload();
@@ -302,7 +289,13 @@ function attachBaseEventListeners() {
     dom.restartGameButton.addEventListener('click', resetGame);
     dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
     dom.modalNextButton.addEventListener('click', renderModalStep2);
-    dom.modalBackButton.addEventListener('click', openNewProjectModal);
+    dom.modalBackButton.addEventListener('click', () => {
+        dom.modalStep1.classList.remove('hidden');
+        dom.modalStep2.classList.add('hidden');
+        dom.modalNextButton.classList.remove('hidden');
+        dom.modalBackButton.classList.add('hidden');
+        dom.confirmNewProjectBtn.classList.add('hidden');
+    });
     dom.projectTypeSelection.addEventListener('click', (e) => {
         const button = e.target.closest('.project-type-choice');
         if (button) {
@@ -330,9 +323,7 @@ function attachBaseEventListeners() {
         if (closeButton) {
              const modal = closeButton.closest('.modal-overlay');
              if(modal) {
-                if (modal.id !== 'daily-summary-modal' || e.target.textContent === 'Continuar') {
-                     modal.classList.add('hidden');
-                }
+                 modal.classList.add('hidden');
              }
         }
     });
@@ -347,39 +338,4 @@ function saveGame() {
 
 function loadGame() {
     return localStorage.getItem('iLupoDevTycoonSave');
-}
-
-function exportSave() {
-    const saveData = loadGame();
-    if (!saveData) { alert("No hay partida guardada."); return; }
-    const blob = new Blob([saveData], { type: 'text/plain' });
-    const a = document.createElement('a');
-a.href = URL.createObjectURL(blob);
-    a.download = `iLupoDevTycoon_save_dia_${gameState.day}.txt`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-}
-
-function importSave() {
-    const importFileInput = document.getElementById('import-file-input');
-    importFileInput.click();
-    importFileInput.onchange = handleFileImport;
-}
-
-function handleFileImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const content = e.target.result;
-            JSON.parse(atob(content));
-            localStorage.setItem('iLupoDevTycoonSave', content);
-            alert("Partida importada. El juego se reiniciará.");
-            window.location.reload();
-        } catch (err) {
-            alert("Error: Archivo de guardado no válido.");
-        }
-    };
-    reader.readAsText(file);
 }
