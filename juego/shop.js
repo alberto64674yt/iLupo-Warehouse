@@ -1,37 +1,6 @@
 // =================================================================================
-//  SHOP.JS - v4.2 - Lógica de renderizado para soportar árbol de mejoras.
+//  SHOP.JS - v4.3 - Lógica de compra (UI movida a ui.js)
 // =================================================================================
-
-function renderShop() {
-    ['hardware', 'personal'].forEach(category => {
-        const container = dom[`shop${category.charAt(0).toUpperCase() + category.slice(1)}`];
-        container.innerHTML = gameData.shopItems[category].map(item => {
-            const isOwned = gameState.shopUpgrades.includes(item.id);
-
-            if (item.requires && !gameState.shopUpgrades.includes(item.requires)) {
-                return '';
-            }
-            
-            const hasTieredUpgrade = gameData.shopItems[category].some(otherItem => otherItem.requires === item.id);
-            if (isOwned && hasTieredUpgrade) {
-                return '';
-            }
-
-            return `
-                <div class="shop-item ${isOwned ? 'owned' : ''}">
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-desc">${item.desc}</div>
-                    <div class="item-buy">
-                        <span class="item-cost">${item.cost} €</span>
-                        <button class="buy-button" data-item-id="${item.id}" ${isOwned ? 'disabled' : ''}>
-                            ${isOwned ? 'Comprado' : 'Comprar'}
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    });
-}
 
 function buyUpgrade(itemId) {
     let item;
@@ -77,6 +46,5 @@ function buyUpgrade(itemId) {
     }
     
     showNotification(`¡${item.name} comprado!`, 'success');
-    renderShop();
-    updateUI();
+    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
 }
