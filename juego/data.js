@@ -87,6 +87,7 @@ const dom = {
     // Minijuegos
     debugMinigameOverlay: document.getElementById('debug-minigame-overlay'),
     videoSeoMinigameOverlay: document.getElementById('video-seo-minigame-overlay'),
+	startDebugButton: document.getElementById('start-debug-button'),
     // Otros
     notificationContainer: document.getElementById('notification-container'),
 };
