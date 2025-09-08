@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v9.2 - Lógica de energía corregida
+//  MAIN.JS - v10.0 - Lógica de seguidores y alquiler corregida
 // =================================================================================
 
 let desktopManager; // Variable global para el gestor del escritorio
@@ -62,6 +62,7 @@ function gameTick() {
         refreshUI();
     }
     
+    // No es necesario refrescar toda la UI, solo la ventana de Code Studio
     if (desktopManager.openWindows['codeStudio']) {
         const codeStudioWindow = desktopManager.openWindows['codeStudio'];
         renderCodeStudioApp(codeStudioWindow.querySelector('.window-body'));
@@ -92,10 +93,12 @@ function nextDay() {
         }
     }
 
-    let { totalIncome } = calculatePassiveIncome();
+    // FIX: Se llama a la función que calcula ingresos Y seguidores.
+    let { totalIncome, totalFollowers } = calculatePassiveIncome();
     let expenses = 0;
 
-    if ((gameState.day - gameState.lastRentDay) >= 6) {
+    // FIX: Se cambia a '>= 7' para que se cobre cada 7 días exactos.
+    if ((gameState.day - gameState.lastRentDay) >= 7) {
         expenses = gameState.rentCost;
         gameState.lastRentDay = gameState.day;
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
@@ -108,13 +111,16 @@ function nextDay() {
     }
 
     dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
-    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Gastos: -${expenses}€</p>`;
+    // FIX: Se añade el resumen de seguidores al modal.
+    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Nuevos Seguidores: +${totalFollowers}</p><p>Gastos: -${expenses}€</p>`;
     dom.dailySummaryModal.classList.remove('hidden');
     
     const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
         gameState.money += netIncome;
+        // FIX: Se suman los nuevos seguidores al total.
+        gameState.followers += totalFollowers;
         gameState.energy = gameState.maxEnergy;
         gameState.completedProjectsToday = [];
         generateNewTrend();
@@ -157,7 +163,7 @@ function checkForLevelUp(skill) {
         currentSkill.level++;
         currentSkill.xp -= xpNeeded;
         showNotification(`¡${skill.toUpperCase()} ha subido al Nivel ${currentSkill.level}!`, 'success');
-        checkForLevelUp(skill);
+        checkForLevelUp(skill); // Llamada recursiva por si sube varios niveles
     }
 }
 
@@ -218,7 +224,6 @@ function startProjectTimer() {
 
 function publishProject() {
     const proj = gameState.activeProject;
-    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
     if (!proj || proj.stage !== 'post') {
         showNotification("No hay ningún proyecto listo para publicar.", "info");
         return;
@@ -228,7 +233,6 @@ function publishProject() {
         return;
     }
     
-    // FIX: La energía se resta y la UI se actualiza.
     gameState.energy -= gameData.energyCosts.publish;
     showNotification(`${proj.name} se ha añadido a tu portfolio.`, 'success');
     gameState.completedProjects.push(proj);
@@ -239,19 +243,38 @@ function publishProject() {
 
 function calculatePassiveIncome() {
     let totalIncome = 0;
+    let totalFollowers = 0; // FIX: Se inicializa la variable de seguidores.
+
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
         let dailyMoney = projData.baseIncome + (proj.quality / 2);
+        // FIX: Se añade el cálculo de seguidores diarios.
+        let dailyFollowers = Math.ceil(proj.quality / 20);
+
         dailyMoney *= gameState.appMonetization;
+        // FIX: Se aplica la monetización de posts a los seguidores.
+        dailyFollowers *= gameState.postMonetization;
+
+        if (proj.seoPenalty) { dailyFollowers *= proj.seoPenalty; }
+
         const followerBonus = 1 + (gameState.followers / 5000);
         const marketingBonus = 1 + (gameState.skills.marketing.level / 10);
+        
         dailyMoney *= followerBonus * marketingBonus;
+        dailyFollowers *= marketingBonus;
+        
         if (gameState.currentTrend.category === proj.type) {
-            dailyMoney *= (1 + gameState.currentTrend.bonus / 100);
+            const trendBonus = 1 + (gameState.currentTrend.bonus / 100);
+            dailyMoney *= trendBonus;
+            dailyFollowers *= trendBonus;
         }
+
         totalIncome += Math.floor(dailyMoney);
+        totalFollowers += Math.floor(dailyFollowers);
     });
-    return { totalIncome };
+
+    // FIX: Se devuelven ambos valores.
+    return { totalIncome, totalFollowers };
 }
 
 function handleGameOver(reason) {
