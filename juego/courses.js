@@ -1,10 +1,14 @@
 // =================================================================================
-//  COURSES.JS - Lógica para el sistema de Cursos de Habilidades.
+//  COURSES.JS - Lógica para el sistema de Cursos de Habilidades (Corregido)
 // =================================================================================
 
 function startCourse(courseId, skillType) {
     if (gameState.activeCourse) {
         showNotification("Ya estás realizando un curso.", "error");
+        return;
+    }
+     if (gameState.activeResearch) {
+        showNotification("No puedes estudiar e investigar al mismo tiempo.", "error");
         return;
     }
 
@@ -34,5 +38,5 @@ function startCourse(courseId, skillType) {
     };
 
     showNotification(`¡Has empezado el curso "${courseData.name}"!`, "success");
-    updateUI();
+    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
 }
