@@ -288,6 +288,14 @@ function attachBaseEventListeners() {
         if (saveData) startGame(saveData);
     });
     document.getElementById('help-button').addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
+    
+    // Listener para el nuevo botón de volver al menú
+    document.getElementById('main-menu-button').addEventListener('click', () => {
+        if (confirm("¿Seguro que quieres volver al menú principal? Perderás el progreso que no hayas guardado desde que empezó el día.")) {
+            window.location.reload();
+        }
+    });
+
     dom.restartGameButton.addEventListener('click', resetGame);
     dom.confirmNewProjectBtn.addEventListener('click', confirmNewProject);
     dom.modalNextButton.addEventListener('click', renderModalStep2);
