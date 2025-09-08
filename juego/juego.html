@@ -41,56 +41,82 @@
             </div>
             <div class="date-display">
                 <span id="date-text">Día 1</span>
-                <button id="next-day-button">Dormir (Pasar al día siguiente)</button>
             </div>
         </header>
 
-        <main id="main-view">
-            <section id="dev-panel" class="view-panel active">
-                <h2>Oficina de Desarrollo</h2>
-                <div id="active-project-slot"></div>
-                <div id="skills-panel"></div>
-                <div id="completed-projects-container">
-                    <h3>Proyectos que generan ingresos</h3>
-                    <div id="completed-projects-list"></div>
-                </div>
-            </section>
-            
-            <section id="shop-panel" class="view-panel">
-                <h2><i class="fas fa-shopping-cart"></i> Tienda de Mejoras</h2>
-                <div id="shop-items-container">
-                    <h3><i class="fas fa-desktop"></i> Hardware</h3>
-                    <div id="shop-hardware" class="shop-category"></div>
-                    <h3><i class="fas fa-coffee"></i> Personal y Software</h3>
-                    <div id="shop-personal" class="shop-category"></div>
-                </div>
-            </section>
-
-            <section id="courses-panel" class="view-panel">
-                <h2><i class="fas fa-graduation-cap"></i> Centro de Formación</h2>
-                <div id="courses-container"></div>
-                <div id="active-course-container"></div>
-            </section>
-
-            <section id="research-panel" class="view-panel">
-                <h2><i class="fas fa-flask"></i> Investigación y Desarrollo</h2>
-                <div id="active-research-container"></div>
-                <div id="research-container"></div>
-            </section>
-
-            <aside id="news-panel">
-                <h3><i class="fas fa-fire"></i> Noticias y Tendencias</h3>
-                <div id="news-content"></div>
-            </aside>
+        <main id="desktop">
+            <div id="desktop-icons"></div>
         </main>
         
-        <nav id="game-nav">
-            <button class="nav-button active" data-view="dev-panel"><i class="fas fa-code"></i> Desarrollo</button>
-            <button class="nav-button" data-view="shop-panel"><i class="fas fa-shopping-cart"></i> Tienda</button>
-            <button class="nav-button" data-view="courses-panel"><i class="fas fa-graduation-cap"></i> Cursos</button>
-            <button class="nav-button" data-view="research-panel"><i class="fas fa-flask"></i> I+D</button>
-        </nav>
+        <div id="taskbar">
+            <button id="start-button"><i class="fab fa-windows"></i></button>
+            <div id="running-apps"></div>
+            <div id="clock">12:00 PM</div>
+        </div>
+
+        <div id="start-menu" class="hidden">
+            <div class="start-menu-header">
+                <img src="/img/logo.png" alt="User Avatar">
+                <span>iLupo</span>
+            </div>
+            <div class="start-menu-body"></div>
+            <div class="start-menu-footer">
+                <button id="shutdown-button"><i class="fas fa-power-off"></i> Dormir</button>
+            </div>
+        </div>
     </div>
+
+    <template id="code-studio-template">
+        <div class="code-studio-layout">
+            <div class="code-editor">
+                <div class="line-numbers"></div>
+                <pre class="code-content"></pre>
+            </div>
+            <div class="ide-sidebar">
+                <h4>Proyecto Activo</h4>
+                <div class="ide-project-info"></div>
+                <div class="ide-actions"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="mytube-template">
+        <div class="mytube-layout">
+            <div class="video-preview">
+                <img src="https://i.imgur.com/3fO0s3E.png" alt="Video Thumbnail">
+                <h3 class="video-title-overlay"></h3>
+            </div>
+            <div class="upload-section">
+                <h4>Subiendo Vídeo...</h4>
+                <div class="progress-bar-container"><div class="progress-bar"></div></div>
+                <div class="seo-minigame-container"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="browser-template">
+        <div class="browser-layout">
+            <div class="browser-header">
+                <i class="fas fa-globe"></i> <span class="browser-title">iLupo Warehouse</span>
+            </div>
+            <div class="browser-content">
+                <div class="publish-area">
+                    <h4>Publicar nuevo artículo en el Almacén</h4>
+                    <p>El proyecto se publicará para ganar ingresos y seguidores pasivos.</p>
+                    <button class="publish-button action-button"><i class="fas fa-rocket"></i> Publicar Proyecto</button>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="warehouse-template">
+        <div id="completed-projects-list"></div>
+    </template>
+
+    <template id="stats-template">
+        <div id="skills-panel"></div>
+    </template>
+
 
     <div id="daily-summary-modal" class="modal-overlay hidden">
         <div class="modal-content">
@@ -110,85 +136,33 @@
 
     <div id="help-modal" class="modal-overlay hidden">
         <div class="modal-content large">
-            <button class="close-modal-button" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem;">&times;</button>
+            <button class="close-modal-button">&times;</button>
             <h3><i class="fas fa-question-circle"></i> Guía del Juego</h3>
             <div class="help-container">
-                <div class="help-section">
-                    <h4>Concepto del Juego</h4>
-                    <p>En <strong>iLupo Dev Tycoon</strong>, tu objetivo es pasar de ser un desarrollador aficionado a un magnate de la tecnología. Desarrolla proyectos, publícalos para ganar dinero y seguidores, e invierte en mejoras para crecer cada vez más rápido.</p>
                 </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-sync-alt"></i> El Bucle de Juego</h4>
-                    <ol>
-                        <li><strong>Iniciar un Proyecto:</strong> Cuesta dinero inicial y solo puedes trabajar en uno a la vez (ampliable en la tienda).</li>
-                        <li><strong>Desarrollo Automático:</strong> El proyecto avanzará solo en tiempo real. Durante este tiempo, pueden aparecer bugs.</li>
-                        <li><strong>Depuración (Minijuego):</strong> Una vez desarrollado, deberás eliminar los bugs. Tu habilidad de <strong>Programación</strong> te da más tiempo. Ganas XP de Programación al superar el minijuego.</li>
-                        <li><strong>Producción de Vídeo (Minijuego):</strong> A continuación, optimiza el SEO de tu vídeo promocional. Ganas XP de <strong>Diseño</strong> según tu puntuación.</li>
-                        <li><strong>Publicación:</strong> El último paso. Publicar consume energía pero añade el proyecto a tu catálogo de ingresos pasivos.</li>
-                        <li><strong>Ingresos Pasivos:</strong> ¡Aquí está la clave! Cada proyecto completado te generará ingresos y seguidores <strong>todos los días</strong>.</li>
-                        <li><strong>Dormir:</strong> Pasa al día siguiente para cobrar tus ingresos, recuperar energía y empezar de nuevo.</li>
-                    </ol>
-                </div>
-                 <div class="help-section">
-                    <h4><i class="fas fa-graduation-cap"></i> Cursos y Formación</h4>
-                    <p>La forma principal de mejorar tus habilidades es a través de los cursos. Puedes acceder a ellos desde la pestaña "Cursos".</p>
-                    <ul>
-                        <li><span><strong>Tomar un curso:</strong></span><div>Cuesta dinero y tarda varios días en completarse. Puedes seguir desarrollando proyectos mientras estudias.</div></li>
-                        <li><span><strong>Ganancia de XP:</strong></span><div>Al finalizar, recibirás una gran cantidad de XP para la habilidad correspondiente y desbloquearás el siguiente nivel del curso.</div></li>
-                         <li><span><strong>Marketing:</strong></span><div>La habilidad de Marketing solo puede mejorarse a través de cursos, lo que la convierte en una inversión estratégica.</div></li>
-                    </ul>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-flask"></i> Investigación y Desarrollo (I+D)</h4>
-                    <p>Además de los cursos, puedes potenciar tus proyectos investigando nuevas tecnologías en la pestaña de I+D. Esto te permitirá crear proyectos más complejos y rentables.</p>
-                    <ul>
-                        <li><span><strong>Investigar Tecnologías:</strong></span><div>Cada investigación tiene un coste en dinero y días. Avanzará un día cada vez que duermas. Puedes tener una investigación, un curso y un proyecto activos al mismo tiempo.</div></li>
-                        <li><span><strong>Árboles Tecnológicos:</strong></span><div>Existen 3 árboles de investigación (Programación, Diseño, Marketing). Para desbloquear nodos avanzados, necesitarás un nivel mínimo en la habilidad correspondiente.</div></li>
-                        <li><span><strong>Proyectos Mejorados:</strong></span><div>Al iniciar un proyecto, podrás añadirle las tecnologías que hayas desbloqueado. Cada una modificará el coste, tiempo y la calidad final del proyecto.</div></li>
-                    </ul>
-                </div>
-                 <div class="help-section">
-                    <h4><i class="fas fa-server"></i> Gastos y Game Over</h4>
-                    <p>Cada 7 días, tendrás que pagar el <strong>alquiler del servidor</strong>. Es un gasto fijo que aumentará a medida que crezcas. Si no puedes pagarlo y tu saldo queda en negativo, será <strong>Game Over</strong>.</p>
-                </div>
-                <div class="help-section">
-                    <h4><i class="fas fa-star"></i> Recursos y Habilidades</h4>
-                    <ul>
-                        <li><span><i class="fas fa-coins"></i> <strong>Dinero:</strong></span><div>Se usa para empezar proyectos, cursos y comprar mejoras. Se gana pasivamente cada día.</div></li>
-                        <li><span><i class="fas fa-users"></i> <strong>Seguidores:</strong></span><div>Aumentan tus ingresos diarios. ¡Más gente ve tu contenido!</div></li>
-                        <li><span><i class="fas fa-bolt"></i> <strong>Energía:</strong></span><div>Se gasta en las fases críticas (depurar, vídeo, publicar). Se recupera al dormir.</div></li>
-                        <li><span><i class="fas fa-code"></i> <strong>Programación:</strong></span><div>(Nivel) Reduce la probabilidad de que aparezcan bugs y te da más tiempo en el minijuego de depuración.</div></li>
-                        <li><span><i class="fas fa-palette"></i> <strong>Diseño:</strong></span><div>(Nivel) Aumenta la calidad base de tus proyectos, lo que se traduce en mayores ingresos pasivos.</div></li>
-                        <li><span><i class="fas fa-chart-line"></i> <strong>Marketing:</strong></span><div>(Nivel) Potencia enormemente tus ganancias de dinero y seguidores diarios. Es la habilidad más importante para crecer económicamente.</div></li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
     
     <div id="new-project-modal" class="modal-overlay hidden">
         <div class="modal-content large">
-            <button class="close-modal-button" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem;">&times;</button>
-            
+            <button class="close-modal-button">&times;</button>
             <div id="modal-step-1">
                 <h3>Iniciar Nuevo Proyecto (Paso 1 de 2)</h3>
                 <p>Elige el tipo de proyecto base y dale un nombre.</p>
                 <div id="project-type-selection"></div>
                 <input type="text" id="new-project-name-input" placeholder="Nombre de tu nuevo proyecto...">
             </div>
-
             <div id="modal-step-2" class="hidden">
                 <h3>Añadir Tecnologías (Paso 2 de 2)</h3>
                 <div class="step2-layout">
                     <div id="tech-selection-container">
                         <h4>Tecnologías Desbloqueadas</h4>
-                        </div>
+                    </div>
                     <div id="project-summary-container">
                         <h4>Resumen del Proyecto</h4>
-                        </div>
+                    </div>
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button id="modal-back-button" class="hidden">Atrás</button>
                 <button id="modal-next-button">Siguiente</button>
@@ -229,10 +203,11 @@
     <script src="data.js" defer></script>
     <script src="courses.js" defer></script>
     <script src="research.js" defer></script>
-    <script src="ui.js" defer></script>
     <script src="shop.js" defer></script>
     <script src="minigames.js" defer></script>
     <script src="events.js" defer></script>
+    <script src="desktop.js" defer></script> 
+    <script src="ui.js" defer></script>
     <script src="main.js" defer></script>
 
 </body>
