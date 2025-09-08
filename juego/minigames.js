@@ -1,14 +1,17 @@
 // =================================================================================
-//  MINIGAMES.JS - v5.1 - Añade recompensas de XP y bonus de habilidad (Completo)
+//  MINIGAMES.JS - v5.2 - Lógica de energía corregida
 // =================================================================================
 
 function startDebugMinigame() {
+    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
     if (gameState.energy < gameData.energyCosts.debug) {
         showNotification(`Se necesitan ${gameData.energyCosts.debug} de energía para depurar.`, 'error');
         return;
     }
+    
+    // FIX: La energía se resta y la UI se actualiza ANTES de empezar el minijuego.
     gameState.energy -= gameData.energyCosts.debug;
-    updateUI();
+    refreshUI();
 
     const proj = gameState.activeProject;
     let bugsToSpawn = proj.bugs;
@@ -70,17 +73,20 @@ function startDebugMinigame() {
             const xpGained = Math.floor((bugsOriginales - bugsToSpawn) * 2);
             if (xpGained > 0) addXp('programming', xpGained);
         }
-        updateUI();
+        refreshUI();
     }
 }
 
 function startSeoMinigame() {
+    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
     if (gameState.energy < gameData.energyCosts.video) {
         showNotification(`Se necesitan ${gameData.energyCosts.video} de energía para el vídeo.`, 'error');
         return;
     }
+    
+    // FIX: La energía se resta y la UI se actualiza ANTES de empezar el minijuego.
     gameState.energy -= gameData.energyCosts.video;
-    updateUI();
+    refreshUI();
 
     dom.videoSeoMinigameOverlay.classList.remove('hidden');
     dom.finishSeoButton.classList.add('hidden');
@@ -149,7 +155,7 @@ function startSeoMinigame() {
         dom.finishSeoButton.onclick = () => {
             gameState.activeProject.stage = 'post';
             dom.videoSeoMinigameOverlay.classList.add('hidden');
-            updateUI();
+            refreshUI();
         };
     }
 }
