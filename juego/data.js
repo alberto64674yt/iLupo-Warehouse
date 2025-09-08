@@ -1,5 +1,5 @@
 // =================================================================================
-//  DATA.JS - v9.0 - Rework a interfaz de OS (Fase 2)
+//  DATA.JS - v9.1 - Solución final de referencias del DOM
 // =================================================================================
 
 // -----------------------------------------------------------------------------
@@ -84,16 +84,26 @@ const dom = {
     gameOverModal: document.getElementById('game-over-modal'),
     gameOverReason: document.getElementById('game-over-reason'),
     restartGameButton: document.getElementById('restart-game-button'),
-    // Minijuegos
+    
+    // FIX: Sección de Minijuegos completada con todas las referencias necesarias
     debugMinigameOverlay: document.getElementById('debug-minigame-overlay'),
+    debugBugsLeft: document.getElementById('debug-bugs-left'),
+    debugTimer: document.getElementById('debug-timer'),
+    debugPlayArea: document.getElementById('debug-play-area'),
+    startDebugButton: document.getElementById('start-debug-button'),
     videoSeoMinigameOverlay: document.getElementById('video-seo-minigame-overlay'),
-	startDebugButton: document.getElementById('start-debug-button'),
+    seoTagsContainer: document.getElementById('seo-tags-container'),
+    seoScore: document.getElementById('seo-score'),
+    seoTimer: document.getElementById('seo-timer'),
+    finishSeoButton: document.getElementById('finish-seo-button'),
+
     // Otros
     notificationContainer: document.getElementById('notification-container'),
+    continueBtn: document.getElementById('continue-button') // Añadido para consistencia
 };
 
 // -----------------------------------------------------------------------------
-//  3. DATOS DEL JUEGO
+//  3. DATOS DEL JUEGO (Sin cambios)
 // -----------------------------------------------------------------------------
 
 const gameData = {
@@ -134,7 +144,7 @@ const gameData = {
         marketing: { name: 'Marketing', icon: 'fa-chart-line', nodes: [ { id: 'res_mkt1', name: 'Página Web Simple', desc: 'Crea una web para promocionar tu proyecto y ganar más seguidores.', cost: 500, duration: 2, requires: { skill: 'marketing', level: 1 }, effect: { cost: 150, time: 0, quality: 0 } }, { id: 'res_mkt2', name: 'Tráiler de Lanzamiento', desc: 'Genera expectación con un vídeo promocional antes del lanzamiento.', cost: 1500, duration: 3, requires: { skill: 'marketing', level: 2, research: 'res_mkt1' }, effect: { cost: 300, time: 0, quality: 5 } }, ] }
     },
     projectTypes: { 'Utilidad': { icon: 'fa-wrench', baseCost: 50, baseTime: 120, baseIncome: 4 }, 'Juego Arcade': { icon: 'fa-gamepad', baseCost: 100, baseTime: 180, baseIncome: 8 }, 'Mod': { icon: 'fa-puzzle-piece', baseCost: 25, baseTime: 90, baseIncome: 2 } },
-    shopItems: { hardware: [ { id: 'hw1', name: 'SSD Básico', desc: 'Reduce el tiempo de desarrollo 15 segundos.', cost: 400, effect: { type: 'hardwareTimeReduction', value: 15 } }, { id: 'hw2', name: 'RAM 16GB', desc: 'Reduce el tiempo de desarrollo 25 segundos más.', cost: 1200, effect: { type: 'hardwareTimeReduction', value: 25 } }, { id: 'hw3', name: 'CPU de 8 núcleos', desc: 'Reduce el tiempo de desarrollo 30 segundos más. (Máx. 90s de reducción)', cost: 3000, effect: { type: 'hardwareTimeReduction', value: 30 } }, ], personal: [ { id: 'ps1', name: 'Monetizar Apps', desc: 'Tus proyectos generan un 25% más de ingresos.', cost: 800, effect: { type: 'appMonetization', value: 1.25 } }, { id: 'ps2', name: 'Monetizar Posts', desc: 'Tus vídeos/posts generan un 25% más de seguidores.', cost: 800, effect: { type: 'postMonetization', value: 1.25 } }, { id: 'ps3', name: 'Curso Productividad I', desc: 'Permite gestionar 2 proyectos/día y aumenta la Energía Máxima a 200.', cost: 4000, effect: { type: 'maxProjectsPerDay', value: 1, energy: 200 } }, { id: 'ps5', name: 'Curso Productividad II', desc: 'Permite gestionar 3 proyectos/día y aumenta la Energía Máxima a 300.', cost: 8000, requires: 'ps3', effect: { type: 'maxProjectsPerDay', value: 1, energy: 300 } }, ] },
+    shopItems: { hardware: [ { id: 'hw1', name: 'SSD Básico', desc: 'Reduce el tiempo de desarrollo 15 segundos.', cost: 400, effect: { type: 'hardwareTimeReduction', value: 15 } }, { id: 'hw2', name: 'RAM 16GB', desc: 'Reduce el tiempo de desarrollo 25 segundos más.', cost: 1200, effect: { type: 'hardwareTimeReduction', value: 25 }, requires: 'hw1' }, { id: 'hw3', name: 'CPU de 8 núcleos', desc: 'Reduce el tiempo de desarrollo 30 segundos más.', cost: 3000, effect: { type: 'hardwareTimeReduction', value: 30 }, requires: 'hw2' }, ], personal: [ { id: 'ps1', name: 'Monetizar Apps', desc: 'Tus proyectos generan un 25% más de ingresos.', cost: 800, effect: { type: 'appMonetization', value: 1.25 } }, { id: 'ps2', name: 'Monetizar Posts', desc: 'Tus vídeos/posts generan un 25% más de seguidores.', cost: 800, effect: { type: 'postMonetization', value: 1.25 } }, { id: 'ps3', name: 'Curso Productividad I', desc: 'Permite gestionar 2 proyectos/día y aumenta la Energía Máxima a 200.', cost: 4000, effect: { type: 'maxProjectsPerDay', value: 1, energy: 200 } }, { id: 'ps5', name: 'Curso Productividad II', desc: 'Permite gestionar 3 proyectos/día y aumenta la Energía Máxima a 300.', cost: 8000, requires: 'ps3', effect: { type: 'maxProjectsPerDay', value: 1, energy: 300 } }, ] },
     trends: [ { quality: 'Común', bonusRange: [5, 20], probability: 0.75, messages: ["Un ligero interés en {category} este mes."] }, { quality: 'Poco Común', bonusRange: [21, 50], probability: 0.20, messages: ["¡Las {category} están de moda!"] }, { quality: 'Rara', bonusRange: [51, 90], probability: 0.04899, messages: ["¡FIEBRE POR {category}! El mercado está en auge."] }, { quality: 'Épica', bonusRange: [91, 150], probability: 0.001, messages: ["¡VIRAL! Un streamer famoso ha impulsado las {category}."] }, { quality: 'Legendaria', bonusRange: [300, 300], probability: 0.00001, messages: ["¡REVOLUCIÓN! Un proyecto de {category} ha cambiado la industria."] } ],
     dailyEvents: { positive: [ { message: "¡Tu último proyecto se ha hecho viral! ¡Recibes un bonus de ingresos y seguidores hoy!", effect: (totals) => { totals.totalIncome = Math.floor(totals.totalIncome * 1.5); totals.totalFollowers = Math.floor(totals.totalFollowers * 1.5); return totals; } }, { message: "Un donante anónimo ha apoyado tu trabajo. ¡Has recibido 500€!", effect: (totals) => { totals.totalIncome += 500; return totals; } } ], negative: [ { message: "Una polémica en redes sociales te salpica. ¡Has perdido un 10% de tus seguidores!", effect: (totals) => { const followersLost = Math.max(1, Math.floor(gameState.followers * 0.1)); gameState.followers -= followersLost; totals.totalFollowers -= followersLost; return totals; } }, { message: "¡Ataque de Ransomware! Los hackers te exigen un pago o perderás datos (calidad de proyectos).", effect: (totals) => { const ransom = Math.min(250, Math.floor(gameState.money * 0.5)); if (confirm(`Pagar ${ransom}€ a los hackers? Si no lo haces, la calidad de todos tus proyectos se reducirá.`)) { gameState.money -= ransom; totals.totalIncome -= ransom; } else { gameState.completedProjects.forEach(p => p.quality = Math.floor(p.quality * 0.9)); } return totals; } } ] },
     energyCosts: { debug: 50, video: 40, publish: 10, }
