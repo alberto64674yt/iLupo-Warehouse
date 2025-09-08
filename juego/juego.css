@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v12.1 - Solución final de bugs de UI */
+/* Contenido 100% completo y funcional, v13.0 - Corrección de diseño en I+D */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -138,7 +138,6 @@ body {
 
 /* ---- ESTILOS ESPECÍFICOS Y CORRECCIONES ---- */
 
-/* FIX: Estilos para la app de Almacén */
 .completed-project-card {
     display: flex;
     justify-content: space-between;
@@ -154,13 +153,12 @@ body {
 }
 .completed-project-card .project-stats {
     display: flex;
-    gap: 1.5rem; /* Espacio entre "Calidad" y "€/día" */
+    gap: 1.5rem;
     font-weight: 500;
 }
 .completed-project-card .stat.success {
-    color: var(--success-color); /* Color verde para los ingresos */
+    color: var(--success-color);
 }
-/* Fin de estilos de Almacén */
 
 .text-bonus { color: var(--success-color); font-weight: bold; }
 .text-malus { color: var(--danger-color); font-weight: bold; }
@@ -195,7 +193,7 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .xp-bar-container { width: 100%; height: 12px; background-color: var(--dark-bg); border-radius: 6px; overflow: hidden; }
 .xp-bar { height: 100%; background-color: var(--primary-color); border-radius: 6px; transition: width 0.5s ease; }
 .shop-category, .courses-category { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
-.course-card, .shop-item, .research-tree { background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+.course-card, .shop-item { background-color: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
 .course-card:hover, .shop-item:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .course-card h4, .shop-item .item-name { margin: 0; color: var(--primary-color); font-size: 1.2rem; }
 .course-info { display: flex; justify-content: space-between; color: var(--light-text); }
@@ -206,9 +204,70 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .research-tree { padding: 1.5rem; }
 .research-tree-header { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 1rem; }
 .research-nodes { display: flex; flex-direction: column; gap: 1rem; }
-.research-node { border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
-.research-node h5 { margin: 0; font-size: 1.1rem; }
-.research-node.completed { background-color: var(--dark-bg); border-color: var(--success-color); }
+
+/* FIX: Se añaden los estilos que faltaban para la app de I+D */
+.research-node {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+.research-node:hover {
+    border-color: var(--primary-color);
+}
+.research-node h5 { 
+    margin: 0; 
+    font-size: 1.1rem; 
+    color: var(--primary-color);
+}
+.research-node p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+.research-req {
+    font-size: 0.85rem;
+    color: var(--light-text);
+    font-style: italic;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+.research-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.8rem;
+}
+.research-footer span {
+    font-weight: 500;
+}
+.research-footer button {
+    padding: 0.6rem 1rem;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.research-footer button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+.research-node.completed { 
+    background-color: #2a3a2a; 
+    border-color: var(--success-color); 
+}
+.research-node.locked {
+    opacity: 0.6;
+}
+/* Fin de estilos de I+D */
+
 .minigame-container { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
 .minigame-container h3 { margin-top: 0; color: var(--primary-color); font-size: 1.8rem; }
 .minigame-hud { display: flex; justify-content: space-around; background-color: var(--surface-color); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 1.2rem; font-weight: bold; }
