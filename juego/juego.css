@@ -145,7 +145,7 @@ body {
 /* FIX: Estilos para Code Studio para evitar que la ventana crezca */
 .code-studio-layout { display: flex; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 1.5rem; box-sizing: border-box; }
 .code-editor { flex: 3; background-color: #1e1e1e; color: #d4d4d4; font-family: 'Courier New', Courier, monospace; display: flex; border-radius: 6px; overflow: hidden; /* <-- IMPORTANTE: el overflow principal aquí */ }
-.line-numbers { padding: 1rem 0.5rem; background-color: #333; color: #858585; text-align: right; user-select: none; }
+.line-numbers { padding: 1rem 0.5rem; background-color: #333; color: #858585; text-align: right; user-select: none; white-space: pre; }
 pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap: break-word; overflow-y: auto; /* <-- AÑADIDO: scroll para el código */ }
 .ide-sidebar { flex: 1; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
 .ide-project-info .project-title { font-size: 1.1rem; font-weight: bold; color: var(--primary-color); }
