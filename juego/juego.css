@@ -33,7 +33,17 @@ body {
 .menu-buttons button:disabled { background-color: var(--surface-color); color: var(--light-text); border-color: var(--border-color); cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: none; }
 
 /* --- Contenedor del Juego --- */
-#game-container { display: flex; flex-direction: column; position: relative; }
+#game-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 98vw; /* 98% del ancho de la ventana */
+    height: 98vh; /* 98% de la altura de la ventana */
+    margin: auto; /* Centra el contenedor */
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    border-radius: 10px;
+    overflow: hidden;
+}
 
 /* --- Barra Superior de Recursos --- */
 #game-header { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1.5rem; background-color: rgba(16, 18, 27, 0.8); backdrop-filter: blur(5px); border-bottom: 1px solid var(--border-color); flex-shrink: 0; z-index: 100; }
@@ -44,18 +54,15 @@ body {
 
 /* --- Contenedor del Monitor --- */
 #monitor {
-    flex-grow: 1; /* Hace que el monitor ocupe el espacio disponible */
-    position: relative; /* Clave para que la taskbar se posicione dentro de él */
-    border-radius: 10px; /* Las esquinas redondeadas que querías */
-    overflow: hidden; /* Oculta lo que se salga del borde (el fondo) */
-    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Sombra para darle profundidad */
-    border: 2px solid #0a0a0f; /* Un borde sutil para el marco */
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
 }
 /* --- INICIO: NUEVA INTERFAZ DE OS --- */
 
 /* --- Escritorio --- */
 #desktop { background: url('https://i.ibb.co/GvTnS8t7/pc-bck.jpg') no-repeat center center/cover; position: relative; overflow: hidden; padding: 2rem; height: calc(100% - 50px); }
-#desktop-icons { display: flex; flex-direction: column; flex-wrap: wrap; gap: 1.5rem; align-content: flex-start; height: 100%; }
+#desktop-icons { display: flex; flex-direction: column; flex-wrap: wrap; gap: 1.2rem; align-content: flex-start; height: 100%; }
 .desktop-icon { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); cursor: pointer; text-align: center; width: 80px; padding: 0.5rem; border-radius: 6px; transition: background-color 0.2s ease; }
 .desktop-icon:hover { background-color: rgba(255, 255, 255, 0.15); }
 .desktop-icon i { font-size: 2.5rem; }
@@ -77,7 +84,7 @@ body {
 #running-apps { display: flex; gap: 0.5rem; height: 100%; align-items: center; }
 .taskbar-icon { background-color: var(--surface-color); border: none; height: 80%; width: 40px; display: flex; justify-content: center; align-items: center; border-radius: 4px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; }
 .taskbar-icon.active { background-color: var(--dark-bg); border-bottom: 3px solid var(--primary-color); }
-#clock { margin-left: auto; margin-right: 1rem; color: white; font-weight: 500; }
+#clock { margin-left: auto; margin-right: 1.5rem; color: white; font-weight: 500; }
 
 /* --- Menú de Inicio --- */
 #start-menu { position: absolute; bottom: 55px; left: 1rem; width: 350px; height: 450px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; z-index: 99; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
@@ -85,7 +92,29 @@ body {
 .start-menu-header img { width: 40px; height: 40px; border-radius: 50%; }
 .start-menu-header span { font-weight: bold; font-size: 1.1rem; }
 .start-menu-body { flex-grow: 1; padding: 1rem; }
-.start-menu-footer { border-top: 1px solid var(--border-color); padding: 0.5rem; display: flex; justify-content: flex-end; }
+.start-menu-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#main-menu-button {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    font-size: 1.2rem;
+    padding: 0.8rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+#main-menu-button:hover {
+    background-color: var(--edit-color);
+    color: white;
+}
 #shutdown-button { background: none; border: none; color: var(--light-text); display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1.2rem; font-size: 1rem; width: 100%; text-align: left; border-radius: 6px; cursor: pointer; }
 #shutdown-button:hover { background-color: var(--danger-color); color: white; }
 
@@ -173,8 +202,19 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 button.close-modal-button { background-color: var(--danger-color); color: white; }
 #restart-game-button { background-color: var(--danger-color); color: white; }
 .summary-event { background-color: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-style: italic; }
-.back-to-portfolio-link { position: fixed; top: 4rem; left: 1rem; z-index: 2000; color: var(--light-text); text-decoration: none; background-color: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); transition: all 0.2s ease; }
-.back-to-portfolio-link:hover { background-color: var(--primary-color); color: var(--dark-bg); box-shadow: 0 0 10px var(--primary-color-trans); }
+.back-to-portfolio-link {
+    display: block;
+    padding: 0.8rem 1.2rem;
+    color: var(--light-text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.back-to-portfolio-link:hover {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+}
 #save-menu { position: absolute; top: 1rem; right: 1rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .hidden { display: none !important; }
 
