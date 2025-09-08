@@ -1,5 +1,5 @@
 // =================================================================================
-//  RESEARCH.JS - v1.0 - Lógica para el sistema de I+D
+//  RESEARCH.JS - v1.1 - Lógica para el sistema de I+D (Corregido)
 // =================================================================================
 
 function findResearchNode(researchId) {
@@ -25,7 +25,6 @@ function startResearch(researchId, skillType) {
     const { node } = findResearchNode(researchId);
     if (!node) return;
 
-    // Verificar requisitos
     const reqSkill = node.requires.skill;
     const reqLevel = node.requires.level;
     const reqResearch = node.requires.research;
@@ -42,7 +41,6 @@ function startResearch(researchId, skillType) {
         return;
     }
 
-    // Iniciar investigación
     gameState.money -= node.cost;
     gameState.activeResearch = {
         id: node.id,
@@ -51,7 +49,7 @@ function startResearch(researchId, skillType) {
     };
 
     showNotification(`Investigación "${node.name}" iniciada.`, "info");
-    updateUI();
+    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
 }
 
 function completeResearch(researchId) {
@@ -61,6 +59,5 @@ function completeResearch(researchId) {
     gameState.completedResearch.push(researchId);
     gameState.activeResearch = null;
     showNotification(`¡Investigación "${node.name}" completada!`, "success");
-    // Aquí se podrían aplicar bonus permanentes si los hubiera
-    updateUI();
+    refreshUI(); // FIX: Llamada a la función correcta de refresco de UI
 }
