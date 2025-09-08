@@ -1,22 +1,25 @@
 // =================================================================================
-//  MINIGAMES.JS - v5.2 - Lógica de energía corregida
+//  MINIGAMES.JS - v5.3 - Solución final de lógica de energía
 // =================================================================================
 
 function startDebugMinigame() {
-    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
+    // FIX: Comprueba si el minijuego ya está activo para evitar múltiples clics y drenaje de energía.
+    if (minigameInterval) {
+        showNotification("La depuración ya está en curso.", "info");
+        return;
+    }
+
     if (gameState.energy < gameData.energyCosts.debug) {
         showNotification(`Se necesitan ${gameData.energyCosts.debug} de energía para depurar.`, 'error');
         return;
     }
     
-    // FIX: La energía se resta y la UI se actualiza ANTES de empezar el minijuego.
     gameState.energy -= gameData.energyCosts.debug;
     refreshUI();
 
     const proj = gameState.activeProject;
     let bugsToSpawn = proj.bugs;
     const bugsOriginales = proj.bugs;
-
     let timeLeft = 30 + (gameState.skills.programming.level * 2);
 
     dom.debugBugsLeft.textContent = bugsToSpawn;
@@ -49,7 +52,7 @@ function startDebugMinigame() {
     minigameInterval = setInterval(() => {
         timeLeft--;
         dom.debugTimer.textContent = `${timeLeft}s`;
-        if (Math.random() > 0.4) spawnBug();
+        if (Math.random() > 0.4 && bugsToSpawn > 0) spawnBug();
         if (timeLeft <= 0) {
             endMinigame(bugsToSpawn === 0);
         }
@@ -57,7 +60,7 @@ function startDebugMinigame() {
 
     function endMinigame(success) {
         clearInterval(minigameInterval);
-        minigameInterval = null;
+        minigameInterval = null; // Libera el bloqueo para poder jugar de nuevo
         dom.debugMinigameOverlay.classList.add('hidden');
         dom.debugPlayArea.innerHTML = '';
         dom.startDebugButton.classList.remove('hidden');
@@ -78,13 +81,16 @@ function startDebugMinigame() {
 }
 
 function startSeoMinigame() {
-    // FIX: Se comprueba la energía y se notifica al jugador si no tiene suficiente.
+    if (minigameInterval) {
+        showNotification("El minijuego de SEO ya está en curso.", "info");
+        return;
+    }
+
     if (gameState.energy < gameData.energyCosts.video) {
         showNotification(`Se necesitan ${gameData.energyCosts.video} de energía para el vídeo.`, 'error');
         return;
     }
     
-    // FIX: La energía se resta y la UI se actualiza ANTES de empezar el minijuego.
     gameState.energy -= gameData.energyCosts.video;
     refreshUI();
 
