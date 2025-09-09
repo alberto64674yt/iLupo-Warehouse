@@ -1,5 +1,5 @@
 // =================================================================================
-//  DATA.JS - v10.0 - Contenido de código temático añadido
+//  DATA.JS - v11.0 - Datos de la app Banco añadidos
 // =================================================================================
 
 // -----------------------------------------------------------------------------
@@ -20,6 +20,7 @@ const initialGameState = {
     activeProject: null,
     activeCourse: null,
     activeResearch: null,
+    activeLoan: null,
     completedProjects: [],
     completedCourses: [],
     completedResearch: [],
@@ -118,8 +119,8 @@ const gameData = {
         { id: 'courses', title: 'Cursos', icon: 'fa-graduation-cap', renderer: 'renderCoursesApp' },
         { id: 'research', title: 'I+D', icon: 'fa-flask', renderer: 'renderResearchApp' },
         { id: 'news', title: 'Noticias', icon: 'fa-fire', renderer: 'renderNewsApp' },
+        { id: 'bank', title: 'Banco', icon: 'fa-piggy-bank', renderer: 'renderBankApp' },
     ],
-    // FIX: Se reemplaza la lista genérica por un objeto con código temático.
     codeSnippetsByType: {
         'Utilidad': [
             'import pandas as pd;\n\nclass DataAnalyzer:\n  def __init__(self, filepath):\n    self.df = pd.read_csv(filepath)',
@@ -175,5 +176,10 @@ const gameData = {
     shopItems: { hardware: [ { id: 'hw1', name: 'SSD Básico', desc: 'Reduce el tiempo de desarrollo 15 segundos.', cost: 400, effect: { type: 'hardwareTimeReduction', value: 15 } }, { id: 'hw2', name: 'RAM 16GB', desc: 'Reduce el tiempo de desarrollo 25 segundos más.', cost: 1200, effect: { type: 'hardwareTimeReduction', value: 25 }, requires: 'hw1' }, { id: 'hw3', name: 'CPU de 8 núcleos', desc: 'Reduce el tiempo de desarrollo 30 segundos más.', cost: 3000, effect: { type: 'hardwareTimeReduction', value: 30 }, requires: 'hw2' }, ], personal: [ { id: 'ps1', name: 'Monetizar Apps', desc: 'Tus proyectos generan un 25% más de ingresos.', cost: 800, effect: { type: 'appMonetization', value: 1.25 } }, { id: 'ps2', name: 'Monetizar Posts', desc: 'Tus vídeos/posts generan un 25% más de seguidores.', cost: 800, effect: { type: 'postMonetization', value: 1.25 } }, { id: 'ps3', name: 'Curso Productividad I', desc: 'Permite gestionar 2 proyectos/día y aumenta la Energía Máxima a 200.', cost: 4000, effect: { type: 'maxProjectsPerDay', value: 1, energy: 200 } }, { id: 'ps5', name: 'Curso Productividad II', desc: 'Permite gestionar 3 proyectos/día y aumenta la Energía Máxima a 300.', cost: 8000, requires: 'ps3', effect: { type: 'maxProjectsPerDay', value: 1, energy: 300 } }, ] },
     trends: [ { quality: 'Común', bonusRange: [5, 20], probability: 0.75, messages: ["Un ligero interés en {category} este mes."] }, { quality: 'Poco Común', bonusRange: [21, 50], probability: 0.20, messages: ["¡Las {category} están de moda!"] }, { quality: 'Rara', bonusRange: [51, 90], probability: 0.04899, messages: ["¡FIEBRE POR {category}! El mercado está en auge."] }, { quality: 'Épica', bonusRange: [91, 150], probability: 0.001, messages: ["¡VIRAL! Un streamer famoso ha impulsado las {category}."] }, { quality: 'Legendaria', bonusRange: [300, 300], probability: 0.00001, messages: ["¡REVOLUCIÓN! Un proyecto de {category} ha cambiado la industria."] } ],
     dailyEvents: { positive: [ { message: "¡Tu último proyecto se ha hecho viral! ¡Recibes un bonus de ingresos y seguidores hoy!", effect: (totals) => { totals.totalIncome = Math.floor(totals.totalIncome * 1.5); totals.totalFollowers = Math.floor(totals.totalFollowers * 1.5); return totals; } }, { message: "Un donante anónimo ha apoyado tu trabajo. ¡Has recibido 500€!", effect: (totals) => { totals.totalIncome += 500; return totals; } } ], negative: [ { message: "Una polémica en redes sociales te salpica. ¡Has perdido un 10% de tus seguidores!", effect: (totals) => { const followersLost = Math.max(1, Math.floor(gameState.followers * 0.1)); gameState.followers -= followersLost; totals.totalFollowers -= followersLost; return totals; } }, { message: "¡Ataque de Ransomware! Los hackers te exigen un pago o perderás datos (calidad de proyectos).", effect: (totals) => { const ransom = Math.min(250, Math.floor(gameState.money * 0.5)); if (confirm(`Pagar ${ransom}€ a los hackers? Si no lo haces, la calidad de todos tus proyectos se reducirá.`)) { gameState.money -= ransom; totals.totalIncome -= ransom; } else { gameState.completedProjects.forEach(p => p.quality = Math.floor(p.quality * 0.9)); } return totals; } } ] },
+    loans: [
+        { id: 'loan_fast', name: 'Préstamo Rápido', amount: 500, repayment: 600, interest: '20%', duration: 5 },
+        { id: 'loan_standard', name: 'Préstamo Estándar', amount: 2000, repayment: 2300, interest: '15%', duration: 7 },
+        { id: 'loan_investment', name: 'Préstamo de Inversión', amount: 5000, repayment: 5500, interest: '10%', duration: 7 }
+    ],
     energyCosts: { debug: 50, video: 40, publish: 10, }
 };
