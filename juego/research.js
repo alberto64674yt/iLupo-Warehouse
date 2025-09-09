@@ -1,5 +1,5 @@
 // =================================================================================
-//  RESEARCH.JS - v2.0 - Lógica de I+D con registro de gastos
+//  RESEARCH.JS - v2.1 - Lógica de I+D (Corregido para permitir cursos simultáneos)
 // =================================================================================
 
 function findResearchNode(researchId) {
@@ -15,10 +15,6 @@ function findResearchNode(researchId) {
 function startResearch(researchId, skillType) {
     if (gameState.activeResearch) {
         showNotification("Ya hay una investigación en curso.", "error");
-        return;
-    }
-    if (gameState.activeCourse) {
-        showNotification("No puedes investigar y estudiar al mismo tiempo.", "error");
         return;
     }
 
