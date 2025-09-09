@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v13.0 - Corrección de diseño en I+D */
+/* Contenido 100% completo y funcional, v14.0 - Estilos para el resumen diario detallado */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -205,7 +205,6 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .research-tree-header { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 1rem; }
 .research-nodes { display: flex; flex-direction: column; gap: 1rem; }
 
-/* FIX: Se añaden los estilos que faltaban para la app de I+D */
 .research-node {
     background-color: var(--dark-bg);
     border: 1px solid var(--border-color);
@@ -266,7 +265,6 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .research-node.locked {
     opacity: 0.6;
 }
-/* Fin de estilos de I+D */
 
 .minigame-container { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
 .minigame-container h3 { margin-top: 0; color: var(--primary-color); font-size: 1.8rem; }
@@ -291,7 +289,7 @@ pre.code-content { flex-grow: 1; padding: 1rem; white-space: pre-wrap; word-wrap
 .notification.info { background-color: var(--edit-color); color: white; border-color: var(--edit-color); }
 @keyframes slideInFadeOutBottom { 0% { transform: translateX(100%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; }
+.modal-content { background-color: var(--dark-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; }
 .modal-content.large { max-width: 800px; }
 .modal-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
 .modal-content button { padding: 0.8rem 1.5rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
@@ -300,6 +298,46 @@ button.close-modal-button { background-color: var(--danger-color); color: white;
 .summary-event { background-color: var(--surface-color); border: 1px solid var(--primary-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-style: italic; }
 #save-menu { position: absolute; top: 1rem; right: 1rem; z-index: 2000; display: flex; gap: 0.5rem; }
 .hidden { display: none !important; }
+
+/* --- Estilos del Resumen Diario --- */
+#summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.summary-section {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: var(--light-text);
+    margin-bottom: 0.5rem;
+}
+.summary-item:last-child {
+    margin-bottom: 0;
+}
+.summary-total.gain, .summary-item .gain {
+    color: var(--success-color);
+}
+.summary-total.loss, .summary-item .loss {
+    color: var(--danger-color);
+}
+/* Fin de estilos de resumen */
+
 #modal-step-1, #modal-step-2 { display: flex; flex-direction: column; gap: 1rem; }
 #project-type-selection { margin: 1.5rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
 .project-type-choice { background-color: var(--surface-color); color: var(--light-text); border: 1px solid var(--border-color); padding: 0.8rem 1.2rem; font-family: inherit; font-size: 1rem; border-radius: 8px; cursor: pointer; }
