@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v12.0 - Desglose detallado en el resumen diario
+//  MAIN.JS - v13.0 - Corrección de lógica de alquiler
 // =================================================================================
 
 let desktopManager;
@@ -96,15 +96,17 @@ function nextDay() {
 
     // --- Cálculo de Ingresos y Gastos ---
     let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
-    let currentDayExpenses = [...gameState.dailyExpenses]; // Copia de los gastos del día
+    let currentDayExpenses = [...gameState.dailyExpenses]; 
 
     let totalExpenses = currentDayExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-    if ((gameState.day - gameState.lastRentDay) >= 7) {
+    // FIX: La lógica ahora usa el operador módulo (%) para cobrar exactamente cada 7 días.
+    // El día 7, 14, 21, etc., (día % 7) será igual a 0.
+    if (gameState.day % 7 === 0) {
         const rentAmount = gameState.rentCost;
         currentDayExpenses.push({ reason: 'Alquiler del Servidor', amount: rentAmount });
         totalExpenses += rentAmount;
-        gameState.lastRentDay = gameState.day;
+        // La actualización del coste del alquiler se puede quedar como estaba
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
 
