@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI-APPS.JS - v2.0 - Añadido renderizador para la app del Banco
+//  UI-APPS.JS - v2.1 - Añadida interacción a la app del Banco
 // =================================================================================
 
 function renderCodeStudioApp(container) {
@@ -183,6 +183,12 @@ function renderBankApp(container) {
     if (!container.querySelector('.bank-layout')) {
         const template = document.getElementById('bank-template');
         container.innerHTML = template.innerHTML;
+        container.addEventListener('click', (e) => {
+            const button = e.target.closest('.request-loan-button');
+            if (button) {
+                takeLoan(button.dataset.loanId);
+            }
+        });
     }
 
     const activeLoanContainer = container.querySelector('#active-loan-status');
