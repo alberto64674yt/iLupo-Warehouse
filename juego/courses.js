@@ -1,14 +1,10 @@
 // =================================================================================
-//  COURSES.JS - Lógica para el sistema de Cursos (con registro de gastos)
+//  COURSES.JS - Lógica para el sistema de Cursos (Corregido para permitir I+D simultáneo)
 // =================================================================================
 
 function startCourse(courseId, skillType) {
     if (gameState.activeCourse) {
         showNotification("Ya estás realizando un curso.", "error");
-        return;
-    }
-     if (gameState.activeResearch) {
-        showNotification("No puedes estudiar e investigar al mismo tiempo.", "error");
         return;
     }
 
