@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v13.0 - Corrección de lógica de alquiler
+//  MAIN.JS - v14.0 - Lógica de préstamos del banco
 // =================================================================================
 
 let desktopManager;
@@ -25,6 +25,9 @@ function startGame(saveData = null) {
     gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
     if (!gameState.dailyExpenses) {
         gameState.dailyExpenses = [];
+    }
+    if (typeof gameState.activeLoan === 'undefined') {
+        gameState.activeLoan = null;
     }
     
     dom.mainMenu.classList.add('hidden');
@@ -99,14 +102,24 @@ function nextDay() {
     let currentDayExpenses = [...gameState.dailyExpenses]; 
 
     let totalExpenses = currentDayExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    
+    // --- LÓGICA DE DEVOLUCIÓN DE PRÉSTAMO ---
+    if (gameState.activeLoan && gameState.day === gameState.activeLoan.repaymentDay) {
+        const loanData = gameData.loans.find(l => l.id === gameState.activeLoan.id);
+        const repaymentAmount = gameState.activeLoan.repaymentAmount;
 
-    // FIX: La lógica ahora usa el operador módulo (%) para cobrar exactamente cada 7 días.
-    // El día 7, 14, 21, etc., (día % 7) será igual a 0.
+        currentDayExpenses.push({ reason: `Devolución Préstamo (${loanData.name})`, amount: repaymentAmount });
+        totalExpenses += repaymentAmount;
+
+        showNotification(`Hoy se ha cobrado la devolución del préstamo: ${repaymentAmount}€.`, 'warning');
+        gameState.activeLoan = null;
+    }
+
+    // Lógica del alquiler
     if (gameState.day % 7 === 0) {
         const rentAmount = gameState.rentCost;
         currentDayExpenses.push({ reason: 'Alquiler del Servidor', amount: rentAmount });
         totalExpenses += rentAmount;
-        // La actualización del coste del alquiler se puede quedar como estaba
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
 
