@@ -218,7 +218,9 @@
 
         print: function(message) {
             const line = document.createElement('div');
-            line.innerHTML = message.replace(/ /g, '&nbsp;');
+            // CORRECCIÓN: Se añade una expresión regular para convertir **texto** a <strong>texto</strong>
+            let formattedMessage = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            line.innerHTML = formattedMessage.replace(/ /g, '&nbsp;');
             this.dom.output.appendChild(line);
         },
 
@@ -438,3 +440,4 @@
     };
     window.Terminal = Terminal;
 })();
+
