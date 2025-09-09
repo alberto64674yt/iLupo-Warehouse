@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v11.0 - Sistema de gastos y botones de guardado corregidos
+//  MAIN.JS - v12.0 - Desglose detallado en el resumen diario
 // =================================================================================
 
 let desktopManager;
@@ -23,7 +23,6 @@ function initializeApp() {
 
 function startGame(saveData = null) {
     gameState = saveData ? JSON.parse(atob(saveData)) : JSON.parse(JSON.stringify(initialGameState));
-    // FIX: Asegurarse de que el registro de gastos exista al iniciar/cargar partida.
     if (!gameState.dailyExpenses) {
         gameState.dailyExpenses = [];
     }
@@ -77,6 +76,7 @@ function nextDay() {
         return;
     }
 
+    // --- Avance de Cursos e Investigaciones ---
     if (gameState.activeCourse) {
         gameState.activeCourse.daysRemaining--;
         if (gameState.activeCourse.daysRemaining <= 0) {
@@ -87,7 +87,6 @@ function nextDay() {
             gameState.activeCourse = null;
         }
     }
-    
     if (gameState.activeResearch) {
         gameState.activeResearch.daysRemaining--;
         if (gameState.activeResearch.daysRemaining <= 0) {
@@ -95,27 +94,65 @@ function nextDay() {
         }
     }
 
-    let { totalIncome, totalFollowers } = calculatePassiveIncome();
-    
-    // FIX: Se suman los gastos del día (cursos, etc.) al total de gastos.
-    let totalExpenses = gameState.dailyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    // --- Cálculo de Ingresos y Gastos ---
+    let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
+    let currentDayExpenses = [...gameState.dailyExpenses]; // Copia de los gastos del día
+
+    let totalExpenses = currentDayExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
     if ((gameState.day - gameState.lastRentDay) >= 7) {
-        totalExpenses += gameState.rentCost;
+        const rentAmount = gameState.rentCost;
+        currentDayExpenses.push({ reason: 'Alquiler del Servidor', amount: rentAmount });
+        totalExpenses += rentAmount;
         gameState.lastRentDay = gameState.day;
         gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
     }
 
+    // --- Game Over Check ---
     const netIncome = totalIncome - totalExpenses;
     if (gameState.money + netIncome < 0) {
         handleGameOver(`Te has quedado sin dinero para pagar los gastos de ${totalExpenses}€.`);
         return;
     }
 
+    // --- Creación del Resumen Detallado ---
     dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
-    dom.summaryContent.innerHTML = `<p>Ingresos Pasivos: +${totalIncome}€</p><p>Nuevos Seguidores: +${totalFollowers}</p><p>Gastos Totales: -${totalExpenses}€</p>`;
+    let summaryHtml = `
+        <div class="summary-section">
+            <div class="summary-total gain">
+                <span>Ingresos Totales:</span>
+                <span>+${totalIncome}€</span>
+            </div>
+            ${incomeBreakdown.map(item => `
+                <div class="summary-item">
+                    <span>${item.name}</span>
+                    <span class="gain">+${item.income}€</span>
+                </div>
+            `).join('')}
+        </div>
+        <div class="summary-section">
+            <div class="summary-total loss">
+                <span>Gastos Totales:</span>
+                <span>-${totalExpenses}€</span>
+            </div>
+            ${currentDayExpenses.map(item => `
+                <div class="summary-item">
+                    <span>${item.reason}</span>
+                    <span class="loss">-${item.amount}€</span>
+                </div>
+            `).join('')}
+        </div>
+        <div class="summary-section">
+            <div class="summary-total">
+                <span>Nuevos Seguidores:</span>
+                <span>+${totalFollowers}</span>
+            </div>
+        </div>
+    `;
+    dom.summaryContent.innerHTML = summaryHtml;
     dom.dailySummaryModal.classList.remove('hidden');
     
+    // --- Lógica al Continuar al Siguiente Día ---
     const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
@@ -123,7 +160,6 @@ function nextDay() {
         gameState.followers += totalFollowers;
         gameState.energy = gameState.maxEnergy;
         gameState.completedProjectsToday = [];
-        // FIX: Se limpia el registro de gastos para el nuevo día.
         gameState.dailyExpenses = [];
         generateNewTrend();
         refreshUI();
@@ -200,7 +236,6 @@ function confirmNewProject() {
         return;
     }
     gameState.money -= totalCost;
-    // FIX: Se registra el coste del proyecto como un gasto del día.
     gameState.dailyExpenses.push({ reason: `Proyecto: ${name}`, amount: totalCost });
     
     const finalTime = Math.max(30, totalTime - gameState.hardwareTimeReduction);
@@ -249,6 +284,7 @@ function publishProject() {
 function calculatePassiveIncome() {
     let totalIncome = 0;
     let totalFollowers = 0;
+    const incomeBreakdown = [];
 
     gameState.completedProjects.forEach(proj => {
         const projData = gameData.projectTypes[proj.type];
@@ -271,12 +307,14 @@ function calculatePassiveIncome() {
             dailyMoney *= trendBonus;
             dailyFollowers *= trendBonus;
         }
-
-        totalIncome += Math.floor(dailyMoney);
+        
+        const finalDailyMoney = Math.floor(dailyMoney);
+        totalIncome += finalDailyMoney;
         totalFollowers += Math.floor(dailyFollowers);
+        incomeBreakdown.push({ name: proj.name, income: finalDailyMoney });
     });
     
-    return { totalIncome, totalFollowers };
+    return { totalIncome, totalFollowers, incomeBreakdown };
 }
 
 function handleGameOver(reason) {
@@ -305,7 +343,6 @@ function attachBaseEventListeners() {
     });
     document.getElementById('help-button').addEventListener('click', () => dom.helpModal.classList.remove('hidden'));
     
-    // FIX: Se conectan los botones de Importar y Exportar a sus funciones.
     document.getElementById('export-save-button').addEventListener('click', exportSave);
     document.getElementById('import-save-button').addEventListener('click', importSave);
 
