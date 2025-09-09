@@ -1,4 +1,4 @@
-/* Contenido 100% completo y funcional, v14.0 - Estilos para el resumen diario detallado */
+/* Contenido 100% completo y funcional, v15.0 - Estilos para el total del Almacén */
 
 /* --- Estructura y Layout General --- */
 body {
@@ -159,6 +159,22 @@ body {
 .completed-project-card .stat.success {
     color: var(--success-color);
 }
+
+/* FIX: Estilos para el total de ingresos en el Almacén */
+#warehouse-total-income {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+#warehouse-total-income .total-value {
+    color: var(--success-color);
+}
+/* Fin de estilos de Almacén */
+
 
 .text-bonus { color: var(--success-color); font-weight: bold; }
 .text-malus { color: var(--danger-color); font-weight: bold; }
