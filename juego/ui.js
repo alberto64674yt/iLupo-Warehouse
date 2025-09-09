@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI.JS - v11.0 - Solución final de bugs de UI (Scroll, Almacén, Cursos)
+//  UI.JS - v12.0 - Total en Almacén y código temático implementados
 // =================================================================================
 
 function refreshUI() {
@@ -32,16 +32,11 @@ function refreshUI() {
 // -----------------------------------------------------------------------------
 
 function renderCodeStudioApp(container) {
-    // FIX: Se reestructura la función para no destruir y recrear el DOM en cada tick,
-    // lo que permite conservar la posición del scroll.
-    
-    // Si el contenedor está vacío, crea la estructura base.
     if (!container.querySelector('.code-studio-layout')) {
         const template = document.getElementById('code-studio-template');
         container.innerHTML = template.innerHTML;
     }
 
-    // Ahora, en lugar de recrear, solo busca los elementos y los actualiza.
     const proj = gameState.activeProject;
     const projectInfoContainer = container.querySelector('.ide-project-info');
     const actionsContainer = container.querySelector('.ide-actions');
@@ -74,15 +69,19 @@ function renderCodeStudioApp(container) {
     switch(proj.stage) {
         case 'development':
             actionsContainer.innerHTML = `<p>Desarrollando... El código aparecerá en el editor.</p>`;
-            // Animación de código
-            const maxSnippets = gameData.codeSnippets.length;
+            
+            // FIX: Se selecciona el array de código basado en el tipo de proyecto.
+            const projectType = proj.type || 'Utilidad'; // Fallback por si acaso
+            const codeSnippets = gameData.codeSnippetsByType[projectType];
+            
+            const maxSnippets = codeSnippets.length;
             const snippetsToShow = Math.min(maxSnippets, Math.floor(progressPercent / (100 / maxSnippets)));
             let codeText = '';
             let lineText = '';
             let currentLine = 1;
 
             for(let i = 0; i < snippetsToShow; i++) {
-                const snippet = gameData.codeSnippets[i];
+                const snippet = codeSnippets[i];
                 const snippetLines = snippet.split('\n');
                 codeText += snippet + '\n\n';
                 snippetLines.forEach(() => {
@@ -104,7 +103,6 @@ function renderCodeStudioApp(container) {
 
 
 function renderMyTubeApp(container) {
-    // Si el contenedor está vacío, crea la estructura base.
     if (!container.querySelector('.mytube-layout')) {
         const template = document.getElementById('mytube-template');
         container.innerHTML = template.innerHTML;
@@ -138,9 +136,16 @@ function renderBrowserApp(container) {
 }
 
 function renderWarehouseApp(container) {
-    const template = document.getElementById('warehouse-template');
-    container.innerHTML = template.innerHTML;
-    renderCompletedProjects(container.querySelector('#completed-projects-list'));
+    // FIX: Se crea la estructura base del almacén, incluyendo el contenedor para el total.
+    if (!container.querySelector('#completed-projects-list')) {
+        container.innerHTML = `
+            <div id="completed-projects-list"></div>
+            <div id="warehouse-total-income"></div>
+        `;
+    }
+    const listContainer = container.querySelector('#completed-projects-list');
+    const totalContainer = container.querySelector('#warehouse-total-income');
+    renderCompletedProjects(listContainer, totalContainer);
 }
 
 function renderStatsApp(container) {
@@ -249,10 +254,8 @@ function renderCoursesUI(container) {
             const isCompleted = gameState.completedCourses.includes(course.id);
             const hasRequirement = course.requires ? gameState.completedCourses.includes(course.requires) : true;
             const canAfford = gameState.money >= course.cost;
-            // FIX: Se añade la condición de si hay un curso activo para deshabilitar el botón.
             const isDisabled = isCompleted || !hasRequirement || !canAfford || gameState.activeCourse;
             
-            // FIX: El texto del botón ahora cambia si hay un curso activo.
             let buttonText = 'Empezar';
             if (isCompleted) {
                 buttonText = 'Completado';
@@ -361,14 +364,18 @@ function renderSkillsUI(container) {
     container.innerHTML = html;
 }
 
-function renderCompletedProjects(container) {
+function renderCompletedProjects(listContainer, totalContainer) {
     if (gameState.completedProjects.length === 0) {
-        container.innerHTML = '<p class="no-projects-message">Aún no has publicado ningún proyecto.</p>';
+        listContainer.innerHTML = '<p class="no-projects-message">Aún no has publicado ningún proyecto.</p>';
+        totalContainer.innerHTML = '';
         return;
     }
-    container.innerHTML = gameState.completedProjects.map(p => {
+
+    let totalIncome = 0;
+
+    listContainer.innerHTML = gameState.completedProjects.map(p => {
         const income = calculatePassiveIncomeForProjectUI(p);
-        // FIX: Se envuelven las estadísticas en su propio div para un mejor control del layout con CSS.
+        totalIncome += income.money;
         return `
             <div class="completed-project-card">
                 <span class="project-name"><i class="fas ${gameData.projectTypes[p.type].icon}"></i> ${p.name}</span>
@@ -378,6 +385,11 @@ function renderCompletedProjects(container) {
                 </div>
             </div>`;
     }).join('');
+
+    totalContainer.innerHTML = `
+        <span>Total por día:</span>
+        <span class="total-value">+${totalIncome}€</span>
+    `;
 }
 
 function showNotification(message, type = 'info') {
