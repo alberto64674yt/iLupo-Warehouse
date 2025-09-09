@@ -339,9 +339,14 @@
                         saveOrder();
                     },
                     onAdd: function(evt) { // Se activa al soltar un elemento de OTRA lista
-                        const originalItem = manageList.querySelector(`.manage-item[data-id="${evt.item.dataset.id}"]`);
+                        // CORRECCIÓN: Lógica mejorada para encontrar y eliminar el duplicado.
+                        // Buscamos todos los elementos con el mismo ID y eliminamos el que NO es
+                        // el que acabamos de soltar (que es el 'original').
+                        const allItemsWithId = manageList.querySelectorAll(`.manage-item[data-id="${evt.item.dataset.id}"]`);
+                        const originalItem = Array.from(allItemsWithId).find(item => item !== evt.item);
+                        
                         if (originalItem) {
-                            originalItem.remove(); // Elimina el elemento original que ya existía
+                            originalItem.remove();
                         }
                         saveOrder();
                     }
@@ -516,4 +521,5 @@
 
 </body>
 </html>
+
 
