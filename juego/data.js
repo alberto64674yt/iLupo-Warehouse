@@ -1,5 +1,5 @@
 // =================================================================================
-//  DATA.JS - v9.1 - Solución final de referencias del DOM
+//  DATA.JS - v10.0 - Contenido de código temático añadido
 // =================================================================================
 
 // -----------------------------------------------------------------------------
@@ -25,6 +25,7 @@ const initialGameState = {
     completedResearch: [],
     completedProjectsToday: [],
     shopUpgrades: [],
+    dailyExpenses: [],
     maxProjectsPerDay: 1,
     hardwareTimeReduction: 0,
     rentCost: 150,
@@ -85,7 +86,7 @@ const dom = {
     gameOverReason: document.getElementById('game-over-reason'),
     restartGameButton: document.getElementById('restart-game-button'),
     
-    // FIX: Sección de Minijuegos completada con todas las referencias necesarias
+    // Minijuegos
     debugMinigameOverlay: document.getElementById('debug-minigame-overlay'),
     debugBugsLeft: document.getElementById('debug-bugs-left'),
     debugTimer: document.getElementById('debug-timer'),
@@ -99,11 +100,11 @@ const dom = {
 
     // Otros
     notificationContainer: document.getElementById('notification-container'),
-    continueBtn: document.getElementById('continue-button') // Añadido para consistencia
+    continueBtn: document.getElementById('continue-button')
 };
 
 // -----------------------------------------------------------------------------
-//  3. DATOS DEL JUEGO (Sin cambios)
+//  3. DATOS DEL JUEGO
 // -----------------------------------------------------------------------------
 
 const gameData = {
@@ -118,18 +119,45 @@ const gameData = {
         { id: 'research', title: 'I+D', icon: 'fa-flask', renderer: 'renderResearchApp' },
         { id: 'news', title: 'Noticias', icon: 'fa-fire', renderer: 'renderNewsApp' },
     ],
-    codeSnippets: [
-        'function calculateProfit(revenue, costs) {\n  return revenue - costs;\n}',
-        'const API_URL = "https://api.example.com/data";',
-        'document.getElementById("btn").addEventListener("click", () => {\n  console.log("Button clicked!");\n});',
-        '.item { display: flex; justify-content: center; }',
-        'fetch(API_URL).then(res => res.json()).then(data => updateUI(data));',
-        'class Player {\n  constructor(name) {\n    this.name = name;\n    this.health = 100;\n  }\n}',
-        'const newArray = oldArray.map(item => item * 2);',
-        '<h1>Bienvenido a mi portfolio</h1>',
-        'const { name, version } = require("./package.json");',
-        'for (let i = 0; i < 10; i++) {\n  console.log(`Iteration ${i}`);\n}',
-    ],
+    // FIX: Se reemplaza la lista genérica por un objeto con código temático.
+    codeSnippetsByType: {
+        'Utilidad': [
+            'import pandas as pd;\n\nclass DataAnalyzer:\n  def __init__(self, filepath):\n    self.df = pd.read_csv(filepath)',
+            'def clean_data(self):\n  self.df.dropna(inplace=True)\n  return self.df',
+            'def get_summary(self):\n  return self.df.describe()',
+            'def export_to_excel(self, output_path):\n  self.df.to_excel(output_path, index=False)',
+            'from flask import Flask, jsonify\n\napp = Flask(__name__)',
+            '@app.route("/api/status")\ndef get_status():\n  return jsonify({"status": "ok"})',
+            'if __name__ == "__main__":\n  app.run(debug=True)',
+            'import matplotlib.pyplot as plt\n\nplt.style.use("ggplot")',
+            'def create_plot(x, y):\n  plt.figure(figsize=(10, 6))\n  plt.plot(x, y)\n  plt.show()',
+            'print("Script finalizado.")'
+        ],
+        'Juego Arcade': [
+            'class Fighter:\n  def __init__(self, name):\n    self.name = name\n    self.health = 100\n    self.meter = 0',
+            '  def punch(self, opponent):\n    opponent.health -= 5\n    self.meter += 2',
+            '  def kick(self, opponent):\n    opponent.health -= 8\n    self.meter += 3',
+            '  def special_move(self, opponent):\n    if self.meter >= 50:\n      opponent.health -= 25\n      self.meter = 0',
+            'function check_collision(rect1, rect2) {\n  return rect1.x < rect2.x + rect2.width &&\n         rect1.x + rect1.width > rect2.x;\n}',
+            'const player = new Fighter("Ryu");\nconst enemy = new Fighter("Ken");',
+            'function update_game_state() {\n  // update physics\n  // render graphics\n}',
+            'function render_combo_counter(combo) {\n  drawText(`x${combo} HITS!`, 320, 50);\n}',
+            'let game_over = false;\nif (player.health <= 0) {\n  game_over = true;\n}',
+            '// K.O.!'
+        ],
+        'Mod': [
+            'using FarmStead2025;\n\nnamespace CustomNPCMod {\n  public class DialogueManager {\n    public void AddCustomDialogue() {',
+            '    string key = $"{Game1.currentSeason}_{Game1.dayOfMonth}";',
+            '    if (Game1.player.friendshipData.ContainsKey("MyNPC")) {\n      dialogue.Add(key, "¡Hola, granjero!");\n    }\n  }\n}',
+            '// Hook into game events\nprivate void OnDayStarted(object sender, DayStartedEventArgs e) {\n  // Check for festivals or birthdays\n}',
+            '[Item]\nId: MyCustomSword\nType: Weapon\nName: Espada de Cristal\nDamage: 50',
+            'function add_new_quest(quest_id, title, description) {\n  Quests[quest_id] = {\n    title: title,\n    desc: description\n  };\n}',
+            '// Patching original game assets\nassetManager.Inject("Characters/Abigail", "assets/Abigail_new_sprite.png");',
+            'public override void performAction(GameLocation location, xTile.Dimensions.Rectangle viewport) {\n  // Custom machine logic here\n}',
+            '// Adding a new crafting recipe\nGame1.player.craftingRecipes.Add("Super Poción", 0);',
+            'log.Info("Custom Mod cargado correctamente.");'
+        ]
+    },
     skillData: {
         xpCurve: [0, 100, 250, 500, 1000, 1750, 2500, 5000]
     },
