@@ -1,5 +1,5 @@
 // =================================================================================
-//  UI-APPS.JS - Contiene los renderizadores para el contenido de cada ventana de app.
+//  UI-APPS.JS - v2.0 - Añadido renderizador para la app del Banco
 // =================================================================================
 
 function renderCodeStudioApp(container) {
@@ -177,6 +177,52 @@ function renderNewsApp(container) {
     const bonusClass = bonus >= 0 ? 'text-bonus' : 'text-malus';
     const bonusSign = bonus >= 0 ? '+' : '';
     container.innerHTML = `<p><strong>Tendencia:</strong> ${gameState.currentTrend.name} <span class="${bonusClass}">(${bonusSign}${bonus}% bonus)</span></p>`;
+}
+
+function renderBankApp(container) {
+    if (!container.querySelector('.bank-layout')) {
+        const template = document.getElementById('bank-template');
+        container.innerHTML = template.innerHTML;
+    }
+
+    const activeLoanContainer = container.querySelector('#active-loan-status');
+    const loanOptionsContainer = container.querySelector('#loan-options');
+    
+    if (gameState.activeLoan) {
+        activeLoanContainer.classList.remove('hidden');
+        loanOptionsContainer.classList.add('hidden');
+        
+        const loanData = gameData.loans.find(l => l.id === gameState.activeLoan.id);
+        
+        activeLoanContainer.innerHTML = `
+            <h4>Préstamo Activo</h4>
+            <div class="active-loan-card">
+                <div class="loan-stat"><span>Nombre:</span> <span>${loanData.name}</span></div>
+                <div class="loan-stat"><span>Cantidad a devolver:</span> <span class="loss">${gameState.activeLoan.repaymentAmount}€</span></div>
+                <div class="loan-stat"><span>Fecha de devolución:</span> <span>Día ${gameState.activeLoan.repaymentDay}</span></div>
+            </div>
+        `;
+
+    } else {
+        activeLoanContainer.classList.add('hidden');
+        loanOptionsContainer.classList.remove('hidden');
+
+        const cardsContainer = container.querySelector('.loan-cards-container');
+        cardsContainer.innerHTML = gameData.loans.map(loan => {
+            return `
+                <div class="loan-card">
+                    <h5 class="loan-name">${loan.name}</h5>
+                    <div class="loan-details">
+                        <div><span>Recibes:</span> <span class="gain">${loan.amount}€</span></div>
+                        <div><span>Devuelves:</span> <span class="loss">${loan.repayment}€</span></div>
+                        <div><span>Interés:</span> <span>${loan.interest}</span></div>
+                        <div><span>Plazo:</span> <span>${loan.duration} días</span></div>
+                    </div>
+                    <button class="action-button request-loan-button" data-loan-id="${loan.id}">Solicitar</button>
+                </div>
+            `;
+        }).join('');
+    }
 }
 
 function renderShopUI(container) {
