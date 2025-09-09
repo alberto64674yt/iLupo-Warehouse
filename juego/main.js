@@ -1,5 +1,5 @@
 // =================================================================================
-//  MAIN.JS - v14.0 - Lógica de préstamos del banco
+//  MAIN.JS - v14.1 - Corregida la lógica de contabilidad de final del día
 // =================================================================================
 
 let desktopManager;
@@ -97,65 +97,55 @@ function nextDay() {
         }
     }
 
-    // --- Cálculo de Ingresos y Gastos ---
-    let { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
-    let currentDayExpenses = [...gameState.dailyExpenses]; 
+    // --- CÁLCULO DE INGRESOS Y GASTOS (LÓGICA CORREGIDA) ---
+    const { totalIncome, totalFollowers, incomeBreakdown } = calculatePassiveIncome();
+    let endOfDayExpenses = 0;
+    const summaryExpenses = [...gameState.dailyExpenses]; 
 
-    let totalExpenses = currentDayExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    
     // --- LÓGICA DE DEVOLUCIÓN DE PRÉSTAMO ---
     if (gameState.activeLoan && gameState.day === gameState.activeLoan.repaymentDay) {
         const loanData = gameData.loans.find(l => l.id === gameState.activeLoan.id);
         const repaymentAmount = gameState.activeLoan.repaymentAmount;
-
-        currentDayExpenses.push({ reason: `Devolución Préstamo (${loanData.name})`, amount: repaymentAmount });
-        totalExpenses += repaymentAmount;
-
-        showNotification(`Hoy se ha cobrado la devolución del préstamo: ${repaymentAmount}€.`, 'warning');
-        gameState.activeLoan = null;
+        endOfDayExpenses += repaymentAmount;
+        summaryExpenses.push({ reason: `Devolución Préstamo (${loanData.name})`, amount: repaymentAmount });
+        showNotification(`Hoy se cobrará la devolución del préstamo: ${repaymentAmount}€.`, 'warning');
     }
 
-    // Lógica del alquiler
+    // --- Lógica del alquiler ---
     if (gameState.day % 7 === 0) {
         const rentAmount = gameState.rentCost;
-        currentDayExpenses.push({ reason: 'Alquiler del Servidor', amount: rentAmount });
-        totalExpenses += rentAmount;
-        gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10));
+        endOfDayExpenses += rentAmount;
+        summaryExpenses.push({ reason: 'Alquiler del Servidor', amount: rentAmount });
     }
 
-    // --- Game Over Check ---
-    const netIncome = totalIncome - totalExpenses;
-    if (gameState.money + netIncome < 0) {
-        handleGameOver(`Te has quedado sin dinero para pagar los gastos de ${totalExpenses}€.`);
+    // --- Game Over Check (CORREGIDO) ---
+    const finalBalance = gameState.money + totalIncome - endOfDayExpenses;
+    if (finalBalance < 0) {
+        const totalExpensesForMessage = summaryExpenses.reduce((sum, exp) => exp.amount > 0 ? sum + exp.amount : sum, 0);
+        handleGameOver(`Te has quedado sin dinero para pagar los gastos de ${totalExpensesForMessage}€.`);
         return;
     }
 
     // --- Creación del Resumen Detallado ---
+    const totalDayIncome = totalIncome + summaryExpenses.reduce((sum, exp) => exp.amount < 0 ? sum - exp.amount : sum, 0);
+    const totalDayExpenses = summaryExpenses.reduce((sum, exp) => exp.amount > 0 ? sum + exp.amount : sum, 0);
+
     dom.summaryTitle.textContent = `Resumen del Día ${gameState.day}`;
     let summaryHtml = `
         <div class="summary-section">
             <div class="summary-total gain">
                 <span>Ingresos Totales:</span>
-                <span>+${totalIncome}€</span>
+                <span>+${totalDayIncome}€</span>
             </div>
-            ${incomeBreakdown.map(item => `
-                <div class="summary-item">
-                    <span>${item.name}</span>
-                    <span class="gain">+${item.income}€</span>
-                </div>
-            `).join('')}
+            ${incomeBreakdown.map(item => `<div class="summary-item"><span>${item.name}</span><span class="gain">+${item.income}€</span></div>`).join('')}
+            ${summaryExpenses.filter(exp => exp.amount < 0).map(item => `<div class="summary-item"><span>${item.reason}</span><span class="gain">+${-item.amount}€</span></div>`).join('')}
         </div>
         <div class="summary-section">
             <div class="summary-total loss">
                 <span>Gastos Totales:</span>
-                <span>-${totalExpenses}€</span>
+                <span>-${totalDayExpenses}€</span>
             </div>
-            ${currentDayExpenses.map(item => `
-                <div class="summary-item">
-                    <span>${item.reason}</span>
-                    <span class="loss">-${item.amount}€</span>
-                </div>
-            `).join('')}
+            ${summaryExpenses.filter(exp => exp.amount > 0).map(item => `<div class="summary-item"><span>${item.reason}</span><span class="loss">-${item.amount}€</span></div>`).join('')}
         </div>
         <div class="summary-section">
             <div class="summary-total">
@@ -171,17 +161,22 @@ function nextDay() {
     const continueButton = dom.dailySummaryModal.querySelector('.close-modal-button');
     continueButton.onclick = () => {
         gameState.day++;
-        gameState.money += netIncome;
+        gameState.money = finalBalance; // Se asigna el balance final calculado correctamente
+        if (gameState.activeLoan && gameState.day > gameState.activeLoan.repaymentDay) {
+            gameState.activeLoan = null; // Limpia el préstamo pagado
+        }
         gameState.followers += totalFollowers;
         gameState.energy = gameState.maxEnergy;
         gameState.completedProjectsToday = [];
         gameState.dailyExpenses = [];
+        gameState.rentCost = Math.floor(150 + (gameState.completedProjects.length * 20) + (gameState.followers / 10)); // Actualiza el coste del alquiler para el futuro
         generateNewTrend();
         refreshUI();
         saveGame();
         dom.dailySummaryModal.classList.add('hidden');
     };
 }
+
 
 function generateNewTrend() {
     const rand = Math.random();
