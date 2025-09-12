@@ -1,19 +1,10 @@
 {
   "items": [
     {
-      "titulo": {
-        "es": "¡Microsoft Visual C++ Redistributables All in One 2022!",
-        "en": ""
-      },
+      "titulo": "¡Microsoft Visual C++ Redistributables All in One 2022!",
       "id": "ms-visual-cpp-aio-2022",
-      "resumen": {
-        "es": "Un instalador todo en uno que reúne todos los **Microsoft Visual C++ Redistributables**. Imprescindible para instalaciones limpias de Windows y para asegurar que todos tus juegos y programas funcionen sin errores.",
-        "en": ""
-      },
-      "contenido_completo": {
-        "es": "### Capturas:\n\n![Captura principal del programa](https://i.imgur.com/7wjry1u.png)\n![Captura secundaria del programa](https://i.imgur.com/ttTFNJT.png)\n\nEste programa es un instalador que agrupa en un solo paquete todos los **Microsoft Visual C++ Redistributables**, desde la versión 2005 a la 2022. Es una herramienta esencial después de formatear un ordenador o al configurar un PC nuevo, ya que soluciona los errores más comunes de librerías (.dll) que impiden que muchos juegos y aplicaciones se inicien.\n\n### Características Principales:\n\n* **Detección Automática de Arquitectura**: El programa incluye un detector que identifica si tu sistema operativo es de 32 o 64 bits para recomendarte la instalación correcta.\n* **Instalación Completa**: Para sistemas de 64 bits, se recomienda instalar tanto las versiones de x64 como las de x86 (32 bits) para garantizar la máxima compatibilidad.\n* **Ligero y Eficiente**: La aplicación completa ocupa menos de 200 MB.\n* **.NET Framework Incluido**: También integra el instalador para .NET Framework 4.8, la versión más reciente.\n\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=u_db17GWfmg\n\n---\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://playpaste.net/?v=nBz)",
-        "en": ""
-      },
+      "resumen": "Un instalador todo en uno que reúne todos los **Microsoft Visual C++ Redistributables**. Imprescindible para instalaciones limpias de Windows y para asegurar que todos tus juegos y programas funcionen sin errores.",
+      "contenido_completo": "### Capturas:\n\n![Captura principal del programa](https://i.imgur.com/7wjry1u.png)\n![Captura secundaria del programa](https://i.imgur.com/ttTFNJT.png)\n\nEste programa es un instalador que agrupa en un solo paquete todos los **Microsoft Visual C++ Redistributables**, desde la versión 2005 a la 2022. Es una herramienta esencial después de formatear un ordenador o al configurar un PC nuevo, ya que soluciona los errores más comunes de librerías (.dll) que impiden que muchos juegos y aplicaciones se inicien.\n\n### Características Principales:\n\n* **Detección Automática de Arquitectura**: El programa incluye un detector que identifica si tu sistema operativo es de 32 o 64 bits para recomendarte la instalación correcta.\n* **Instalación Completa**: Para sistemas de 64 bits, se recomienda instalar tanto las versiones de x64 como las de x86 (32 bits) para garantizar la máxima compatibilidad.\n* **Ligero y Eficiente**: La aplicación completa ocupa menos de 200 MB.\n* **.NET Framework Incluido**: También integra el instalador para .NET Framework 4.8, la versión más reciente.\n\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=u_db17GWfmg\n\n---\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://playpaste.net/?v=nBz)",
       "imagen": "https://i.imgur.com/tEbsYUy.jpeg",
       "enlace": "",
       "tags": [
@@ -23,19 +14,10 @@
       ]
     },
     {
-      "titulo": {
-        "es": "Mi Primer Juego con Game Maker: Versión de 'The World's Hardest Game'",
-        "en": ""
-      },
+      "titulo": "Mi Primer Juego con Game Maker: Versión de 'The World's Hardest Game'",
       "id": "mi-primer-juego-game-maker",
-      "resumen": {
-        "es": "Mi primer proyecto de desarrollo de videojuegos. Creado con el clásico Game Maker 8, este juego es mi propia versión del adictivo y popular 'The World's Hardest Game'. ¡Prepárate para poner a prueba tus reflejos y tu paciencia!",
-        "en": ""
-      },
-      "contenido_completo": {
-        "es": "### Capturas:\n\n![alt text](https://i.ibb.co/39y2W2WQ/3s4s2r.png)\n![alt text](https://i.ibb.co/rRb7r6m9/fl4bO4.png)\n\nEste fue mi primer juego completo, creado por pura nostalgia y como un desafío personal usando Game Maker 8. Se trata de una recreación del famoso \"The World's Hardest Game\", un juego que puso a prueba la paciencia de millones de jugadores hace años. El objetivo es simple: mueve el cuadrado rojo a través del nivel, recoge las monedas y llega a la zona verde sin que te toquen los obstáculos azules.\n\nCaracterísticas Principales:\nJugabilidad Clásica: La mecánica es fiel al original, ofreciendo un reto de habilidad y precisión.\n\nNiveles Desafiantes: Incluye varios niveles diseñados para aumentar la dificultad progresivamente.\n\nDesarrollo Retro: Programado íntegramente en Game Maker 8, demostrando lo que se podía hacer con herramientas clásicas.\n\nLigero y Portátil: El juego es un ejecutable simple que no requiere instalación y funciona en cualquier PC.\n\nA continuación puedes ver el juego en acción:\n\nhttps://www.youtube.com/watch?v=dk4LFT5zWuw\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://alberto64674yt.itch.io/the-worlds-hardest-game-custom-edition)",
-        "en": ""
-      },
+      "resumen": "Mi primer proyecto de desarrollo de videojuegos. Creado con el clásico Game Maker 8, este juego es mi propia versión del adictivo y popular 'The World's Hardest Game'. ¡Prepárate para poner a prueba tus reflejos y tu paciencia!",
+      "contenido_completo": "### Capturas:\n\n![alt text](https://i.ibb.co/39y2W2WQ/3s4s2r.png)\n![alt text](https://i.ibb.co/rRb7r6m9/fl4bO4.png)\n\nEste fue mi primer juego completo, creado por pura nostalgia y como un desafío personal usando Game Maker 8. Se trata de una recreación del famoso \"The World's Hardest Game\", un juego que puso a prueba la paciencia de millones de jugadores hace años. El objetivo es simple: mueve el cuadrado rojo a través del nivel, recoge las monedas y llega a la zona verde sin que te toquen los obstáculos azules.\n\nCaracterísticas Principales:\nJugabilidad Clásica: La mecánica es fiel al original, ofreciendo un reto de habilidad y precisión.\n\nNiveles Desafiantes: Incluye varios niveles diseñados para aumentar la dificultad progresivamente.\n\nDesarrollo Retro: Programado íntegramente en Game Maker 8, demostrando lo que se podía hacer con herramientas clásicas.\n\nLigero y Portátil: El juego es un ejecutable simple que no requiere instalación y funciona en cualquier PC.\n\nA continuación puedes ver el juego en acción:\n\nhttps://www.youtube.com/watch?v=dk4LFT5zWuw\n\n### Descarga:\n\n[![Descarga el programa AIO](https://i.imgur.com/IW7Vzjo.gif)](https://alberto64674yt.itch.io/the-worlds-hardest-game-custom-edition)",
       "imagen": "https://i.ibb.co/Nn2wvy2c/Ros7nJ.png",
       "enlace": "",
       "tags": [
@@ -45,19 +27,10 @@
       ]
     },
     {
-      "titulo": {
-        "es": "iLupo Crosshair Editor",
-        "en": ""
-      },
+      "titulo": "iLupo Crosshair Editor",
       "id": "ilupo-crosshair-editor",
-      "resumen": {
-        "es": "Editor y overlay de miras personalizadas para juegos, con formas, colores y atajos configurables.",
-        "en": ""
-      },
-      "contenido_completo": {
-        "es": "### Capturas:\n\n![Captura principal del programa](https://i.ibb.co/hFDPt5xn/1.png)\n\n**iLupo Crosshair Editor** es un programa creado en **Python** (convertido a `.exe` con PyInstaller) que te permite mostrar una **mira flotante y personalizable** en tu pantalla, ideal para juegos que no incluyen una mira propia o para aumentar la dificultad de los que sí la tienen.  \n\nSe ejecuta como un **overlay siempre en primer plano**, por lo que la mira permanecerá visible encima de cualquier ventana o juego (excepto en pantalla completa exclusiva).  \n\n### Características Principales:\n\n* 🎨 **Formas y estilos**: incluye una gran variedad de miras (punto, cruz, círculo, T, holográfica, chevron, anillo, punteada, etc.).  \n* 🌈 **Colores personalizables**: selecciona color principal y color de borde con un selector visual.  \n* 📏 **Ajustes avanzados**: escala, grosor, separación, rotación, punto central, espaciado de puntos, inversión de forma T, y más.  \n* ⌨️ **Atajos configurables**: activa o desactiva la mira (`F6`) y abre/cierra el menú de opciones (`F7`) con teclas editables.  \n* 💾 **Perfiles de usuario**: guarda y carga configuraciones personalizadas para cambiar rápidamente entre estilos.  \n* 🖥️ **Multi-monitor**: selecciona en qué monitor se mostrará la mira.  \n* 🌍 **Soporte multi-idioma**: interfaz en **español** e **inglés**.  \n* 🆙 **Versión actual**: `1.1.4` (En El Momento De Crear La Publicacion).  \n\n---\n\n\n[aviso]\nEs posible que salte el antivirus con el programa es un falso positivo, mas info en el archivo de texto que incluye el programa.\n[/aviso]\n\n[aviso]\nEs probable que si juegas en modo \"Pantalla Completa Exclusiva\" el Crosshair No funcione, mas info en el archivo de texto que incluye el programa.\n[/aviso]\n\n\n---\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=FMlZcOm4v6Y\n\n---\n\n### Descarga:\n\n[![Descargar iLupo Crosshair Editor](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/eq0xaqoe3agcjjm/iLupo_Crosshair_Editor.rar/file)\n",
-        "en": ""
-      },
+      "resumen": "Editor y overlay de miras personalizadas para juegos, con formas, colores y atajos configurables.",
+      "contenido_completo": "### Capturas:\n\n![Captura principal del programa](https://i.ibb.co/hFDPt5xn/1.png)\n\n**iLupo Crosshair Editor** es un programa creado en **Python** (convertido a `.exe` con PyInstaller) que te permite mostrar una **mira flotante y personalizable** en tu pantalla, ideal para juegos que no incluyen una mira propia o para aumentar la dificultad de los que sí la tienen.  \n\nSe ejecuta como un **overlay siempre en primer plano**, por lo que la mira permanecerá visible encima de cualquier ventana o juego (excepto en pantalla completa exclusiva).  \n\n### Características Principales:\n\n* 🎨 **Formas y estilos**: incluye una gran variedad de miras (punto, cruz, círculo, T, holográfica, chevron, anillo, punteada, etc.).  \n* 🌈 **Colores personalizables**: selecciona color principal y color de borde con un selector visual.  \n* 📏 **Ajustes avanzados**: escala, grosor, separación, rotación, punto central, espaciado de puntos, inversión de forma T, y más.  \n* ⌨️ **Atajos configurables**: activa o desactiva la mira (`F6`) y abre/cierra el menú de opciones (`F7`) con teclas editables.  \n* 💾 **Perfiles de usuario**: guarda y carga configuraciones personalizadas para cambiar rápidamente entre estilos.  \n* 🖥️ **Multi-monitor**: selecciona en qué monitor se mostrará la mira.  \n* 🌍 **Soporte multi-idioma**: interfaz en **español** e **inglés**.  \n* 🆙 **Versión actual**: `1.1.4` (En El Momento De Crear La Publicacion).  \n\n---\n\n\n[aviso]\nEs posible que salte el antivirus con el programa es un falso positivo, mas info en el archivo de texto que incluye el programa.\n[/aviso]\n\n[aviso]\nEs probable que si juegas en modo \"Pantalla Completa Exclusiva\" el Crosshair No funcione, mas info en el archivo de texto que incluye el programa.\n[/aviso]\n\n\n---\nA continuación puedes ver el programa en acción:\n\nhttps://www.youtube.com/watch?v=FMlZcOm4v6Y\n\n---\n\n### Descarga:\n\n[![Descargar iLupo Crosshair Editor](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/eq0xaqoe3agcjjm/iLupo_Crosshair_Editor.rar/file)\n",
       "imagen": "https://i.ibb.co/HfY8VfyK/crosshair.gif",
       "enlace": "",
       "tags": [
@@ -69,19 +42,10 @@
       ]
     },
     {
-      "titulo": {
-        "es": "iLupo Studio — Editor de Imágenes (Android)",
-        "en": ""
-      },
+      "titulo": "iLupo Studio — Editor de Imágenes (Android)",
       "id": "ilupo-studio",
-      "resumen": {
-        "es": "Editor de imágenes para Android con eliminador de fondo por IA, marcas de agua interactivas, conversor por lotes y ajustes avanzados.",
-        "en": ""
-      },
-      "contenido_completo": {
-        "es": "## Capturas:\n\n![Captura Principal](https://i.ibb.co/7NQDdt6Y/Imagen-de-Whats-App-2025-09-06-a-las-15-15-34-c8831f72.jpg)\n![Captura Secundaria](https://i.ibb.co/1NX3PVb/Imagen-de-Whats-App-2025-09-06-a-las-15-15-48-5336b0a0.jpg)\n\n**iLupo Studio** es una aplicación para **Android** pensada para editar fotos rápida y fácilmente. Ofrece herramientas avanzadas en una interfaz oscura e intuitiva, ideal para preparar imágenes para redes sociales o proteger tu trabajo.\n\n## Características Principales:\n\n* 🤖 **Eliminador de fondo con IA**: borra el fondo de tus fotos con un solo toque.  \n* 🔐 **Marca de agua interactiva y de stock**: añade marcas de agua que puedes mover, escalar y rotar.  \n* 🔁 **Convertidor por lotes**: convierte varias imágenes a JPG, PNG o WEBP de una sola vez.  \n* 🎚️ **Ajustes de imagen**: controla brillo, contraste y saturación con deslizadores.  \n* 🎛️ **Filtros artísticos**: aplica efectos como viñeta, sepia y ajusta la intensidad.  \n* ↩️ **Historial completo de deshacer/rehacer**: recupera cambios fácilmente.  \n* 📱 **Interfaz optimizada para móvil** y dark-theme.\n\n---\n\n[info]\nLa app contiene anuncios; puedes eliminar anuncios con una compra única o desbloquear una sesión PRO temporal mediante vídeos recompensados.\n[/info]\n\n---\n\n## Vídeo:\n\nhttps://www.youtube.com/watch?v=CIYSW99lvz8\n\n---\n\n## Descarga:\n\n[IMAGEN-DESCARGA](https://i.ibb.co/pj7P6wwt/Google-Play-Store-badge-EN-svg.png, https://play.google.com/store/apps/details?id=com.alberto64674yt.ilupostudio)\n",
-        "en": ""
-      },
+      "resumen": "Editor de imágenes para Android con eliminador de fondo por IA, marcas de agua interactivas, conversor por lotes y ajustes avanzados.",
+      "contenido_completo": "## Capturas:\n\n![Captura Principal](https://i.ibb.co/7NQDdt6Y/Imagen-de-Whats-App-2025-09-06-a-las-15-15-34-c8831f72.jpg)\n![Captura Secundaria](https://i.ibb.co/1NX3PVb/Imagen-de-Whats-App-2025-09-06-a-las-15-15-48-5336b0a0.jpg)\n\n**iLupo Studio** es una aplicación para **Android** pensada para editar fotos rápida y fácilmente. Ofrece herramientas avanzadas en una interfaz oscura e intuitiva, ideal para preparar imágenes para redes sociales o proteger tu trabajo.\n\n## Características Principales:\n\n* 🤖 **Eliminador de fondo con IA**: borra el fondo de tus fotos con un solo toque.  \n* 🔐 **Marca de agua interactiva y de stock**: añade marcas de agua que puedes mover, escalar y rotar.  \n* 🔁 **Convertidor por lotes**: convierte varias imágenes a JPG, PNG o WEBP de una sola vez.  \n* 🎚️ **Ajustes de imagen**: controla brillo, contraste y saturación con deslizadores.  \n* 🎛️ **Filtros artísticos**: aplica efectos como viñeta, sepia y ajusta la intensidad.  \n* ↩️ **Historial completo de deshacer/rehacer**: recupera cambios fácilmente.  \n* 📱 **Interfaz optimizada para móvil** y dark-theme.\n\n---\n\n[info]\nLa app contiene anuncios; puedes eliminar anuncios con una compra única o desbloquear una sesión PRO temporal mediante vídeos recompensados.\n[/info]\n\n---\n\n## Vídeo:\n\nhttps://www.youtube.com/watch?v=CIYSW99lvz8\n\n---\n\n## Descarga:\n\n[IMAGEN-DESCARGA](https://i.ibb.co/pj7P6wwt/Google-Play-Store-badge-EN-svg.png, https://play.google.com/store/apps/details?id=com.alberto64674yt.ilupostudio)\n",
       "imagen": "https://i.ibb.co/mV87Ygpx/Imagen-de-Whats-App-2025-09-06-a-las-15-14-58-ab38733a.jpg",
       "enlace": "",
       "tags": [
@@ -90,19 +54,10 @@
       ]
     },
     {
-      "titulo": {
-        "es": "Islands Prices APP: la mejor herramienta para Roblox Islands",
-        "en": ""
-      },
+      "titulo": "Islands Prices APP: la mejor herramienta para Roblox Islands",
       "id": "islands-prices-app",
-      "resumen": {
-        "es": "Organiza tus ítems, guarda precios, calcula ganancias y desbloquea logros en Roblox Islands con esta app hecha para jugadores. 🔥",
-        "en": ""
-      },
-      "contenido_completo": {
-        "es": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/GQrNfZKs/2.png)\n![Captura Secundaria](https://i.ibb.co/KxwYw7yG/3.png)\n\n**Islands Prices APP** es una aplicación creada en **Python** (convertida a `.exe`) pensada especialmente para jugadores de **Roblox Islands**.  \nCon ella podrás organizar tus ítems, guardar precios de venta y compra, calcular ganancias fácilmente y hasta desbloquear logros y misiones mientras juegas.  \n\nSe ejecuta como una **utilidad ligera y siempre disponible**, ideal para complementar tu experiencia dentro de Islands.  \n\n### Características Principales:\n\n* 💰 **Gestión de precios**: guarda precios de compra y venta de tus ítems.  \n* 📊 **Calculadora flotante**: haz cuentas rápidas sin salir del juego.  \n* 🛒 **Rastreador de tiendas**: encuentra los mejores precios en un solo lugar.  \n* 📝 **Bloc de notas y post-its**: apunta lo que necesites mientras juegas.  \n* 🎨 **Personalización**: crea perfiles con temas visuales distintos.  \n* 🏆 **Logros y misiones**: organiza tus objetivos dentro del juego.  \n\n---\n\n[aviso]\nNo Borres La Carpeta **Data** Tiene que estar Siempre Junto al **EXE**! o El Programa Podria Fallar.\n[/aviso]\n\n---\n\nA continuación puedes ver la aplicación en acción:  \n\nhttps://www.youtube.com/watch?v=eLQ57RZUCyQ\n\n---\n\n### Descarga:\n\n[![Descargar Islands Prices APP](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/d6vgb3thpkogcuu/Roblox+Islands+Prices+APP.rar/file)  \n",
-        "en": ""
-      },
+      "resumen": "Organiza tus ítems, guarda precios, calcula ganancias y desbloquea logros en Roblox Islands con esta app hecha para jugadores. 🔥",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/GQrNfZKs/2.png)\n![Captura Secundaria](https://i.ibb.co/KxwYw7yG/3.png)\n\n**Islands Prices APP** es una aplicación creada en **Python** (convertida a `.exe`) pensada especialmente para jugadores de **Roblox Islands**.  \nCon ella podrás organizar tus ítems, guardar precios de venta y compra, calcular ganancias fácilmente y hasta desbloquear logros y misiones mientras juegas.  \n\nSe ejecuta como una **utilidad ligera y siempre disponible**, ideal para complementar tu experiencia dentro de Islands.  \n\n### Características Principales:\n\n* 💰 **Gestión de precios**: guarda precios de compra y venta de tus ítems.  \n* 📊 **Calculadora flotante**: haz cuentas rápidas sin salir del juego.  \n* 🛒 **Rastreador de tiendas**: encuentra los mejores precios en un solo lugar.  \n* 📝 **Bloc de notas y post-its**: apunta lo que necesites mientras juegas.  \n* 🎨 **Personalización**: crea perfiles con temas visuales distintos.  \n* 🏆 **Logros y misiones**: organiza tus objetivos dentro del juego.  \n\n---\n\n[aviso]\nNo Borres La Carpeta **Data** Tiene que estar Siempre Junto al **EXE**! o El Programa Podria Fallar.\n[/aviso]\n\n---\n\nA continuación puedes ver la aplicación en acción:  \n\nhttps://www.youtube.com/watch?v=eLQ57RZUCyQ\n\n---\n\n### Descarga:\n\n[![Descargar Islands Prices APP](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/d6vgb3thpkogcuu/Roblox+Islands+Prices+APP.rar/file)  \n",
       "imagen": "https://i.ibb.co/QjNKDDVv/1.png",
       "enlace": "",
       "tags": [
