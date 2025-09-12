@@ -13,6 +13,40 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+	<style>
+        /* Estilos para pestañas de idioma */
+        .lang-tabs {
+            display: flex;
+            margin-bottom: -1px; /* Para que se solape con el borde del campo de texto */
+        }
+        .lang-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            color: var(--light-text);
+        }
+        .lang-tab.active {
+            background-color: var(--dark-bg);
+            border-bottom: 1px solid var(--dark-bg);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .lang-pane {
+            display: none;
+            /* El borde superior se lo dará el campo de texto de dentro */
+        }
+        .lang-pane.active {
+            display: block;
+        }
+        /* Pequeño ajuste para los inputs dentro de las pestañas */
+        .lang-pane input, .lang-pane textarea {
+            border-top-left-radius: 0;
+        }
+    </style>
 </head>
 <body class="panel-body">
     <div class="panel-container">
@@ -24,42 +58,90 @@
                 <fieldset>
                     <legend>Gestionar Proyectos</legend>
                     <div class="form-section">
-                        <label for="titulo">Título del Proyecto</label>
-                        <input type="text" id="titulo" oninput="updatePreview()">
+                        <label>Título del Proyecto</label>
+                        <div class="lang-tabs">
+                            <div class="lang-tab active" data-lang="es" data-field="titulo">Español</div>
+                            <div class="lang-tab" data-lang="en" data-field="titulo">Inglés</div>
+                        </div>
+                        <div id="pane-titulo-es" class="lang-pane active">
+                            <input type="text" id="titulo_es" oninput="updatePreview()" placeholder="Título en español">
+                        </div>
+                        <div id="pane-titulo-en" class="lang-pane">
+                            <input type="text" id="titulo_en" oninput="updatePreview()" placeholder="Título en inglés">
+                        </div>
                         <label for="id">ID para la URL (ej: mi-proyecto-1)</label>
                         <input type="text" id="id" oninput="updatePreview(); validateId();">
                         <small id="id-error" style="color: var(--danger-color); margin-top: -0.75rem; display: block; height: 1rem;"></small>
-                        <label for="resumen">Resumen Corto (para la tarjeta)</label>
-                        <textarea id="resumen" oninput="updatePreview()"></textarea>
+                        <label>Resumen Corto (para la tarjeta)</label>
+                        <div class="lang-tabs">
+                            <div class="lang-tab active" data-lang="es" data-field="resumen">Español</div>
+                            <div class="lang-tab" data-lang="en" data-field="resumen">Inglés</div>
+                        </div>
+                        <div id="pane-resumen-es" class="lang-pane active">
+                            <textarea id="resumen_es" oninput="updatePreview()" placeholder="Resumen en español"></textarea>
+                        </div>
+                        <div id="pane-resumen-en" class="lang-pane">
+                            <textarea id="resumen_en" oninput="updatePreview()" placeholder="Resumen en inglés"></textarea>
+                        </div>
                         <label for="imagen">URL de la Imagen Principal</label>
                         <input type="text" id="imagen" oninput="updatePreview()">
                         <button class="upload-button" onclick="triggerUpload('imagen', 'input')">Subir a ImgBB</button>
 
                         <label for="tags">Etiquetas (separadas por comas)</label>
                         <input type="text" id="tags" placeholder="Ej: Programación > Python, Juegos > Minecraft > Mods" oninput="updatePreview()">
-                        <label for="contenido_completo">Descripción Completa (Markdown)</label>
-                        <div class="markdown-toolbar">
-                            <button onclick="applyMarkdown('bold', 'contenido_completo')" title="Negrita"><b>B</b></button>
-                            <button onclick="applyMarkdown('italic', 'contenido_completo')" title="Cursiva"><i>I</i></button>
-                            <button onclick="applyMarkdown('strike', 'contenido_completo')" title="Tachado"><s>S</s></button>
-                            <button onclick="applyMarkdown('link', 'contenido_completo')" title="Enlace">Enlace</button>
-                            <button onclick="applyMarkdown('image', 'contenido_completo')" title="Insertar URL de Imagen">Imagen</button>
-                            <button onclick="applyMarkdown('imgbb-image', 'contenido_completo')" title="Subir Imagen a ImgBB">ImgBB</button>
-                            <button onclick="applyMarkdown('download-image', 'contenido_completo')" title="Imagen con Descarga (URL)">[Img-DL]</button>
-                            <button onclick="applyMarkdown('imgbb-link-image', 'contenido_completo')" title="Subir Imagen con Enlace (ImgBB)">[ImgBB+Link]</button>
-                            <button onclick="applyMarkdown('quote', 'contenido_completo')" title="Cita">Cita</button>
-                            <button onclick="applyMarkdown('code_block', 'contenido_completo')" title="Bloque de Código">Bloque</button>
-                            <button onclick="applyMarkdown('hr', 'contenido_completo')" title="Línea horizontal">Línea</button>
-                            <button onclick="applyMarkdown('alert', 'contenido_completo')" title="Caja de Alerta">Alerta</button>
-                            <button onclick="applyMarkdown('spoiler', 'contenido_completo')" title="Contenido Desplegable">Spoiler</button>
-                            <button onclick="applyMarkdown('tabs', 'contenido_completo')" title="Pestañas">Tabs</button>
-                            <button onclick="applyMarkdown('table', 'contenido_completo')" title="Tabla">Tabla</button>
-                            <button onclick="applyMarkdown('h2', 'contenido_completo')" title="Título 2">Tít 2</button>
-                            <button onclick="applyMarkdown('h3', 'contenido_completo')" title="Título 3">Tít 3</button>
-                            <button onclick="applyMarkdown('ul', 'contenido_completo')" title="Lista">Lista</button>
-                            <button onclick="applyMarkdown('ol', 'contenido_completo')" title="Lista Num.">Lista Num.</button>
+                        <label>Descripción Completa (Markdown)</label>
+                        <div class="lang-tabs">
+                            <div class="lang-tab active" data-lang="es" data-field="contenido_completo">Español</div>
+                            <div class="lang-tab" data-lang="en" data-field="contenido_completo">Inglés</div>
                         </div>
-                        <textarea id="contenido_completo" oninput="updatePreview()"></textarea>
+                        <div id="pane-contenido_completo-es" class="lang-pane active">
+                            <div class="markdown-toolbar">
+                                <button onclick="applyMarkdown('bold', 'contenido_completo_es')" title="Negrita"><b>B</b></button>
+                                <button onclick="applyMarkdown('italic', 'contenido_completo_es')" title="Cursiva"><i>I</i></button>
+                                <button onclick="applyMarkdown('strike', 'contenido_completo_es')" title="Tachado"><s>S</s></button>
+                                <button onclick="applyMarkdown('link', 'contenido_completo_es')" title="Enlace">Enlace</button>
+                                <button onclick="applyMarkdown('image', 'contenido_completo_es')" title="Insertar URL de Imagen">Imagen</button>
+                                <button onclick="applyMarkdown('imgbb-image', 'contenido_completo_es')" title="Subir Imagen a ImgBB">ImgBB</button>
+                                <button onclick="applyMarkdown('download-image', 'contenido_completo_es')" title="Imagen con Descarga (URL)">[Img-DL]</button>
+                                <button onclick="applyMarkdown('imgbb-link-image', 'contenido_completo_es')" title="Subir Imagen con Enlace (ImgBB)">[ImgBB+Link]</button>
+                                <button onclick="applyMarkdown('quote', 'contenido_completo_es')" title="Cita">Cita</button>
+                                <button onclick="applyMarkdown('code_block', 'contenido_completo_es')" title="Bloque de Código">Bloque</button>
+                                <button onclick="applyMarkdown('hr', 'contenido_completo_es')" title="Línea horizontal">Línea</button>
+                                <button onclick="applyMarkdown('alert', 'contenido_completo_es')" title="Caja de Alerta">Alerta</button>
+                                <button onclick="applyMarkdown('spoiler', 'contenido_completo_es')" title="Contenido Desplegable">Spoiler</button>
+                                <button onclick="applyMarkdown('tabs', 'contenido_completo_es')" title="Pestañas">Tabs</button>
+                                <button onclick="applyMarkdown('table', 'contenido_completo_es')" title="Tabla">Tabla</button>
+                                <button onclick="applyMarkdown('h2', 'contenido_completo_es')" title="Título 2">Tít 2</button>
+                                <button onclick="applyMarkdown('h3', 'contenido_completo_es')" title="Título 3">Tít 3</button>
+                                <button onclick="applyMarkdown('ul', 'contenido_completo_es')" title="Lista">Lista</button>
+                                <button onclick="applyMarkdown('ol', 'contenido_completo_es')" title="Lista Num.">Lista Num.</button>
+                            </div>
+                            <textarea id="contenido_completo_es" oninput="updatePreview()" placeholder="Descripción en español"></textarea>
+                        </div>
+                        <div id="pane-contenido_completo-en" class="lang-pane">
+                            <div class="markdown-toolbar">
+                                <button onclick="applyMarkdown('bold', 'contenido_completo_en')" title="Negrita"><b>B</b></button>
+                                <button onclick="applyMarkdown('italic', 'contenido_completo_en')" title="Cursiva"><i>I</i></button>
+                                <button onclick="applyMarkdown('strike', 'contenido_completo_en')" title="Tachado"><s>S</s></button>
+                                <button onclick="applyMarkdown('link', 'contenido_completo_en')" title="Enlace">Enlace</button>
+                                <button onclick="applyMarkdown('image', 'contenido_completo_en')" title="Insertar URL de Imagen">Imagen</button>
+                                <button onclick="applyMarkdown('imgbb-image', 'contenido_completo_en')" title="Subir Imagen a ImgBB">ImgBB</button>
+                                <button onclick="applyMarkdown('download-image', 'contenido_completo_en')" title="Imagen con Descarga (URL)">[Img-DL]</button>
+                                <button onclick="applyMarkdown('imgbb-link-image', 'contenido_completo_en')" title="Subir Imagen con Enlace (ImgBB)">[ImgBB+Link]</button>
+                                <button onclick="applyMarkdown('quote', 'contenido_completo_en')" title="Cita">Cita</button>
+                                <button onclick="applyMarkdown('code_block', 'contenido_completo_en')" title="Bloque de Código">Bloque</button>
+                                <button onclick="applyMarkdown('hr', 'contenido_completo_en')" title="Línea horizontal">Línea</button>
+                                <button onclick="applyMarkdown('alert', 'contenido_completo_en')" title="Caja de Alerta">Alerta</button>
+                                <button onclick="applyMarkdown('spoiler', 'contenido_completo_en')" title="Contenido Desplegable">Spoiler</button>
+                                <button onclick="applyMarkdown('tabs', 'contenido_completo_en')" title="Pestañas">Tabs</button>
+                                <button onclick="applyMarkdown('table', 'contenido_completo_en')" title="Tabla">Tabla</button>
+                                <button onclick="applyMarkdown('h2', 'contenido_completo_en')" title="Título 2">Tít 2</button>
+                                <button onclick="applyMarkdown('h3', 'contenido_completo_en')" title="Título 3">Tít 3</button>
+                                <button onclick="applyMarkdown('ul', 'contenido_completo_en')" title="Lista">Lista</button>
+                                <button onclick="applyMarkdown('ol', 'contenido_completo_en')" title="Lista Num.">Lista Num.</button>
+                            </div>
+                            <textarea id="contenido_completo_en" oninput="updatePreview()" placeholder="Descripción en inglés"></textarea>
+                        </div>
                         <label for="enlace">URL del Botón Principal (opcional)</label>
                         <input type="text" id="enlace" oninput="updatePreview()">
                     </div>
@@ -137,6 +219,15 @@
         const searchResultsList = document.getElementById('search-results-list');
         const manageSearchBox = document.getElementById('manage-search-box');
         // --- FIN: NUEVOS ELEMENTOS DEL DOM ---
+		function switchLang(field, lang) {
+            // Ocultar todos los paneles y quitar 'active' de las pestañas para ese campo
+            document.querySelectorAll(`[data-field="${field}"]`).forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll(`[id^="pane-${field}-"]`).forEach(pane => pane.classList.remove('active'));
+
+            // Mostrar el panel y la pestaña seleccionados
+            document.querySelector(`[data-field="${field}"][data-lang="${lang}"]`).classList.add('active');
+            document.getElementById(`pane-${field}-${lang}`).classList.add('active');
+        }
 
         function validateId() {
             const idInput = document.getElementById('id');
@@ -413,8 +504,27 @@
         }
         
         function editProjectById(i){
-            const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];document.getElementById('titulo').value=p.titulo;document.getElementById('id').value=p.id;document.getElementById('resumen').value=p.resumen;document.getElementById('contenido_completo').value=p.contenido_completo;document.getElementById('imagen').value=p.imagen;document.getElementById('enlace').value=p.enlace||'';document.getElementById('tags').value=(p.tags||[]).join(', ');
-            validateId();document.getElementById('main-button').innerText='Guardar Cambios';document.getElementById('cancel-button').style.display='block';window.scrollTo(0,0);switchToDetailView()
+            const d=findProjectIndexById(i);if(d===-1)return;editingIndex=d;const p=currentProjects[d];
+            
+            // Rellenar campos bilingües
+            document.getElementById('titulo_es').value = p.titulo.es || '';
+            document.getElementById('titulo_en').value = p.titulo.en || '';
+            document.getElementById('resumen_es').value = p.resumen.es || '';
+            document.getElementById('resumen_en').value = p.resumen.en || '';
+            document.getElementById('contenido_completo_es').value = p.contenido_completo.es || '';
+            document.getElementById('contenido_completo_en').value = p.contenido_completo.en || '';
+
+            // Rellenar campos normales
+            document.getElementById('id').value=p.id;
+            document.getElementById('imagen').value=p.imagen;
+            document.getElementById('enlace').value=p.enlace||'';
+            document.getElementById('tags').value=(p.tags||[]).join(', ');
+
+            validateId();
+            document.getElementById('main-button').innerText='Guardar Cambios';
+            document.getElementById('cancel-button').style.display='block';
+            window.scrollTo(0,0);
+            switchToDetailView();
         }
         
         function deleteProjectById(i){
@@ -422,7 +532,25 @@
         }
         
         function getProjectFromForm(){
-            const t=document.getElementById('tags').value;return{titulo:document.getElementById('titulo').value,id:document.getElementById('id').value,resumen:document.getElementById('resumen').value,contenido_completo:document.getElementById('contenido_completo').value,imagen:document.getElementById('imagen').value,enlace:document.getElementById('enlace').value,tags:t?t.split(',').map(g=>g.trim()):[]}
+            const t=document.getElementById('tags').value;
+            return {
+                titulo: {
+                    es: document.getElementById('titulo_es').value,
+                    en: document.getElementById('titulo_en').value
+                },
+                id: document.getElementById('id').value,
+                resumen: {
+                    es: document.getElementById('resumen_es').value,
+                    en: document.getElementById('resumen_en').value
+                },
+                contenido_completo: {
+                    es: document.getElementById('contenido_completo_es').value,
+                    en: document.getElementById('contenido_completo_en').value
+                },
+                imagen: document.getElementById('imagen').value,
+                enlace: document.getElementById('enlace').value,
+                tags: t ? t.split(',').map(g=>g.trim()) : []
+            }
         }
         
         function updatePreview(forceFullRefresh = false) {
@@ -501,7 +629,13 @@
         }
         
         function clearForm(){
-            ['titulo','id','resumen','contenido_completo','imagen','enlace','tags'].forEach(i=>document.getElementById(i).value='');validateId();
+            // Limpiar campos bilingües
+            ['titulo_es', 'titulo_en', 'resumen_es', 'resumen_en', 'contenido_completo_es', 'contenido_completo_en'].forEach(id => {
+                if(document.getElementById(id)) document.getElementById(id).value = '';
+            });
+            // Limpiar campos únicos
+            ['id','imagen','enlace','tags'].forEach(i=>document.getElementById(i).value='');
+            validateId();
         }
 
         loadInitialData();
