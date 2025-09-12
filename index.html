@@ -326,6 +326,10 @@
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
 
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
+		// Avisamos al panel de que la vista previa está lista para recibir datos
+        if (window.self !== window.top) { // Solo se ejecuta si está en un iframe
+            window.parent.postMessage({ type: 'previewReady' }, '*');
+        }
         const gridBtn = document.getElementById('grid-view-btn');
         const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
