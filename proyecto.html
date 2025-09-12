@@ -35,83 +35,7 @@
     <script>
         marked.setOptions({ gfm: true, breaks: true });
         Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
-        let lightbox;
-		
-		let currentProjectData = null; // Guardará los datos del proyecto actual
-
-        // Pequeña función para mostrar notificaciones en esta página
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.position = 'fixed';
-            notification.style.bottom = '20px';
-            notification.style.left = '50%';
-            notification.style.transform = 'translateX(-50%)';
-            notification.style.backgroundColor = 'var(--primary-color)';
-            notification.style.color = 'var(--dark-bg)';
-            notification.style.padding = '10px 20px';
-            notification.style.borderRadius = '8px';
-            notification.style.zIndex = '1001';
-            notification.style.fontWeight = 'bold';
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-		
-		function switchLanguage(lang) {
-            if (!currentProjectData) return;
-
-            // Comprobar si la traducción existe
-            if (!currentProjectData.titulo[lang] || currentProjectData.titulo[lang].trim() === '') {
-                showNotification('Translation not available');
-                return;
-            }
-
-            // Actualizar los textos
-            document.querySelector('[data-lang-text="titulo"]').innerHTML = currentProjectData.titulo[lang];
-            document.querySelector('.project-hero-image').alt = currentProjectData.titulo[lang];
-
-            // Re-procesar y renderizar el contenido de Markdown en el nuevo idioma
-            let rawContent = currentProjectData.contenido_completo[lang] || '';
-            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
-            rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
-            const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
-            rawContent = rawContent.replace(downloadImgRegex, (m, img, dl) => `<a href="${dl}" class="download-image-link" target="_blank"><img src="${img}" alt="Imagen de descarga"/></a>`);
-            rawContent = parseCustomShortcodes(rawContent);
-            let finalHtml = marked.parse(rawContent);
-
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = finalHtml;
-            tempDiv.querySelectorAll('img').forEach(img => {
-                if (img.parentElement.tagName !== 'A') {
-                    const link = document.createElement('a');
-                    link.href = img.src;
-                    link.classList.add('glightbox');
-                    img.parentNode.insertBefore(link, img);
-                    link.appendChild(img);
-                }
-            });
-            tempDiv.querySelectorAll('table').forEach(table => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'table-wrapper';
-                table.parentNode.insertBefore(wrapper, table);
-                wrapper.appendChild(table);
-            });
-            finalHtml = tempDiv.innerHTML;
-
-            document.querySelector('[data-lang-text="contenido_completo"]').innerHTML = finalHtml;
-
-            // Actualizar el estado visual de los botones
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.lang-btn[data-lang="${lang}"]`).classList.add('active');
-
-            // Re-inicializar plugins que dependen del contenido
-            Prism.highlightAll();
-            initializeGallery();
-            initializeTabs();
-        }
+        let lightbox; 
 
         function initializeGallery() {
             if (lightbox) {
@@ -193,17 +117,18 @@
 
 
         function renderProjectDetails(proyecto) {
-            currentProjectData = proyecto; // Guardamos los datos del proyecto en la variable global
             const container = document.getElementById('project-detail-content');
             if (!proyecto || !proyecto.titulo) { container.innerHTML = '<h1>Proyecto no encontrado</h1>'; return; }
-            document.title = proyecto.titulo.es + " | iLupo Warehouse";
+            document.title = proyecto.titulo + " | iLupo Warehouse";
 			
+			// Actualiza la meta descripción
 			const metaDescription = document.querySelector('meta[name="description"]');
-			if (metaDescription && proyecto.resumen && proyecto.resumen.es) {
-    		    metaDescription.setAttribute('content', proyecto.resumen.es.replace(/[*_#`~>]/g, ''));
+			if (metaDescription && proyecto.resumen) {
+    		// Usamos el resumen del proyecto como descripción. Quitamos el formato Markdown.
+    		metaDescription.setAttribute('content', proyecto.resumen.replace(/[*_#`~>]/g, ''));
 			}
 			
-            let rawContent = proyecto.contenido_completo.es || ''; // Cargamos español por defecto
+            let rawContent = proyecto.contenido_completo || '';
             const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
             rawContent = rawContent.replace(youtubeRegex, (m, id) => `<div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div>`);
             const downloadImgRegex = /\[IMAGEN-DESCARGA\]\(([^,]+),\s*([^)]+)\)/g;
@@ -213,9 +138,11 @@
 
             let finalHtml = marked.parse(rawContent);
 
+            // --- INICIO: LÓGICA MEJORADA PARA GALERÍA Y TABLAS ---
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = finalHtml;
             
+            // Envolver imágenes en enlaces para la galería (si no lo están ya)
             tempDiv.querySelectorAll('img').forEach(img => {
                 if (img.parentElement.tagName !== 'A') {
                     const link = document.createElement('a');
@@ -226,6 +153,7 @@
                 }
             });
 
+            // Envolver tablas para hacerlas scrollables
             tempDiv.querySelectorAll('table').forEach(table => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'table-wrapper';
@@ -234,6 +162,7 @@
             });
 
             finalHtml = tempDiv.innerHTML;
+            // --- FIN: LÓGICA MEJORADA ---
             
             let tagsHtml = '';
             if (proyecto.tags && proyecto.tags.length > 0) {
@@ -249,21 +178,13 @@
             }
             
             container.innerHTML = `
-                <h1 class="project-title" data-lang-text="titulo">${proyecto.titulo.es}</h1>
-                <div class="lang-switcher">
-                    <button class="lang-btn active" data-lang="es" title="Ver en español">🇪🇸</button>
-                    <button class="lang-btn" data-lang="en" title="View in English">🇬🇧</button>
-                </div>
-                <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo.es}">
-                <div class="project-description" data-lang-text="contenido_completo">${finalHtml}</div>
+                <h1 class="project-title">${proyecto.titulo}</h1>
+                <img class="project-hero-image" src="${proyecto.imagen}" alt="${proyecto.titulo}">
+                <div class="project-description">${finalHtml}</div>
                 ${tagsHtml}
                 ${proyecto.enlace ? `<a href="${proyecto.enlace}" class="button project-button" target="_blank">Enlace Principal</a>` : ''}
             `;
             
-            // Añadir los event listeners a los botones recién creados
-            container.querySelector('.lang-btn[data-lang="es"]').addEventListener('click', () => switchLanguage('es'));
-            container.querySelector('.lang-btn[data-lang="en"]').addEventListener('click', () => switchLanguage('en'));
-
             Prism.highlightAll();
             initializeGallery();
             initializeTabs();
@@ -278,22 +199,12 @@
         function loadPublishedProject() {
             const params = new URLSearchParams(window.location.search);
             const proyectoId = params.get('id');
-            if (!proyectoId) { 
-                document.getElementById('project-detail-content').innerHTML = '<h1>Error: No se ha especificado un ID de proyecto.</h1>';
-                return;
-            }
+            if (!proyectoId) return; 
             fetch('proyectos.json')
                 .then(r => r.json())
-                .then(data => {
-                    const project = (data.items || []).find(p => p.id === proyectoId);
-                    renderProjectDetails(project);
-                });
+                .then(data => renderProjectDetails((data.items || []).find(p => p.id === proyectoId)));
         }
-		// Avisamos al panel de que la vista previa está lista para recibir datos
-			if (window.self !== window.top) { // Solo se ejecuta si está en un iframe
-				window.parent.postMessage({ type: 'previewReady' }, '*');
-			}
-		document.addEventListener('DOMContentLoaded', loadPublishedProject);
+        document.addEventListener('DOMContentLoaded', loadPublishedProject);
     </script>
 	
 	<script>
