@@ -445,7 +445,21 @@
 
             });
             fetch('info.json').then(r=>r.json()).then(d=>{aboutMeContent=d;document.getElementById('contenido_sobre_mi').value=aboutMeContent.contenido||''}).catch(e=>console.log("info.json no encontrado."));
-            previewFrame.onload=()=>updatePreview(true);
+            // --- INICIO: LÓGICA PARA PESTAÑAS DE IDIOMA ---
+            // Añadimos un 'event listener' al contenedor del panel para que detecte
+            // los clics en cualquier pestaña de idioma.
+            document.querySelector('.editor-pane').addEventListener('click', function(e) {
+                // Solo reaccionamos si se ha hecho clic en un elemento con la clase 'lang-tab'
+                if (e.target.classList.contains('lang-tab')) {
+                    const field = e.target.dataset.field;
+                    const lang = e.target.dataset.lang;
+                    if (field && lang) {
+                        switchLang(field, lang);
+                    }
+                }
+            });
+            // --- FIN: LÓGICA PARA PESTAÑAS DE IDIOMA ---
+			previewFrame.onload=()=>updatePreview(true);
         }
 
         function saveOrder() {
