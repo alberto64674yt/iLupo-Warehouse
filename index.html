@@ -102,11 +102,13 @@
                 this.field('tags');
 
                 proyectos.forEach(function (p) {
+                    // CORRECCIÓN DEFINITIVA: Asegurarse de que TODOS los campos son strings
+                    // para evitar errores con la librería de búsqueda.
                     const docToAdd = {
                         id: p.id || '',
-                        titulo: (p.titulo && p.titulo.es) ? p.titulo.es : '',
-                        resumen: (p.resumen && p.resumen.es) ? p.resumen.es : '',
-                        contenido_completo: (p.contenido_completo && p.contenido_completo.es) ? p.contenido_completo.es : '',
+                        titulo: p.titulo || '',
+                        resumen: p.resumen || '',
+                        contenido_completo: p.contenido_completo || '',
                         tags: (p.tags || []).join(' ')
                     };
                     this.add(docToAdd);
@@ -123,10 +125,6 @@
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
             
             paginatedProjects.forEach((proyecto, index) => {
-                // CORRECCIÓN: Se añaden comprobaciones para que no falle si el título o resumen no existen.
-                const tituloES = (proyecto.titulo && proyecto.titulo.es) ? proyecto.titulo.es : 'Sin Título';
-                const resumenES = (proyecto.resumen && proyecto.resumen.es) ? proyecto.resumen.es : '';
-
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
@@ -135,13 +133,15 @@
                     e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
                 });
                 card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
-                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${tituloES}" loading="lazy"><div class="card-content"><h2>${tituloES}</h2><div class="card-excerpt">${marked.parse(resumenES)}</div><span class="button-imitation">Ver detalles</span></div></div>`;
+                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
                 
                 const isPreview = (window.self !== window.top);
                 if (isPreview || index < 3) {
+                    // Si estamos en la vista previa O es una de las 3 primeras tarjetas, hazla visible al instante.
                     card.classList.add('is-visible');
                 } else {
+                    // Para el resto, usa el observer para el efecto de scroll.
                     cardObserver.observe(card);
                 }
             });
@@ -326,10 +326,6 @@
         }).catch(e=>{console.error(e); grid.innerHTML='<p class="empty-message">Error al cargar proyectos.</p>'});
 
         searchBox.addEventListener('input', () => { currentPage = 1; filterAndRender(); });
-		// Avisamos al panel de que la vista previa está lista para recibir datos
-        if (window.self !== window.top) { // Solo se ejecuta si está en un iframe
-            window.parent.postMessage({ type: 'previewReady' }, '*');
-        }
         const gridBtn = document.getElementById('grid-view-btn');
         const listBtn = document.getElementById('list-view-btn');
         gridBtn.addEventListener('click', () => { grid.classList.remove('view-list'); gridBtn.classList.add('active'); listBtn.classList.remove('active'); });
