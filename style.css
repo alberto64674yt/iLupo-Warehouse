@@ -578,33 +578,5 @@ summary::marker {
     margin-bottom: -5px;      /* Margen negativo para encoger la caja */
     vertical-align: middle;   /* Centra verticalmente las letras */
 }
-/* --- Estilos para el selector de idioma --- */
-.lang-switcher {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-.lang-btn {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.2rem; /* Aumenta el tamaño de las banderas (emojis) */
-    line-height: 1;
-    transition: all 0.2s ease;
-    opacity: 0.6;
-}
-.lang-btn:hover {
-    border-color: var(--primary-color);
-    opacity: 1;
-}
-.lang-btn.active {
-    border-color: var(--primary-color);
-    background-color: var(--primary-color);
-    opacity: 1;
-}
 
 
