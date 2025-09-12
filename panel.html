@@ -583,7 +583,7 @@
                     if (isLiveTyping && editingIndex > -1) {
                         projectsForPreview[editingIndex] = projectFromForm;
                     } 
-                    else if (isLiveTyping && editingIndex === -1 && (projectFromForm.titulo || projectFromForm.resumen)) {
+                    else if (isLiveTyping && editingIndex === -1 && (projectFromForm.titulo.es || projectFromForm.resumen.es)) {
                         projectsForPreview.push(projectFromForm);
                     }
                     previewFrame.contentWindow.postMessage({ type: 'previewUpdate', payload: projectsForPreview, isLive: isLiveTyping }, '*');
