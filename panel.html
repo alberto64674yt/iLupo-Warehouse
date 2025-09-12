@@ -405,33 +405,51 @@
         }
         
         // --- INICIO: LÓGICA DE GESTIÓN DE PROYECTOS (MODIFICADA) ---
-        function loadInitialData(){
-            fetch('proyectos.json').then(r=>r.json()).then(d=>{
-                currentProjects=d.items||[];
-                renderManageList();
-                
-                Sortable.create(searchResultsList, {
-                    group: { name: 'projects', pull: 'clone', put: false },
-                    animation: 150,
-                    sort: false 
-                });
+        async function loadInitialData() {
+            try {
+                const response = await fetch('proyectos.json');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                currentProjects = data.items || [];
+            } catch (error) {
+                console.error('Error fatal al cargar proyectos.json:', error);
+                alert('No se pudo cargar proyectos.json. El panel no puede funcionar.');
+                currentProjects = [];
+            }
 
-                Sortable.create(manageList, {
-                    group: 'projects', 
-                    animation: 150,
-                    handle: '.drag-handle',
-                    onEnd: function() { saveOrder(); },
-                    onAdd: function(evt) {
-                        const allItemsWithId = manageList.querySelectorAll(`.manage-item[data-id="${evt.item.dataset.id}"]`);
-                        const originalItem = Array.from(allItemsWithId).find(item => item !== evt.item);
-                        if (originalItem) { originalItem.remove(); }
-                        saveOrder();
-                    }
-                });
-
-            });
-            fetch('info.json').then(r=>r.json()).then(d=>{aboutMeContent=d;document.getElementById('contenido_sobre_mi').value=aboutMeContent.contenido||''}).catch(e=>console.log("info.json no encontrado."));
+            // AHORA que los datos están cargados de forma segura, continuamos con el resto.
+            renderManageList();
             
+            try {
+                const infoResponse = await fetch('info.json');
+                const infoData = await infoResponse.json();
+                aboutMeContent = infoData;
+                document.getElementById('contenido_sobre_mi').value = aboutMeContent.contenido || '';
+            } catch (e) {
+                console.log("info.json no encontrado.");
+            }
+
+            // Inicializar SortableJS
+            Sortable.create(searchResultsList, {
+                group: { name: 'projects', pull: 'clone', put: false },
+                animation: 150,
+                sort: false 
+            });
+
+            Sortable.create(manageList, {
+                group: 'projects', 
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: function() { saveOrder(); },
+                onAdd: function(evt) {
+                    const allItemsWithId = manageList.querySelectorAll(`.manage-item[data-id="${evt.item.dataset.id}"]`);
+                    const originalItem = Array.from(allItemsWithId).find(item => item !== evt.item);
+                    if (originalItem) { originalItem.remove(); }
+                    saveOrder();
+                }
+            });
+
+            // Inicializar listeners de las pestañas de idioma
             document.querySelector('.editor-pane').addEventListener('click', function(e) {
                 if (e.target.classList.contains('lang-tab')) {
                     const field = e.target.dataset.field;
@@ -440,12 +458,17 @@
                 }
             });
             
-            // CORRECCIÓN: Escuchamos el mensaje de 'listo' de la vista previa
+            // Listener para recibir el aviso de la vista previa
             window.addEventListener('message', e => {
                 if (e.data.type === 'previewReady') {
                     updatePreview(true);
                 }
             });
+
+            // Si el iframe ya está cargado, forzamos una actualización inicial
+            if (previewFrame.contentDocument && previewFrame.contentDocument.readyState === 'complete') {
+                 updatePreview(true);
+            }
         }
 
         function saveOrder() {
