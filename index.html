@@ -123,6 +123,10 @@
             const paginatedProjects = proyectos.slice().reverse().slice((currentPage - 1) * projectsPerPage, currentPage * projectsPerPage);
             
             paginatedProjects.forEach((proyecto, index) => {
+                // CORRECCIÓN: Se añaden comprobaciones para que no falle si el título o resumen no existen.
+                const tituloES = (proyecto.titulo && proyecto.titulo.es) ? proyecto.titulo.es : 'Sin Título';
+                const resumenES = (proyecto.resumen && proyecto.resumen.es) ? proyecto.resumen.es : '';
+
                 const card = document.createElement('a');
                 card.className = 'card';
                 card.href = `proyecto.html?id=${proyecto.id}`;
@@ -131,7 +135,7 @@
                     e.currentTarget.querySelector('.card-inner').style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
                 });
                 card.addEventListener('mouseleave', e => { e.currentTarget.querySelector('.card-inner').style.transform = 'rotateX(0) rotateY(0) scale(1)'; });
-                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${proyecto.titulo.es}" loading="lazy"><div class="card-content"><h2>${proyecto.titulo.es}</h2><div class="card-excerpt">${marked.parse(proyecto.resumen.es || '')}</div><span class="button-imitation">Ver detalles</span></div></div>`;
+                card.innerHTML = `<div class="card-inner"><img class="card-hero-image" src="${proyecto.imagen || ''}" alt="${tituloES}" loading="lazy"><div class="card-content"><h2>${tituloES}</h2><div class="card-excerpt">${marked.parse(resumenES)}</div><span class="button-imitation">Ver detalles</span></div></div>`;
                 grid.appendChild(card);
                 
                 const isPreview = (window.self !== window.top);
