@@ -410,56 +410,42 @@
                 currentProjects=d.items||[];
                 renderManageList();
                 
-                // Configurar la lista de resultados de búsqueda (fuente de clones)
                 Sortable.create(searchResultsList, {
-                    group: {
-                        name: 'projects',
-                        pull: 'clone', // Permite clonar elementos hacia afuera
-                        put: false    // No permite que nada se suelte aquí
-                    },
+                    group: { name: 'projects', pull: 'clone', put: false },
                     animation: 150,
-                    sort: false // No se puede reordenar la lista de resultados
+                    sort: false 
                 });
 
-                // Configurar la lista principal de proyectos (destino)
                 Sortable.create(manageList, {
-                    group: 'projects', // Pertenece al mismo grupo
+                    group: 'projects', 
                     animation: 150,
                     handle: '.drag-handle',
-                    onEnd: function() { // Se activa al reordenar DENTRO de la lista principal
-                        saveOrder();
-                    },
-                    onAdd: function(evt) { // Se activa al soltar un elemento de OTRA lista
-                        // CORRECCIÓN: Lógica mejorada para encontrar y eliminar el duplicado.
-                        // Buscamos todos los elementos con el mismo ID y eliminamos el que NO es
-                        // el que acabamos de soltar (que es el 'original').
+                    onEnd: function() { saveOrder(); },
+                    onAdd: function(evt) {
                         const allItemsWithId = manageList.querySelectorAll(`.manage-item[data-id="${evt.item.dataset.id}"]`);
                         const originalItem = Array.from(allItemsWithId).find(item => item !== evt.item);
-                        
-                        if (originalItem) {
-                            originalItem.remove();
-                        }
+                        if (originalItem) { originalItem.remove(); }
                         saveOrder();
                     }
                 });
 
             });
             fetch('info.json').then(r=>r.json()).then(d=>{aboutMeContent=d;document.getElementById('contenido_sobre_mi').value=aboutMeContent.contenido||''}).catch(e=>console.log("info.json no encontrado."));
-            // --- INICIO: LÓGICA PARA PESTAÑAS DE IDIOMA ---
-            // Añadimos un 'event listener' al contenedor del panel para que detecte
-            // los clics en cualquier pestaña de idioma.
+            
             document.querySelector('.editor-pane').addEventListener('click', function(e) {
-                // Solo reaccionamos si se ha hecho clic en un elemento con la clase 'lang-tab'
                 if (e.target.classList.contains('lang-tab')) {
                     const field = e.target.dataset.field;
                     const lang = e.target.dataset.lang;
-                    if (field && lang) {
-                        switchLang(field, lang);
-                    }
+                    if (field && lang) { switchLang(field, lang); }
                 }
             });
-            // --- FIN: LÓGICA PARA PESTAÑAS DE IDIOMA ---
-			previewFrame.onload=()=>updatePreview(true);
+            
+            // CORRECCIÓN: Escuchamos el mensaje de 'listo' de la vista previa
+            window.addEventListener('message', e => {
+                if (e.data.type === 'previewReady') {
+                    updatePreview(true);
+                }
+            });
         }
 
         function saveOrder() {
@@ -610,16 +596,20 @@
             setActiveView('list');
             if (!previewFrame.src.includes('index.html')) {
                 previewFrame.src = 'index.html';
-                previewFrame.onload = () => updatePreview(true);
-            } else { updatePreview(true); }
+                // La lógica 'onload' se elimina, ahora el iframe nos avisará cuando esté listo.
+            } else { 
+                updatePreview(true); 
+            }
         }
         
         function switchToDetailView() {
             setActiveView('detail');
             if (!previewFrame.src.includes('proyecto.html')) {
                 previewFrame.src = 'proyecto.html';
-                previewFrame.onload = () => updatePreview();
-            } else { updatePreview(); }
+                 // La lógica 'onload' se elimina.
+            } else { 
+                updatePreview(); 
+            }
         }
 
         function switchToAboutView() {
@@ -635,7 +625,9 @@
         }
         
         function submitProject(){
-            const p=getProjectFromForm();if(!p.titulo||!p.id||!p.resumen||!p.contenido_completo||!p.imagen){return alert('Faltan campos obligatorios.')}
+            const p=getProjectFromForm();
+            // CORRECCIÓN: La validación ahora comprueba el título en español.
+            if(!p.titulo.es||!p.id||!p.resumen.es||!p.contenido_completo.es||!p.imagen){return alert('Faltan campos obligatorios (al menos en español).')}
             if(currentProjects.some((project,index)=>index!==editingIndex&&project.id===p.id)){return alert('El ID del proyecto ya está en uso.')}
             if(editingIndex>-1){currentProjects[editingIndex]=p;alert('Proyecto actualizado.')}else{currentProjects.push(p);sitemapNeedsUpdate = true;alert('Proyecto añadido.')}
             cancelEdit();renderManageList();updatePreview(true)
