@@ -483,7 +483,9 @@
             searchResultsList.innerHTML = '';
             if (!searchTerm) return;
 
-            const filteredProjects = currentProjects.filter(p => p.titulo.toLowerCase().includes(searchTerm));
+            const filteredProjects = currentProjects.filter(p => 
+                p.titulo && p.titulo.es && p.titulo.es.toLowerCase().includes(searchTerm)
+            );
 
             if (filteredProjects.length === 0) {
                 searchResultsList.innerHTML = '<p class="empty-search-message">No se encontraron proyectos.</p>';
