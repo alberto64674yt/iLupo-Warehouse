@@ -289,7 +289,11 @@
                     renderProjectDetails(project);
                 });
         }
-        document.addEventListener('DOMContentLoaded', loadPublishedProject);
+		// Avisamos al panel de que la vista previa está lista para recibir datos
+			if (window.self !== window.top) { // Solo se ejecuta si está en un iframe
+				window.parent.postMessage({ type: 'previewReady' }, '*');
+			}
+		document.addEventListener('DOMContentLoaded', loadPublishedProject);
     </script>
 	
 	<script>
