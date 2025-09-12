@@ -475,7 +475,7 @@
             item.dataset.id = project.id;
             item.innerHTML = `
                 <span class="drag-handle">::</span>
-                <span class="manage-item-title">${project.titulo}</span>
+                <span class="manage-item-title">${project.titulo.es}</span>
                 <div class="manage-buttons">
                     <button class="duplicate-button" onclick="duplicateProjectById('${project.id}')">Duplicar</button>
                     <button class="edit-button" onclick="editProjectById('${project.id}')">Editar</button>
@@ -514,7 +514,13 @@
         function findProjectIndexById(i){return currentProjects.findIndex(p=>p.id===i)}
         
         function duplicateProjectById(i){
-            const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));p.titulo+=" (Copia)";p.id+="-copia-"+Date.now();currentProjects.push(p);renderManageList();updatePreview(true);
+            const d=findProjectIndexById(i);if(d===-1)return;const p=JSON.parse(JSON.stringify(currentProjects[d]));
+            p.titulo.es += " (Copia)";
+            if (p.titulo.en) {
+                p.titulo.en += " (Copy)";
+            }
+            p.id+="-copia-"+Date.now();
+            currentProjects.push(p);renderManageList();updatePreview(true);
         }
         
         function editProjectById(i){
@@ -542,7 +548,7 @@
         }
         
         function deleteProjectById(i){
-            const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo}"?`)){currentProjects.splice(d,1);sitemapNeedsUpdate = true;renderManageList();updatePreview(true);}
+            const d=findProjectIndexById(i);if(d===-1)return;if(confirm(`¿Borrar "${currentProjects[d].titulo.es}"?`)){currentProjects.splice(d,1);sitemapNeedsUpdate = true;renderManageList();updatePreview(true);}
         }
         
         function getProjectFromForm(){
