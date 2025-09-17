@@ -67,6 +67,22 @@
         "Productividad > Notas Rápidas",
         "Programación > Python"
       ]
+    },
+    {
+      "titulo": "iLupo Media Suite Pro",
+      "id": "ilupo-media-suite-pro",
+      "resumen": "Descarga, convierte, edita, comprime y crea GIFs de videos de cientos de sitios en un solo programa.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/ns2XLCj8/2.png)\n![Captura Secundaria](https://i.ibb.co/DgGT6tcK/3.png)\n![Captura Terciaria](https://i.ibb.co/DDHGQP5p/4.png)\n\n**iLupo Media Suite Pro** es un programa creado en **Python** (convertido a `.exe` con PyInstaller) que combina en una sola aplicación todas las herramientas necesarias para trabajar con videos y audios de manera rápida y sencilla.  \n\nGracias a **yt-dlp** y **ffmpeg**, podrás descargar, convertir, comprimir, editar y hasta crear GIFs en cuestión de segundos.  \n\n### Características Principales:\n\n* 🌐 **Descarga de cientos de sitios**: YouTube, Twitch, Twitter, Facebook, TikTok, Instagram, y muchos más.  \n* 📂 **Listas completas**: descarga playlists enteras en un solo clic.  \n* 🔄 **Conversión de formatos**: MP4, MP3, MKV, AVI, WAV, GIF y muchos más.  \n* 📏 **Redimensionar y comprimir**: ajusta tamaño y peso de los archivos fácilmente.  \n* ✂️ **Editor integrado**: corta fragmentos específicos de video o audio.  \n* 📦 **Descarga en ZIP**: exporta tus resultados listos para compartir.  \n* 🎞️ **Creación de GIFs**: convierte cualquier parte de un video en un GIF animado.  \n* 💻 **Interfaz intuitiva**: pensada para que cualquier usuario pueda usarla sin complicaciones.  \n\n---\n\n[aviso]  \nEs posible que algunos antivirus detecten el ejecutable como falso positivo debido al empaquetado con PyInstaller. El programa es seguro.  \n[/aviso]\n\n\n[info]\nRecomiendo Leer el archivo **Leeme.txt** en el interior de la carpeta del programa para ver la lista completa de sitios soportados por la herramienta \n> *\"ten en cuenta que es la informacion mas reciente en el momento de publicar esto pero con el tiempo la lista podria cambiar recomiendo simplemente ir probando donde quieras descargar algo\"*\n\n[/info]\n  \n\n---\n\nA continuación puedes ver el programa en acción:  \n\nEn Proceso De Creacion... \n\n---\n\n### Descarga:\n\n[![Descargar iLupo Media Suite Pro](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/l69kk6zfd9q5e3c/iLupo_Media_Suite_Pro.rar/file)",
+      "imagen": "https://i.ibb.co/KjxyJJ9V/1.png",
+      "enlace": "",
+      "tags": [
+        "Software > Utilidades",
+        "Software > Windows",
+        "Multimedia > Descargas",
+        "Multimedia > Conversión",
+        "Multimedia > Edición",
+        "Programación > Python"
+      ]
     }
   ]
 }
