@@ -1,5 +1,5 @@
 // Contenido completo para sw.js
-const CACHE_NAME = 'ilupo-warehouse-cache-v2';
+const CACHE_NAME = 'ilupo-warehouse-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
