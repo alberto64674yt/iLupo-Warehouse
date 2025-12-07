@@ -100,6 +100,36 @@
         "Redes > P2P",
         "Seguridad > Privacidad"
       ]
+    },
+    {
+      "titulo": "iLupo Sound Looper & Joiner Pro",
+      "id": "ilupo-sound-looper-joiner",
+      "resumen": "Aplicación portable para generar archivos de audio largos mediante repetición (loops) o uniendo múltiples pistas en un solo fichero. Sin instalación.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/5hnmCsH0/2.png)\n![Captura Secundaria](https://i.ibb.co/SwhJHWfY/3.png)\n\n**iLupo Sound Looper & Joiner Pro** es una herramienta de escritorio desarrollada en Python y compilada en .exe que automatiza la creación de archivos de audio de larga duración.\n\nSi necesitas que una canción dure 1 hora, no hace falta editarla manualmente: este programa calcula cuántas veces debe repetirse y genera el archivo por ti. También permite pegar varias canciones una detrás de otra para crear un único archivo de playlist.\n\n---\n\n### ¿Qué es iLupo Sound Looper?\n\nEs una utilidad diseñada para ahorrar tiempo a la hora de manipular archivos de audio para usos concretos como streams, fondos de vídeo o sesiones largas.\n\nFunciona de dos maneras:\n1.  **Modo Loop:** Tú le dices cuánto tiempo total necesitas (ej: 60 minutos) y el programa repite la pista original las veces necesarias hasta cubrir ese tiempo.\n2.  **Modo Joiner:** Tomas varios archivos de audio distintos y el programa los fusiona en un solo archivo MP3 continuo, uno detrás de otro.\n\n---\n\n### Características Principales:\n\n* 🔄 **Generador de Bucles por Repetición**: Extiende la duración de un audio repitiéndolo automáticamente hasta alcanzar el tiempo objetivo.\n* ➕ **Fusión de Archivos (Merge)**: Une múltiples canciones o audios en un solo archivo largo (ideal para playlists en un solo fichero).\n* 🐍 **Motor Python**: Script ligero convertido a ejecutable para Windows.\n* 📦 **Portable**: No requiere instalación, es un archivo .exe listo para usar.\n* ⏱️ **Ahorro de tiempo**: Evita tener que copiar y pegar pistas manualmente en un editor de audio.\n* 📂 **Gestión de Archivos**: Procesa los audios de entrada y exporta el resultado final en la carpeta que elijas.\n\n---\n\n### ¿Cómo funciona?\n\n1.  Ejecuta **iLupo** en tu PC.\n2.  Elige la función: **Crear Loop** o **Unir Canciones**.\n3.  **Para Loops:** Carga el archivo y escribe la duración deseada (el script calculará las repeticiones).\n4.  **Para Unir:** Selecciona la lista de archivos que quieres fusionar.\n5.  El programa procesará el audio y generará un nuevo archivo con el resultado final.\n\n---\n\n### Vídeo en acción\n\nAquí puedes ver cómo funciona la herramienta generando un loop y uniendo una playlist:\nhttps://youtu.be/dO6OIjCjXYk\n\n---\n\n### Descargar\n\n[![Descargar iLupo Media Suite Pro](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/dam5rhfphty9xq8/iLupo+Sound+Looper+&+Joiner+Pro.rar/file)",
+      "imagen": "https://i.ibb.co/PGHBkBFM/Captura.png",
+      "enlace": "",
+      "tags": [
+        "Software > Windows",
+        "Multimedia > Audio",
+        "Herramientas > Automatización",
+        "Desarrollo > Python",
+        "Herramientas > Utilidades"
+      ]
+    },
+    {
+      "titulo": "iLupo Nuitka GUI Compiler",
+      "id": "ilupo-nuitka-gui-compiler",
+      "resumen": "Interfaz gráfica para Nuitka que convierte scripts de Python en ejecutables nativos reales (C++) con ofuscación y seguridad. Olvídate de la línea de comandos.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/0jLX7xf8/2.png)\n![Captura Secundaria](https://i.ibb.co/2Y0DfrzX/3.png)\n\n**iLupo Nuitka GUI Compiler** es una herramienta diseñada para facilitar la protección y distribución de tus programas en Python.\n\nFunciona como una interfaz visual (GUI) para el potente compilador **Nuitka**, permitiéndote convertir tu código Python en lenguaje C++ y posteriormente en un ejecutable (.exe) nativo, todo ello sin necesidad de escribir ni una sola línea de comando en la consola.\n\n---\n\n### ¿Qué es iLupo Nuitka GUI?\n\nNormalmente, usar Nuitka requiere aprender comandos complejos y banderas largas en la terminal. Esta herramienta simplifica todo ese proceso.\n\nSu objetivo principal es **proteger tu código fuente**. A diferencia de otros \"convertidores\" que solo empaquetan el script (haciéndolo fácil de extraer), esta herramienta transpila tu código a C++, lo que aplica una capa real de ofuscación y mejora el rendimiento, haciendo que la ingeniería inversa sea mucho más difícil.\n\n---\n\n### Características Principales:\n\n* 🛡️ **Seguridad Avanzada**: Convierte Python a C++, haciendo el código ilegible y difícil de revertir.\n* 🖱️ **Interfaz Visual (GUI)**: Olvídate de la consola (CMD) y los parámetros complejos. Todo se hace con clics.\n* 🚀 **Compilación Nativa**: Genera ejecutables reales (.exe) que no requieren tener Python instalado para funcionar.\n* ⚡ **Mejor Rendimiento**: Al compilar a lenguaje máquina, los scripts suelen ejecutarse más rápido que el código interpretado.\n* 🔒 **Protección de IP**: Ideal para distribuir aplicaciones comerciales o cerradas sin entregar tu código fuente original.\n* 📦 **Standalone**: Crea archivos portables listos para compartir.\n\n---\n\n### ¿Cómo funciona?\n\n1.  Abre **iLupo Nuitka GUI**.\n2.  Selecciona tu script principal de Python (.py).\n3.  Marca las opciones deseadas (ej: ofuscación, incluir icono, modo un solo archivo).\n4.  Pulsa el botón de compilar.\n5.  La herramienta gestiona Nuitka en segundo plano y te entrega el ejecutable final listo en C++.\n\nEl proceso automatiza la traducción del código y la compilación, entregándote un binario seguro y optimizado.\n\n---\n\n### Vídeo en acción\n\nAquí explico cómo proteger un script y convertirlo a EXE usando la interfaz:\nhttps://youtu.be/utacoG6c0ZM\n\n---\n\n### Descargar\n\n[![Descargar iLupo Nuitka GUI Compiler](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/395fjl5cko1crou/iLupo+Nuitka+GUI+Compiler.rar/file)",
+      "imagen": "https://i.ibb.co/PsZBLBqb/1.png",
+      "enlace": "",
+      "tags": [
+        "Desarrollo > Python",
+        "Seguridad > Código",
+        "Herramientas > Programación",
+        "Software > Windows",
+        "Desarrollo > Compiladores"
+      ]
     }
   ]
 }
