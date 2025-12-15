@@ -11,8 +11,37 @@ header .subtitle { font-size: 1.25rem; color: var(--light-text); margin-top: 0.5
 main { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; flex-grow: 1; width: 100%; box-sizing: border-box; }
 .no-select { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
 .filter-controls { max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1.5rem; }
-.about-me-button { display: block; width: -moz-fit-content; width: fit-content; margin: 1.5rem auto 2.5rem auto; padding: 12px 24px; text-decoration: none; background-color: var(--surface-color); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 25px; font-weight: 500; transition: all 0.2s ease; }
-.about-me-button:hover { background-color: var(--primary-color); color: var(--dark-bg); }
+.nav-buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem auto 2.5rem auto;
+    flex-wrap: wrap;
+}
+.main-nav-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    text-decoration: none;
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+.main-nav-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+.main-nav-button:hover {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+}
 .top-controls { display: flex; gap: 1rem; align-items: flex-end; }
 .search-container { flex-grow: 1; }
 #search-box { width: 100%; padding: 15px 20px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-color); font-size: 1.1rem; font-family: inherit; box-sizing: border-box; }
@@ -578,5 +607,6 @@ summary::marker {
     margin-bottom: -5px;      /* Margen negativo para encoger la caja */
     vertical-align: middle;   /* Centra verticalmente las letras */
 }
+
 
 
