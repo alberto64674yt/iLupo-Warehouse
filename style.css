@@ -639,3 +639,19 @@ header, footer {
     background-color: rgba(31, 41, 55, 0.9) !important; /* Un poco de transparencia */
     backdrop-filter: blur(5px); /* Efecto borroso elegante */
 }
+/* --- ARREGLO PARA PÁGINA SOBRE MÍ --- */
+
+/* Hacemos que el contenedor del texto sea semitransparente */
+.project-detail-container {
+    /* Usamos un color oscuro con transparencia (0.9) */
+    background-color: rgba(17, 24, 39, 0.9) !important; 
+    /* Efecto de desenfoque para que el texto se lea bien */
+    backdrop-filter: blur(10px); 
+    /* Borde sutil para separarlo del fondo */
+    border: 1px solid rgba(59, 130, 246, 0.2); 
+}
+
+/* Arreglo para que el body de esta página no de problemas */
+.detail-page-body {
+    background-color: transparent !important;
+}
