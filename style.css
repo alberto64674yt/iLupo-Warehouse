@@ -607,6 +607,35 @@ summary::marker {
     margin-bottom: -5px;      /* Margen negativo para encoger la caja */
     vertical-align: middle;   /* Centra verticalmente las letras */
 }
+/* --- CONFIGURACIÓN DE PARTÍCULAS --- */
 
+/* 1. Hacemos el cuerpo transparente para ver el fondo de partículas */
+body {
+    background-color: transparent !important;
+}
 
+/* 2. El contenedor de partículas: Se queda fijo y pinta el fondo gris oscuro */
+#tsparticles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Se pone detrás de todo */
+    background-color: var(--dark-bg); /* Tu color de fondo original */
+}
 
+/* 3. ESTO ES LO NUEVO: Header y Footer transparentes */
+/* Al quitarles el fondo, las partículas se verán pasar por detrás del logo y los textos */
+header, footer {
+    background-color: transparent !important; 
+    position: relative;
+    z-index: 1; /* Asegura que el texto y botones estén por encima de las partículas */
+}
+
+/* 4. (Opcional) Tarjetas semitransparentes */
+/* Para que se intuya el movimiento detrás de los proyectos sin dificultar la lectura */
+.card {
+    background-color: rgba(31, 41, 55, 0.9) !important; /* Un poco de transparencia */
+    backdrop-filter: blur(5px); /* Efecto borroso elegante */
+}
