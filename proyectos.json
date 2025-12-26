@@ -130,6 +130,44 @@
         "Software > Windows",
         "Desarrollo > Compiladores"
       ]
+    },
+    {
+      "titulo": "HexSecGPT GUI – Interfaz gráfica mejorada para una IA sin censura",
+      "id": "hexsecgpt-gui",
+      "resumen": "Interfaz gráfica standalone para HexSecGPT que elimina el uso de consola, añade gestión de prompts, bloques de código descargables y mejora la experiencia de uso de una IA libre y sin censura.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/Xk6N9x62/1.png)\n![Captura Secundaria](https://i.ibb.co/pcyJ4rd/2.png)\n\n**HexSecGPT GUI** es una interfaz gráfica standalone creada para mejorar y facilitar el uso de **HexSecGPT**, una inteligencia artificial sin censura que funciona a través de **OpenRouter** y **DeepSeek** mediante API.\n\nEste proyecto **no crea una IA nueva**, sino que transforma un sistema originalmente pensado para ejecutarse en consola (CMD) en una aplicación visual moderna, cómoda y mucho más accesible para cualquier usuario.\n\n---\n\n### ¿Qué es HexSecGPT GUI?\n\nHexSecGPT GUI es un *fork mejorado con interfaz gráfica* que elimina por completo la necesidad de usar comandos de terminal.\n\nSu objetivo principal es **mejorar la experiencia de uso**, ofreciendo control total sobre la personalidad de la IA, una visualización clara de las respuestas y herramientas prácticas pensadas para programadores, testers y usuarios avanzados.\n\nTodo se ejecuta en una aplicación **standalone**, sin depender de CMD ni configuraciones externas complejas.\n\n---\n\n### Características Principales:\n\n* 🖥️ **Interfaz Gráfica Completa (GUI)**: Uso 100% visual, sin consola.\n* 🧠 **Editor de System Prompt**: Cambia la personalidad y comportamiento de la IA fácilmente.\n* 🔌 **Soporte OpenRouter y DeepSeek**: Compatible con múltiples proveedores vía API.\n* 📦 **Standalone y Portable**: No requiere instalación compleja.\n* 💬 **Chat persistente con memoria**: Mantiene contexto hasta reinicio manual.\n* 🧩 **Bloques de código inteligentes**:  \n  - Formato correcto  \n  - Respeto de indentación  \n  - Botón de copiar  \n  - Botón de descarga directa (.py, .js, .html, etc.)\n* 🌍 **Soporte multi-idioma**: Español e Inglés.\n* 🔄 **Reset de memoria instantáneo**.\n* 🎨 **Diseño limpio y funcional**, enfocado en productividad.\n\n---\n\n### ¿En qué mejora al proyecto original?\n\nEl proyecto original de HexSecGPT estaba pensado para ejecutarse únicamente desde consola, lo que limitaba su accesibilidad y comodidad.\n\nEsta versión añade:\n- Interfaz visual moderna\n- Gestión centralizada de configuración\n- Edición sencilla del prompt del sistema\n- Mejor lectura de respuestas largas\n- Manejo avanzado de código generado por la IA\n\nTodo sin modificar la esencia del proyecto original.\n\n---\n\n### ¿Cómo funciona?\n\n1. Abres **HexSecGPT GUI**.\n2. Introduces tu API Key (OpenRouter o DeepSeek).\n3. Configuras el proveedor y el System Prompt.\n4. Empiezas a interactuar con la IA desde una interfaz visual.\n5. Copias o descargas directamente el código generado.\n\nLa aplicación gestiona todo el flujo internamente.\n\n---\n\n[nota]\nEste proyecto es una **mejora visual y funcional** sobre HexSecGPT.  \nLa IA, los modelos y las respuestas dependen del proveedor configurado por el usuario.\n[/nota]\n\n---\n\n### Vídeo demostración\n\nAquí se muestra el funcionamiento completo de la interfaz y sus mejoras:\nhttps://www.youtube.com/watch?v=DUsmBlpY0ug\n\n---\n\n### Descargar / Acceso\n\n [![Descargar HexSec GUI](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/i2b5yy2d70gj8dn/HexSecGPT+GUI.rar/file) \n",
+      "imagen": "https://i.ibb.co/LX3gkpC3/image.png",
+      "enlace": "",
+      "tags": [
+        "IA>Chatbots",
+        "IA>Sin Censura",
+        "IA>OpenRouter",
+        "IA>DeepSeek",
+        "Software>GUI",
+        "Software>Standalone",
+        "Desarrollo>Python",
+        "Desarrollo>Interfaces Gráficas",
+        "Seguridad>Privacidad",
+        "Herramientas>IA",
+        "Sistemas>Windows"
+      ]
+    },
+    {
+      "titulo": "iLupo Multi-Bloxer – Abrir múltiples cuentas de Roblox al mismo tiempo",
+      "id": "ilupo-multi-bloxer",
+      "resumen": "Herramienta para ejecutar múltiples instancias de Roblox simultáneamente, eliminando la limitación de una sola sesión por sistema y gestionando perfiles de forma automática.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/Fb8Rfqd8/1.png)\n![Captura Secundaria](https://i.ibb.co/fVHxkDt0/2.png)\n\n**iLupo Multi-Bloxer** es una herramienta diseñada para permitir la ejecución de múltiples instancias de **Roblox** al mismo tiempo en un mismo sistema Windows.\n\nEl programa elimina la limitación nativa de Roblox que impide abrir más de un cliente simultáneamente, permitiendo trabajar con varias cuentas de forma paralela sin configuraciones complejas ni software externo adicional.\n\nTodo el sistema está empaquetado en un único ejecutable, listo para usar.\n\n---\n\n### ¿Qué es iLupo Multi-Bloxer?\n\nRoblox utiliza internamente un mecanismo de bloqueo (Singleton Event) que evita que su cliente se ejecute más de una vez al mismo tiempo.\n\n**iLupo Multi-Bloxer** actúa directamente sobre ese bloqueo, desactivándolo de forma automática cuando detecta nuevas instancias del cliente, permitiendo así abrir tantas sesiones como el sistema pueda manejar.\n\nAdemás, la herramienta incluye un navegador integrado completamente funcional para iniciar sesión en diferentes cuentas sin interferencias.\n\n---\n\n### Características Principales:\n\n* 🎮 **Multi-Instancia Real**: Permite abrir múltiples Roblox Player simultáneamente.\n* 🧠 **Desbloqueo Automático**: Detecta y elimina el bloqueo Singleton sin intervención manual.\n* 👤 **Gestión de Perfiles**: Cada cuenta utiliza su propio perfil aislado.\n* 🌐 **Navegador Integrado**: Incluye Chrome empaquetado dentro del ejecutable.\n* 📦 **Todo en Uno**: No requiere instalaciones adicionales ni dependencias externas.\n* 🚀 **Rendimiento Estable**: Diseñado para funcionar de forma continua en segundo plano.\n* 🔐 **Permisos Elevados**: Utiliza acceso avanzado al sistema para garantizar compatibilidad.\n* 🖥️ **Interfaz Gráfica (GUI)**: Uso sencillo, sin consola ni comandos.\n\n---\n\n### ¿Cómo funciona?\n\n1. Ejecuta **iLupo Multi-Bloxer** (requiere permisos de administrador).\n2. Crea un perfil para cada cuenta de Roblox.\n3. Lanza el navegador integrado desde el perfil deseado.\n4. Inicia sesión en Roblox.\n5. Abre Roblox Player tantas veces como necesites, sin restricciones.\n\nEl sistema monitoriza automáticamente las instancias activas y elimina los bloqueos en tiempo real.\n\n---\n\n\n[aviso]\nEl programa esta 100% limpio y te aseguro que ni hay virus ni el navegador integrado obtiene tus cookies, puedes usarlo o no a tu eleccion si tanto miedo tienes simplemente comenta en el video que quieres que enseñe el metodo manual y listo lo subire si varios lo piden, pero es mas lento y engorroso, mi programa lo hace todo automaticamente y guarda tus cookies en \"Appdata/Roaming/iLupo Multi-Bloxer\" asi que salvo que borres eso desde appdata o desde la aplicacion tus cuentas las tendras siempre logueadas para mayor velocidad.\n[/aviso]\n\n\n---\n### Video Mostrandolo:\nhttps://www.youtube.com/watch?v=tNDXzTkiGA0\n\n\n---\n\n### Descargar\n\n[![Descargar iLupo Multi-Bloxer](https://i.imgur.com/IW7Vzjo.gif)](https://www.mediafire.com/file/pref762b32bdzby/iLupo+Multi-Bloxer.rar/file)\n",
+      "imagen": "https://i.ibb.co/1Yj15mQb/image.png",
+      "enlace": "",
+      "tags": [
+        "Sistema > Windows",
+        "Juegos > Roblox",
+        "Herramientas > Utilidades",
+        "Software > Automatización",
+        "Desarrollo > Python",
+        "Gaming > Multicuenta",
+        "Gaming > Launchers"
+      ]
     }
   ]
 }
