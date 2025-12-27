@@ -8,9 +8,9 @@
       "imagen": "https://i.imgur.com/tEbsYUy.jpeg",
       "enlace": "",
       "tags": [
-        "Software > Utilidades",
-        "Software > Windows",
-        "Programación > Herramientas"
+        "Software > Windows > Drivers",
+        "Software > Utilidades > Sistema",
+        "Desarrollo > Herramientas"
       ]
     },
     {
@@ -21,9 +21,9 @@
       "imagen": "https://i.ibb.co/Nn2wvy2c/Ros7nJ.png",
       "enlace": "",
       "tags": [
-        "Juegos > Arcade",
+        "Gaming > Videojuegos > Arcade",
         "Software > Windows",
-        "Motores de Juego > Game Maker"
+        "Desarrollo > Motores > Game Maker"
       ]
     },
     {
@@ -34,11 +34,10 @@
       "imagen": "https://i.ibb.co/HfY8VfyK/crosshair.gif",
       "enlace": "",
       "tags": [
-        "Software > Utilidades",
+        "Gaming > Herramientas > Overlays",
         "Software > Windows",
-        "Gaming > Overlays",
-        "Gaming > Herramientas",
-        "Programación > Python"
+        "Software > Utilidades",
+        "Desarrollo > Python"
       ]
     },
     {
@@ -49,8 +48,9 @@
       "imagen": "https://i.ibb.co/mV87Ygpx/Imagen-de-Whats-App-2025-09-06-a-las-15-14-58-ab38733a.jpg",
       "enlace": "",
       "tags": [
-        "Aplicaciones > Android",
-        "Aplicaciones > Android > Edición de Imágenes"
+        "Software > Android",
+        "Multimedia > Imagen > Edición",
+        "IA > Herramientas > Edición"
       ]
     },
     {
@@ -61,11 +61,10 @@
       "imagen": "https://i.ibb.co/QjNKDDVv/1.png",
       "enlace": "",
       "tags": [
-        "Juegos > Roblox > Islands",
-        "Utilidades > Calculadoras",
-        "Utilidades > Trackers",
-        "Productividad > Notas Rápidas",
-        "Programación > Python"
+        "Gaming > Roblox > Utilidades",
+        "Software > Utilidades > Calculadoras",
+        "Software > Productividad > Notas",
+        "Desarrollo > Python"
       ]
     },
     {
@@ -76,29 +75,25 @@
       "imagen": "https://i.ibb.co/KjxyJJ9V/1.png",
       "enlace": "",
       "tags": [
-        "Software > Utilidades",
         "Software > Windows",
-        "Multimedia > Descargas",
+        "Multimedia > Video > Descargas",
+        "Multimedia > Video > Edición",
         "Multimedia > Conversión",
-        "Multimedia > Edición",
-        "Programación > Python"
+        "Desarrollo > Python"
       ]
     },
     {
       "titulo": "LupoSync – Transferencias P2P Instantáneas y Sin Límites Desde el Navegador",
       "id": "luposync-transferencia-p2p",
       "resumen": "Comparte archivos de cualquier tamaño entre dispositivos con conexión directa P2P, sin nube, sin límites y desde cualquier navegador.",
-      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/7dRkXJvm/Captura.png)\n![Captura Secundaria](https://i.ibb.co/G4Prry8B/2.png)\n\n**LupoSync** es una herramienta web diseñada para enviar archivos entre dispositivos de manera directa, privada y sin límites de tamaño.  \nTodo funciona desde el navegador: no necesitas instalar nada, no requiere cuentas y los archivos no pasan por ninguna nube.\n\nLa conexión se establece entre Emisor y Receptor de forma P2P, lo que permite una transferencia fluida incluso con archivos grandes.\n\n---\n\n### ¿Qué es LupoSync?\n\nLupoSync permite enviar archivos entre dos dispositivos conectándolos mediante:\n\n* Código numérico  \n* Código QR  \n* Magic Link (enlace directo)\n\nEl emparejamiento es rápido y la transferencia comienza en cuanto ambos dispositivos están conectados.  \nSolo seleccionas el archivo y el receptor lo recibe directamente.\n\n---\n\n### Características Principales:\n\n* ⚡ **Transferencia directa P2P**, sin intermediarios.  \n* 📦 **Tamaño ilimitado de archivo**, perfecto para videos o carpetas grandes.  \n* 🔐 **Privacidad total**, los archivos nunca tocan un servidor.  \n* 📱 **Multiplataforma**: funciona en iOS, Android, Windows, Mac y Linux.  \n* 🌐 **Todo desde el navegador**, sin apps externas.  \n* 📲 **Emparejamiento rápido** mediante código, QR o Magic Link.  \n* 🖥️ **PWA instalable** para usarlo como si fuera una app.  \n* 🎨 **Interfaz moderna con estilo Glassmorphism.**  \n* 📚 **Historial local** de transferencias en el dispositivo.  \n* 🔋 **Wake Lock** para evitar que la pantalla se apague durante envíos largos.  \n* 📳 **Vibración al completar o fallar una transferencia.**\n\n---\n\n### ¿Cómo funciona?\n\n1. Abre LupoSync en ambos dispositivos.  \n2. Empareja usando un código, QR o Magic Link.  \n3. Selecciona los archivos que quieres enviar.  \n4. El receptor los recibe directamente, sin servidores de por medio.  \n\nEl proceso es sencillo y pensado para ser rápido incluso en archivos de gran tamaño.\n\n---\n\n### Vídeo en acción\nhttps://www.youtube.com/watch?v=UxrL0ditLMc\n\n---\n\n### Enlace a la herramienta\n\n[![Usar LupoSync](https://i.imgur.com/kX6U85q.gif)](https://luposync.netlify.app)\n",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/7dRkXJvm/Captura.png)\n![Captura Secundaria](https://i.ibb.co/G4Prry8B/2.png)\n\n**LupoSync** es una herramienta web diseñada para enviar archivos entre dispositivos de manera directa, privada y sin límites de tamaño.  \nTodo funciona desde el navegador: no necesitas instalar nada, no requiere cuentas y los archivos no pasan por ninguna nube.\n\nLa conexión se establece entre Emisor y Receptor de forma P2P, lo que permite una transferencia fluida incluso con archivos grandes.\n\n---\n\n### ¿Qué es LupoSync?\n\nLupoSync permite enviar archivos entre dos dispositivos conectándolos mediante:\n\n* Código numérico  \n* Código QR  \n* Magic Link (enlace directo)\n\nEl emparejamiento es rápido y la transferencia comienza en cuanto ambos dispositivos están conectados.  \nSolo seleccionas el archivo y el receptor lo recibe directamente.\n\n---\n\n### Características Principales:\n\n* ⚡ **Transferencia directa P2P**, sin intermediarios.  \n* 📦 **Tamaño ilimitado de archivo**, perfecto para videos o carpetas grandes.  \n* 🔐 **Privacidad total**, los archivos nunca tocan un servidor.  \n* 📱 **Multiplataforma**: funciona en iOS, Android, Windows, Mac y Linux.  \n* 🌐 **Todo desde el navegador**, sin apps externas.  \n* 📲 **Emparejamiento rápido** mediante código, QR o Magic Link.  \n* 🖥️ **PWA instalable** para usarlo como si fuera una app.  \n* 🎨 **Interfaz moderna con estilo Glassmorphism.** \n* 📚 **Historial local** de transferencias en el dispositivo.  \n* 🔋 **Wake Lock** para evitar que la pantalla se apague durante envíos largos.  \n* 📳 **Vibración al completar o fallar una transferencia.**\n\n---\n\n### ¿Cómo funciona?\n\n1. Abre LupoSync en ambos dispositivos.  \n2. Empareja usando un código, QR o Magic Link.  \n3. Selecciona los archivos que quieres enviar.  \n4. El receptor los recibe directamente, sin servidores de por medio.  \n\nEl proceso es sencillo y pensado para ser rápido incluso en archivos de gran tamaño.\n\n---\n\n### Vídeo en acción\nhttps://www.youtube.com/watch?v=UxrL0ditLMc\n\n---\n\n### Enlace a la herramienta\n\n[![Usar LupoSync](https://i.imgur.com/kX6U85q.gif)](https://luposync.netlify.app)\n",
       "imagen": "https://i.ibb.co/7dRkXJvm/Captura.png",
       "enlace": "",
       "tags": [
-        "Tecnología > WebApps",
-        "Tecnología > Navegador",
-        "Software > Multiplataforma",
-        "Herramientas > Archivos",
-        "Herramientas > Productividad",
-        "Redes > P2P",
-        "Seguridad > Privacidad"
+        "Software > Web > PWA",
+        "Software > Utilidades > Archivos",
+        "Redes > P2P > Transferencia",
+        "Software > Seguridad > Privacidad"
       ]
     },
     {
@@ -110,10 +105,9 @@
       "enlace": "",
       "tags": [
         "Software > Windows",
-        "Multimedia > Audio",
-        "Herramientas > Automatización",
-        "Desarrollo > Python",
-        "Herramientas > Utilidades"
+        "Multimedia > Audio > Edición",
+        "Software > Automatización",
+        "Desarrollo > Python"
       ]
     },
     {
@@ -124,11 +118,9 @@
       "imagen": "https://i.ibb.co/PsZBLBqb/1.png",
       "enlace": "",
       "tags": [
-        "Desarrollo > Python",
-        "Seguridad > Código",
-        "Herramientas > Programación",
-        "Software > Windows",
-        "Desarrollo > Compiladores"
+        "Desarrollo > Python > Compiladores",
+        "Software > Seguridad > Código",
+        "Software > Windows"
       ]
     },
     {
@@ -139,17 +131,10 @@
       "imagen": "https://i.ibb.co/LX3gkpC3/image.png",
       "enlace": "",
       "tags": [
-        "IA > Chatbots",
-        "IA > Sin Censura",
-        "IA > OpenRouter",
-        "IA > DeepSeek",
-        "Software > GUI",
-        "Software > Standalone",
-        "Desarrollo > Python",
-        "Desarrollo > Interfaces Gráficas",
-        "Seguridad > Privacidad",
-        "Herramientas > IA",
-        "Sistema > Windows"
+        "IA > Chatbots > Sin Censura",
+        "IA > Modelos > DeepSeek",
+        "Desarrollo > Python > GUI",
+        "Software > Windows"
       ]
     },
     {
@@ -160,13 +145,10 @@
       "imagen": "https://i.ibb.co/1Yj15mQb/image.png",
       "enlace": "",
       "tags": [
-        "Sistema > Windows",
-        "Juegos > Roblox",
-        "Herramientas > Utilidades",
+        "Gaming > Roblox > Utilidades",
         "Software > Automatización",
-        "Desarrollo > Python",
-        "Gaming > Multicuenta",
-        "Gaming > Launchers"
+        "Software > Windows",
+        "Desarrollo > Python"
       ]
     }
   ]
