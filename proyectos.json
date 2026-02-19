@@ -151,6 +151,23 @@
         "Software > Windows",
         "Desarrollo > Python"
       ]
+    },
+    {
+      "titulo": "PokeMMO Breeder Pro",
+      "id": "pokemmo-breeder-pro",
+      "resumen": "Herramienta web para planificar crianzas en PokeMMO de forma organizada, integrando IV, EV, grupos huevo y movimientos huevo en un solo sistema.",
+      "contenido_completo": "### Capturas:\n\n![Captura Principal](https://i.ibb.co/4988QK8/2.png)\n![Captura Secundaria](https://i.ibb.co/LhSBXHq0/3.png)\n![Captura Terciaria](https://i.ibb.co/gMrZMpcT/4.png)\n\n**PokeMMO Breeder Pro** es una herramienta web diseñada para organizar y planificar crianzas dentro de **PokeMMO** de forma clara y estructurada.\n\nLa plataforma centraliza en un solo lugar todo lo necesario para preparar una crianza competitiva sin depender de múltiples páginas externas, hojas de cálculo o cálculos manuales.\n\n---\n\n### ¿Qué es PokeMMO Breeder Pro?\n\nLa crianza en PokeMMO puede volverse compleja rápidamente.  \nEntre la planificación de IV, la transmisión de movimientos huevo, la consulta de grupos huevo y el cálculo posterior de EV, el proceso suele requerir varias herramientas diferentes.\n\n**PokeMMO Breeder Pro** nace como una solución unificada que permite:\n\n- Visualizar la estructura completa de una crianza paso a paso.\n- Configurar los IV objetivo antes de empezar.\n- Consultar grupos huevo de manera rápida.\n- Ver movimientos huevo disponibles y posibles cadenas de crianza.\n- Calcular EV según el entrenamiento necesario y hordas recomendadas.\n\nTodo desde una interfaz web accesible sin instalación.\n\n---\n\n### Características Principales:\n\n* 🧬 **Planificación de IV Paso a Paso**: Organiza la estructura de la crianza antes de gastar recursos.\n* 🥚 **Consulta de Grupos Huevo**: Identificación rápida de compatibilidades.\n* ⚔️ **Movimientos Huevo y Cadenas**: Visualización clara de cómo transferir movimientos.\n* 📊 **Calculadora de EV**: Estimación de hordas necesarias según distribución deseada.\n* 🌐 **Acceso Web Directo**: No requiere descarga ni instalación.\n* 🧠 **Enfoque Práctico**: Diseñada para preparar la crianza antes de ejecutarla dentro del juego.\n* 🖥️ **Interfaz Visual Clara**: Información organizada sin necesidad de hojas de cálculo externas.\n\n---\n\n### ¿Cómo funciona?\n\n1. Configura el Pokémon objetivo y los IV que deseas mantener.\n2. Visualiza la estructura recomendada de la crianza.\n3. Consulta los grupos huevo compatibles.\n4. Revisa posibles movimientos huevo y sus cadenas de transmisión.\n5. Calcula la distribución de EV según tu build final.\n\nLa herramienta no modifica el juego ni interactúa con el cliente.  \nFunciona exclusivamente como sistema de planificación y consulta.\n\n---\n\n[aviso]\nEsta herramienta es exclusivamente informativa y de planificación.  \nNo modifica archivos del juego ni automatiza procesos dentro de PokeMMO.  \nSu objetivo es ayudarte a organizar la crianza antes de realizarla manualmente dentro del juego.\n[/aviso]\n\n---\n\n### Video Mostrándola:\n\nhttps://www.youtube.com/watch?v=ypnRN8ztzgE\n\n---\n\n### Acceder a la herramienta\n\n[![Usar LupoSync](https://i.imgur.com/kX6U85q.gif)](https://pokemmobreederpro.netlify.app)",
+      "imagen": "https://i.ibb.co/tM7mtvPs/1.png",
+      "enlace": "",
+      "tags": [
+        "Gaming > Pokemon > PokeMMO",
+        "Gaming > Pokemon > Herramientas",
+        "Web > Aplicaciones Web",
+        "Desarrollo > JavaScript",
+        "Desarrollo > Frontend",
+        "Software > Utilidades",
+        "Gaming > MMORPG"
+      ]
     }
   ]
 }
